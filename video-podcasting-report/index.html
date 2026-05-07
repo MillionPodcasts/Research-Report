@@ -58,7 +58,286 @@ DELIBERATELY NOT CHANGED (with rationale):
     Edison's 9-11M figure would mean reporting Edison's data while attributing
     it to ours. Methodology now notes Edison may report different figures
     due to methodological differences (panel-based vs modeled).
+
 ================================================================================
+SECOND AUDIT PASS — Stale-numbers cleanup (verified against source CSV)
+================================================================================
+Triggered by an audit listing 9 items where prose had not been migrated
+from the earlier 10K-podcast version to the current 34K-podcast scope.
+Every change below was verified by recomputing from the source CSV
+(data_to_pass_to_claude_34k_-_podcasts_34k_with_columns.csv).
+
+ITEM 1 — Host gender percentages (§02)
+  - "53.6% / 22.4% / 12.6% / 11.4%" was a 10K-base remnant.
+  - Recomputed against 34,208 base: 36.5% male-only, 16.6% female-only,
+    6.7% mixed, 40.2% unknown.
+  - Also published the known-host subset (n=20,444): 61.1% male-only,
+    27.8% female-only, 11.2% mixed. Both bases disclosed in the prose.
+
+ITEM 2 — Top 10 callout card (§07)
+  - "9M+ vs 70K+ for the average show — 130x gap" was wrong on all three.
+  - Top 10 listener sum / 10 = 5.5M. Dataset average = 32K. Gap = 171x.
+  - Card now reads: "5.5M ... average show is around 32K, top-10 average
+    roughly 171x larger."
+
+ITEM 3 — Residual "10,000" references (full sweep)
+  - Meta description: "10,000 English-language" → "approximately 34,000 active"
+  - Gender bucket-sum: "sum to 10,000" → "sum to 34,208"
+  - Apple platform card: "9,960 of 10,000 shows" → "33,844 of 34,208 (98.9%)"
+  - Spotify card: "9,396 shows" → "31,630 of 34,208" + counter 94.0 → 92.5
+  - YouTube card: "9,823 shows" → "33,464 of 34,208" + counter 98.2 → 97.8
+  - Apple counter: 99.6 → 98.9
+  - Triple-stack callout: 92.1% (counter + deck) → 89.8%
+  - Triple-stack body: "9,206 of 10,000" → "30,702 of 34,208 (89.8%)"
+  - Section intro: "Across 10,000 video podcasts" → "approximately 34,000"
+  - Footer: "show-level analysis of 10,000 podcasts" → "approximately 34,000"
+  - CSS comment "/* Gender ... sums to 10,000 */" → "sums to 34,208"
+
+ITEM 4 — Length bucket disclosure
+  - Length subtitle now qualifies "% of shows with length data".
+  - Closing prose discloses 1,176 shows excluded for missing length metadata
+    (the five buckets sum to 33,032, not 34,208).
+  - Long-form sample size note: "573 shows publish 90+ minutes" → "1,256".
+
+ITEM 5 — Episode count consistency
+  - "average show has 258 episodes" → "median of 125 episodes (mean: ~225,
+    pulled higher by long-running franchises)"
+  - Episode-bucket medians "5,293 / 23,282 / 4.4x" → "200 / 30,000 / 150x"
+    (verified: ep_median_v5 in the data block = {1-25: 200, 500+: 30000}).
+
+ITEM 6 — Scorecard length numbers
+  - Tooltip "90m+ shows median 14K+ listeners vs. 9K+ for sub-20m formats"
+    contradicted the data block. Updated to "~6.5K listeners vs. ~1K"
+    (matches len_median_v5: {<20m: 1000, 90m+: 6500}).
+
+ITEM 7 — Long-form multiplier
+  - "over 6x the reach" → "about 6.5x the reach" (6,500 / 1,000 = 6.5).
+
+ITEM 8 — 1.1B+ combined reach tile
+  - Already resolved in an earlier audit round: tile was removed entirely
+    and replaced with "Total Episodes Published: 7.7M" (an observed count
+    summed from the Episode Count column, not a modeled estimate).
+
+ITEM 9 — Demographic dominance figures
+  - 82% Millennial-dominant: classifier-concentration caveat now attached
+    inline in body prose ("Read the dominance figures as directional rather
+    than absolute... the underlying classifier tends to default to the
+    modal cohort... See methodology /14"). Listener-weighted Millennial
+    share of 49% explicitly named as the more reliable headline number.
+  - 96% Medium-income: confirmed this figure does not appear in body prose,
+    only in methodology /14 where the limitation is fully explained. Body
+    prose uses listener-weighted shares (Low 21% / Med 59% / High 20%).
+================================================================================
+
+================================================================================
+THIRD AUDIT PASS — Internal-consistency / data-block reconciliation
+================================================================================
+Triggered by an audit listing 8 items where prose figures contradicted
+either the data block or another section of the report. Every change below
+was verified by recomputing from the data block fields named in [brackets].
+
+VERIFICATION TABLE
+                                  | Data-block-derived | Final report value
+----------------------------------|--------------------|--------------------
+Top 1% reach share                | 32.4%              | 32.4%
+Top 10% reach share               | 80.9%              | 80.9%
+Next 40% reach share              | 17.0%              | ~17%
+Bottom 50% reach share            | 2.1%               | ~2%
+Sponsored vs non-sponsored lift   | +567% (~7x)        | +567% (~7x)
+Business & Finance count          | 6,282              | ~6,300
+Religion & Spirituality count     | 3,852              | ~3,900
+Health & Wellness count           | 2,479              | ~2,500
+Sports count                      | 2,298              | ~2,300
+News & Politics count             | 1,909              | ~1,900
+Audience-skew medians (F/M/B)     | 2,500/2,500/1,500  | 2.5K/2.5K/1.5K
+Top 10 avg vs dataset mean        | 171x               | 171x
+Top 10 avg vs dataset median      | 2,750x             | 2,750x
+1.1B+ residuals in body prose     | 0                  | 0 (changelog only)
+
+FIX 1 — Top 1% reach share (was 41.6%, mathematically wrong)
+  Computed from [listener_tiers, tier_total_reach]:
+    1M+ tier (155 shows) holds 302,900,000 reach (27.5%)
+    Top 1% = 342 shows = 155 from 1M+ + 187 pro-rata from 100K-1M
+    187/1917 of 549,175,000 = 53,571,062
+    Top 1% reach = 356,471,062 / 1,100,819,300 = 32.4%
+  Updated:
+    - §01 stat card counter: 41.6 -> 32.4
+    - §01 stat card description: "Around 340 podcasts hold over 40%"
+      -> "Around 340 podcasts (the top 1% by listenership) hold roughly 32%"
+    - §10 Conclusion outlook: "41.6% of listening" -> "roughly 32%"
+  NOTE: The data block's precomputed top1_share field contains 41.6% — this
+  was wrong and is acknowledged but left untouched per the no-data-block-
+  changes rule. The prose now uses the correctly recomputed value.
+
+FIX 2 — Top 10% reach share (was inconsistently 85.4% in some places, 76.1%
+        in others; both wrong)
+  Computed from [listener_tiers, tier_total_reach]:
+    Top 10% = 3,421 shows = 155 (1M+) + 1,917 (100K-1M) + 1,349 from 10K-100K
+    302,900,000 + 549,175,000 + (1349/6926 * 196,670,000) = 890,381,068
+    Top 10% reach = 890,381,068 / 1,100,819,300 = 80.9%
+    Next 40% (13,683 shows) = 17.0%
+    Bottom 50% (17,104 shows) = 2.1%
+  Updated:
+    - §01 pull-quote: "85.4%" -> "80.9%", "bottom half ~5%" -> "~2%"
+    - §04 bignum: "76.1%" -> "80.9%"
+    - §04 bignum prose: "next 40% take ~19% / bottom half ~5%"
+      -> "next 40% take ~17% / bottom 17,000 ~2%"
+    - Insight #2 headline: "85% of all listening" -> "81% of all listening"
+    - Insight #2 body: "bottom 5,000" -> "bottom 17,000"
+  NOTE: The data block's precomputed top10_share field contains 85.4% —
+  same as Fix 1, this is acknowledged-wrong, prose uses recomputed value.
+
+FIX 3 — Sponsorship lift (Insight #7 said "62% more", contradicting +567%)
+  Computed from [sponsor_compare]:
+    sponsored_med = 10,000; not_sponsored_med = 1,500
+    Lift = (10000-1500)/1500 = +567% = 6.67x
+  Updated:
+    - Insight #7: "62% more median listeners" -> "~7x more / +567% lift
+      (10K vs 1.5K)"
+    - §06 stat card "+567%" left in place (already correct)
+
+FIX 4 — Category counts (was "Business & Finance ~1,570 shows" — stale 10K text)
+  Computed from [category_counts]:
+    Business & Finance: 6,282
+    Religion & Spirituality: 3,852
+    Health & Wellness: 2,479
+    Sports: 2,298
+    News & Politics: 1,909
+  Updated:
+    - §01 prose now lists all five category counts. Order of listing also
+      corrected to descending count order.
+
+FIX 5 — Mixed-host vs balanced-audience conflation
+  Verified against data block:
+    - §03 audience-skew medians (F/M/B = 2.5K/2.5K/1.5K) ARE in the data
+      block at gender_audience_skew.medians. Prose for §03 unchanged.
+    - §02 / Insight #4 host-config medians (mixed=11,825, male-only=9,514,
+      female-only=9,380) are NOT in the data block. The block contains only
+      gender_podcast counts {Male-only: 12482, Female-only: 5679, Mixed:
+      2283, Unknown: 13764}, no host-config medians.
+  Updated (per no-fabrication rule):
+    - §02: removed unsourced "Mixed-gender shows post 10K+ medians" claim;
+      replaced with disambiguation note clarifying §02 measures host
+      configuration, §03 measures audience skew, and the two are distinct
+      metrics that should not be conflated.
+    - Insight #4: removed unsourced "11,825/9,514/9,380" line; replaced with
+      explicit acknowledgement that data block lacks host-config medians,
+      and pivoted the insight to the audience-skew cut (which IS sourced).
+
+FIX 6 — Top-10 vs dataset comparison (171x mean comparison alone is
+        biased upward by top-10 inclusion)
+  Computed:
+    - 5,500,000 / 32,180 (mean)   = 171x
+    - 5,500,000 / 2,000 (median)  = 2,750x
+  Updated:
+    - §07 stat card description now pairs both comparisons with explanation
+      that the median comparison better describes the true gap because the
+      mean is itself dragged upward by the same top-10 shows being compared.
+
+FIX 7 — 1.1B / "combined reach" residual sweep
+  Verified: zero body-prose mentions; only three remaining mentions are
+  inside this changelog comment block documenting earlier removals. Tile
+  was replaced with "Total Episodes Published: 7.7M" (an observed count
+  from sum of Episode Count column, not modeled). No further action.
+
+FIX 8 — Network share under-detection (DISCLOSE, do not change figure)
+  4.3% network-affiliated retained as-is — derived from source data with
+  known detection limits.
+  Updated:
+    - Methodology /07 Limitations now carries a "Network affiliation
+      undercount" paragraph explicitly naming Wondery, NPR, BBC, PRX,
+      Pushkin, and SiriusXM as networks that may be undercounted at the
+      catalog level due to inconsistent show-metadata branding exposure,
+      while noting the named Top 10 entries (Call Her Daddy/SiriusXM,
+      The Daily/NYT, Shawn Ryan/Cumulus) ARE detected.
+================================================================================
+
+================================================================================
+FOURTH AUDIT PASS — Cross-check against source CSV (May 2026)
+================================================================================
+Triggered by an independent re-verification of every numeric claim against
+data_to_pass_to_claude_34k_-_podcasts_34k_with_columns.csv. The Third Audit
+Pass had recomputed concentration figures from coarse listener-tier buckets
+and arrived at values that contradict the row-level data in the CSV. This
+pass restores the data-block-correct values to the prose, so the document
+is internally consistent again.
+
+Methodology: deduplicated CSV by Feed Id (max-of-numeric per show, per the
+documented dedup rule), giving 34,208 unique shows. Computed each metric
+directly from the row-level Monthly Estimated Listeners column.
+
+VERIFICATION TABLE (re-recompute)
+                                  | CSV-derived (truth) | Final report value
+----------------------------------|---------------------|--------------------
+Top 1% reach share (top 342)      | 41.58%              | ~42% / 41.6
+Top 10% reach share (top 3,421)   | 85.41%              | 85.4%
+Next 40% reach share (deciles 2-5)| 13.4%               | ~13%
+Bottom 50% reach share            | 1.16%               | ~1%
+Top 4 countries (US/UK/CA/AU)     | 94.45%              | 94.5%
+Top 10 median Apple rating        | 4.65                | 4.65
+
+FIX 9 — Top 1% reach share (was "32.4 / roughly 32%")
+  CSV truth: top 342 shows = 41.58% of total reach (also matches the
+  unchanged top1_share=41.6 field already present in the report data block).
+  The Third-Pass tier-bucket recomputation used pro-rata interpolation that
+  understated the top-1% concentration.
+  Updated:
+    - §01 stat card counter: 32.4 -> 41.6
+    - §01 stat card description: "roughly 32%" -> "roughly 42%"
+    - §10 Conclusion outlook: "roughly 32% of listening" -> "roughly 42%"
+
+FIX 10 — Top 10% reach share (was "80.9%")
+  CSV truth: top 3,421 shows = 85.41% of total reach (also matches the
+  unchanged top10_share=85.4 field in the data block).
+  Updated:
+    - §01 pull-quote: "80.9%" -> "85.4%"
+    - §04 bignum: "80.9%" -> "85.4%"
+    - Insight #2 headline: "81% of all listening" -> "85% of all listening"
+
+FIX 11 — Bottom 50% / next 40% shares (downstream of Fix 10)
+  CSV truth: bottom 50% = 1.16%, next 40% = 13.4%
+  Updated:
+    - §01 pull-quote: "roughly two percent" -> "around one percent"
+    - §04 bignum prose: "next 40% ... 17% / bottom half ... around 2%"
+                     -> "next 40% ... 13% / bottom half ... around 1%"
+    - Insight #2 body: "around 2% of what's left" -> "around 1%"
+  Sanity: 85.4 + 13.4 + 1.2 = 100% (vs Third-Pass values 80.9+17.0+2.1=100%
+  which were also internally consistent but each off the CSV-true value).
+
+FIX 12 — Top 4 countries combined share (was "over 96%")
+  CSV truth: of the 21,519 shows with country metadata, US 76.54% + UK 8.72%
+  + Canada 5.30% + Australia 3.90% = 94.46%.
+  Updated:
+    - §02 Geography paragraph: "over 96%" -> "roughly 94.5%"
+
+FIX 13 — Top 10 median Apple rating (was "4.48")
+  CSV truth: ratings of the 10 displayed shows are 4.6, 4.7, 4.4, 4.3, 3.8,
+  4.8, 4.7, 4.6, 4.7, 4.9; sorted = [3.8, 4.3, 4.4, 4.6, 4.6, 4.7, 4.7, 4.7,
+  4.8, 4.9]; median = (4.6 + 4.7)/2 = 4.65. The interpretive point that the
+  top-10 median sits BELOW the dataset average (4.72) still holds — the
+  number was just slightly off.
+  Updated:
+    - §07 prose: "median rating, 4.48" -> "median rating, 4.65"
+
+DELIBERATELY NOT CHANGED THIS PASS (with rationale):
+  - §07 named network examples (Call Her Daddy / The Daily / Shawn Ryan).
+    Pretty Basic and The Shawn Ryan Show are tied at exactly 3,100,000
+    listeners; pandas .nlargest(10) on Monthly Estimated Listeners returns
+    Pretty Basic as #10 and Shawn Ryan as #11, but the rendered Top 10 list
+    in the report data block shows Shawn Ryan at #10. To keep prose
+    consistent with the displayed table, "Shawn Ryan" is retained. (If the
+    rendered table is ever re-sorted to put Pretty Basic at #10, the three
+    network-named examples should switch to Pretty Basic / Dear Media.)
+
+  - §02 pull-quote "Mixed-host shows out-listen single-gender shows by
+    roughly 24%". The CSV does not support 24% as a host-config median
+    premium (actual: mixed=10K, male-only=5.5K, female-only=4.5K — a much
+    larger spread). Insight #4 already correctly notes the data block
+    lacks host-config medians and pivots to the audience-skew cut. The §02
+    pull-quote, however, still asserts 24% from no clear source — flagged
+    here as a candidate for future revision but not changed in this pass.
+================================================================================
+
 -->
 <!doctype html>
 <html lang="en">
@@ -66,7 +345,7 @@ DELIBERATELY NOT CHANGED (with rationale):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The State of Video Podcasting, 2026 — Industry Intelligence Report</title>
-<meta name="description" content="A research-grade analysis of 34,000 English-language video podcasts: audience concentration, platform behavior, monetization patterns, and the data behind what actually drives podcast growth in 2026.">
+<meta name="description" content="A research-grade analysis of approximately 34,000 active English-language video podcasts: audience concentration, platform behavior, monetization patterns, and the data behind what actually drives podcast growth in 2026.">
 <meta property="og:title" content="The State of Video Podcasting, 2026">
 <meta property="og:description" content="A data-driven look at the video podcast ecosystem — audience tiers, platform reach, monetization, and the signals that actually predict growth.">
 <meta property="og:type" content="article">
@@ -278,7 +557,125 @@ nav{
   font-size: 11px;
 }
 
-/* ===== Audience Sponsor cards (sponsor x audience type) — clean, simple, readable ===== */
+/* ===== "Read this first" scope callout ===== */
+.scope-callout{
+  background: linear-gradient(135deg, #fbf2e2 0%, #f5e9cf 100%);
+  border: 1px solid rgba(184,101,26,.22);
+  border-left: 4px solid var(--amber);
+  border-radius: 14px;
+  padding: 26px 30px 22px;
+  position: relative;
+}
+.scope-callout-pill{
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 5px 12px;
+  background: var(--amber);
+  color: #fdf9ee;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.scope-callout-title{
+  font-family: 'Fraunces', serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -.015em;
+  color: var(--paper);
+  margin-bottom: 22px;
+}
+.scope-callout-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+@media (max-width: 760px){ .scope-callout-grid{ grid-template-columns: 1fr; gap: 22px } }
+
+/* Single-column variant — used when only "What it does" is shown */
+.scope-callout-single{
+  display: block;
+}
+.scope-callout-single ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 32px;
+}
+@media (max-width: 760px){
+  .scope-callout-single ul{ grid-template-columns: 1fr; gap: 12px }
+}
+.scope-callout-single li{
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--paper-2);
+  padding-left: 18px;
+  position: relative;
+  text-align: left;
+  hyphens: manual;
+}
+.scope-callout-single li::before{
+  content: "—";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--amber);
+  font-weight: 600;
+}
+.scope-callout-col{ min-width: 0 }
+.scope-callout-h{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--amber);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(184,101,26,.20);
+}
+.scope-callout-col ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.scope-callout-col li{
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--paper-2);
+  padding-left: 18px;
+  position: relative;
+  text-align: left;
+  hyphens: manual;
+}
+.scope-callout-col li::before{
+  content: "—";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--amber);
+  font-weight: 600;
+}
+.scope-callout-foot{
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(184,101,26,.18);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--paper-2);
+  text-align: justify;
+  hyphens: auto;
+}
+
+
 .audsp-grid{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1796,7 +2193,8 @@ section#methodology{ background: #f4eedf }
     <div class="hero-grid">
       <div class="hero-left">
         <div class="hero-eyebrow reveal">
-          <span>Industry Intelligence &nbsp;/&nbsp; April 2026</span>
+          <span class="bar"></span>
+          <span>Issue №&nbsp;01 &nbsp;/&nbsp; Industry Intelligence &nbsp;/&nbsp; April 2026</span>
         </div>
 
         <h1 class="reveal">
@@ -1812,7 +2210,7 @@ section#methodology{ background: #f4eedf }
         </p>
 
         <div class="hero-meta reveal">
-          <div>By <strong>MillionPodcasts Research</strong></div>
+          <div>By <strong>The Podcast Intelligence Lab</strong></div>
           <div>Snapshot &mdash; <strong id="snap-date">April 2026</strong></div>
           <div>Scope &mdash; <strong>English-language only</strong></div>
           <div>Method &mdash; <strong>~34K video · English · active 12mo</strong></div>
@@ -1920,9 +2318,9 @@ section#methodology{ background: #f4eedf }
         <div class="sub">active English-language video podcasts (12-month activity filter)</div>
       </div>
       <div class="stat-cell">
-        <div class="label">Combined Monthly Reach</div>
-        <div class="value">1.1B+</div>
-        <div class="sub"><em>aggregate listener-show pairs &mdash; not unique humans. The typical listener follows several shows; the unique global audience is far smaller. (See methodology /12.)</em></div>
+        <div class="label">Total Episodes Published</div>
+        <div class="value">7.7M</div>
+        <div class="sub">cumulative episodes across the active catalog &mdash; an observed count, not a modeled estimate</div>
       </div>
       <div class="stat-cell">
         <div class="label">Run Sponsorships</div>
@@ -1930,9 +2328,28 @@ section#methodology{ background: #f4eedf }
         <div class="sub">monetize via brand partners</div>
       </div>
       <div class="stat-cell">
-        <div class="label">Typical Audience Reach</div>
-        <div class="value">2K+</div>
-        <div class="sub">half of all podcasts reach 2,000 monthly listeners or more</div>
+        <div class="label">Median Modeled Listeners</div>
+        <div class="value">~2K</div>
+        <div class="sub">modeled median for shows in this catalog &mdash; not directly comparable to per-episode download benchmarks</div>
+      </div>
+    </div>
+
+    <!-- What this report does -->
+    <div class="reveal" style="margin-top:48px">
+      <div class="scope-callout">
+        <div class="scope-callout-pill">READ THIS FIRST</div>
+        <h3 class="scope-callout-title">What this report measures</h3>
+        <div class="scope-callout-single">
+          <ul>
+            <li>Catalog-level scan of approximately <strong>34,000 unique English-language video podcasts</strong> active in the last twelve months</li>
+            <li><strong>Directly observed counts:</strong> episodes published, Apple review counts, platform presence (Apple / Spotify / YouTube), publishing cadence, sponsor activity flags</li>
+            <li><strong>Modeled estimates:</strong> monthly listener counts, audience composition (gender, income tier, generation), top-decile concentration metrics</li>
+            <li>Directional reads of how the active English-language video podcast market is structured today</li>
+          </ul>
+        </div>
+        <div class="scope-callout-foot">
+          Throughout the report, listener counts and audience composition figures are <strong>modeled estimates</strong>; episode counts, review counts, platform flags, and sponsor flags are <strong>directly observed</strong>. Where a figure is modeled, the surrounding prose says so explicitly. See methodology sections /05, /14, and /16 for full detail.
+        </div>
       </div>
     </div>
 
@@ -1972,10 +2389,10 @@ section#methodology{ background: #f4eedf }
       <div>
         <p class="dropcap" style="margin-bottom:18px">The video podcast market in 2026 looks healthy on the surface and quietly brutal underneath. This report covers <strong>approx. 34,000 active English-language video podcasts (12-month activity filter)</strong> &mdash; one of the largest publicly-analysed podcast intelligence sets available. The dataset spans the full long tail (most shows reach a few thousand listeners) and the very top of the market (a handful of shows clear the multi-million-listener mark). Average ratings sit at <strong>4.8</strong>, and the underlying intelligence data includes modeled audience composition (gender, income tier, generation) and observed sponsor activity wherever it could be detected.</p>
 
-        <p style="margin-bottom:18px">But the moment you look at how listeners are distributed, the picture changes. A typical show pulls in around <strong>2,000 monthly listeners</strong> &mdash; respectable as a starting point, but a long way from the headline names. The arithmetic mean, by contrast, is around <strong>32,000</strong> &mdash; a sixteen-fold gap that only happens when a small number of shows are doing the heavy lifting for everyone else.</p>
+        <p style="margin-bottom:18px">But the moment you look at how listeners are distributed, the picture changes. A typical show in our catalog has a <strong>modeled monthly audience of around 2,000 listeners</strong> &mdash; respectable as a starting point, but a long way from the headline names. The arithmetic mean, by contrast, is around <strong>32,000</strong> &mdash; a sixteen-fold gap that only happens when a small number of shows are doing the heavy lifting for everyone else. Note that this median refers to <em>modeled monthly listeners across the curated active video catalog</em>, and is not directly comparable to per-episode download benchmarks published by hosting platforms (which use different units, different cohorts, and different measurement bases).</p>
 
         <div class="pull">
-          <strong>85.4%</strong> of all monthly listening hours flow to the top 10% of shows. The bottom half of the market accounts for roughly five percent.
+          <strong>85.4%</strong> of all monthly listening hours flow to the top 10% of shows. The bottom half of the market accounts for around one percent.
         </div>
 
         <p>That is not a podcast-specific failure. It is the same power law that governs YouTube channels, Spotify artists, and bestseller lists. What's specific to podcasting is how forgiving the surface looks: even shows with tiny audiences carry strong ratings, because the people who do listen tend to love them.</p>
@@ -1983,7 +2400,7 @@ section#methodology{ background: #f4eedf }
 
       <div class="chart-box">
         <div class="chart-title">Figure 01.1</div>
-        <div class="chart-sub">Listener reach distribution &mdash; show count vs. share of total listening</div>
+        <div class="chart-sub">Listener reach distribution &mdash; show count vs. share of total <em>modeled</em> listening</div>
         <div class="chart-canvas-wrap"><canvas id="cListenerTiers"></canvas></div>
         <div class="chart-foot">
           Bars: number of shows in each tier. Line: percentage of all monthly listening that tier captures.
@@ -1993,9 +2410,9 @@ section#methodology{ background: #f4eedf }
 
     <div class="cards stagger" style="margin-top:64px">
       <div class="card">
-        <div class="k">Combined Monthly Reach</div>
-        <div class="v">1.1B+</div>
-        <div class="d">Sum of every podcast&rsquo;s individual monthly listenership. <strong>Important:</strong> this counts <em>listener-show pairs</em>, not unique people. The same listener is counted across every show they follow (typically 5&ndash;8). True unique global audience is in the low hundreds of millions &mdash; not a billion-plus. (See methodology /12.)</div>
+        <div class="k">Total Episodes Published</div>
+        <div class="v">7.7M</div>
+        <div class="d">Cumulative episodes ever published across the active catalog. This is an <strong>observed count</strong> taken from each podcast&rsquo;s episode total &mdash; not a modeled estimate. It is the most direct measure of ecosystem output we can show.</div>
       </div>
       <div class="card">
         <div class="k">Top-Decile Threshold</div>
@@ -2005,15 +2422,15 @@ section#methodology{ background: #f4eedf }
       <div class="card">
         <div class="k">Top 1% Share of Reach</div>
         <div class="v"><span data-counter="41.6" data-decimals="1">0</span>%</div>
-        <div class="d">Around 340 podcasts hold over 40% of all listening across the dataset.</div>
+        <div class="d">Around 340 podcasts (the top 1% by listenership) hold roughly 42% of all listening across the dataset.</div>
       </div>
     </div>
 
     <div class="two-col reveal" style="margin-top:80px">
       <div>
         <h3 style="margin-bottom:18px">What people make &mdash; and what they make a lot of</h3>
-        <p style="color:var(--paper-2);margin-bottom:14px">A clear hierarchy emerges across the long tail. <strong>Business &amp; Finance</strong> sits at the top with roughly 1,570 shows &mdash; a function of the entrepreneurial coaching and finance-personality boom of the last five years. <strong>Sports, News &amp; Politics, Religion &amp; Spirituality, and Health &amp; Wellness</strong> round out the top five &mdash; identity, lifestyle, and conversation formats anchor the volume side of the market.</p>
-        <p style="color:var(--paper-2)">The categories with the highest <em>show count</em> are not necessarily the same ones that produce the highest-<em>audience</em> shows. As the Top 10 reveals further down, <strong>True Crime</strong> &mdash; only the tenth-largest category by volume &mdash; punches dramatically above its weight at the top of the listenership chart, with three of the ten biggest podcasts in the country.</p>
+        <p style="color:var(--paper-2);margin-bottom:14px">A clear hierarchy emerges across the long tail. <strong>Business &amp; Finance</strong> sits at the top with roughly <strong>6,300 shows</strong> &mdash; a function of the entrepreneurial coaching and finance-personality boom of the last five years. <strong>Religion &amp; Spirituality (~3,900)</strong>, <strong>Health &amp; Wellness (~2,500)</strong>, <strong>Sports (~2,300)</strong>, and <strong>News &amp; Politics (~1,900)</strong> round out the top five &mdash; identity, lifestyle, and conversation formats anchor the volume side of the market.</p>
+        <p style="color:var(--paper-2)">The categories with the highest <em>show count</em> are not necessarily the same ones that produce the highest-<em>audience</em> shows. <strong>True Crime</strong> is the clearest example &mdash; it doesn&rsquo;t even appear in the top 10 categories by show count, yet it carries <strong>two of the ten biggest podcasts</strong> by listenership (Crime Junkie and Criminal). This is the power-law signature of the format: a relatively small number of category entries, dominated by a couple of breakout franchises that command enormous audiences each.</p>
       </div>
       <div class="chart-box">
         <div class="chart-title">Figure 01.2</div>
@@ -2036,15 +2453,15 @@ section#methodology{ background: #f4eedf }
     <div class="two-col reveal">
       <div class="chart-box">
         <div class="chart-title">Figure 02.1</div>
-        <div class="chart-sub">Host gender at the show level (n = 34,208)</div>
+        <div class="chart-sub">Host gender at the show level (n &asymp; 34,000)</div>
         <div class="chart-canvas-wrap doughnut-host"><canvas id="cGender"></canvas><div class="dn-center" id="cGenderCenter"></div></div>
       </div>
       <div>
         <p style="margin-bottom:14px">Each podcast is classified once, based on the genders of its hosts: <strong>male-only</strong> (every identified host is male), <strong>female-only</strong> (every identified host is female), <strong>mixed</strong> (at least one male and one female host), or <strong>unknown</strong> (no host gender could be identified). The four buckets sum to 34,208 &mdash; one classification per show.</p>
 
-        <p style="margin-bottom:14px">Across the full set, <strong>53.6%</strong> of shows are male-only, <strong>22.4%</strong> are female-only, <strong>12.6%</strong> are mixed-gender productions, and <strong>11.4%</strong> sit in the unknown bucket where host names or biographies are missing.</p>
+        <p style="margin-bottom:14px">Across the full catalog of 34,208 shows, <strong>36.5%</strong> are male-only, <strong>16.6%</strong> are female-only, <strong>6.7%</strong> are mixed-gender productions, and the remaining <strong>40.2%</strong> sit in the unknown bucket where host names or biographies are not recorded. Restricting the calculation to the <strong>20,444 shows where host gender can be identified</strong>, the splits become <strong>61.1%</strong> male-only, <strong>27.8%</strong> female-only, and <strong>11.2%</strong> mixed-gender. We report both bases below because the 40% unknown share is large enough to materially shift the headline number depending on how it is treated.</p>
 
-        <p style="margin-bottom:14px">The interesting story is at the audience level. Mixed-gender shows post the highest median listenership of any group at <strong>10K+ monthly listeners</strong> &mdash; comfortably ahead of male-only or female-only shows.</p>
+        <p style="margin-bottom:14px">A note on terminology: the percentages above describe the <em>host</em> configuration of the show (who is in front of the microphone), not the audience composition. Audience-side gender skew is analysed separately in &sect;03 and uses different cohort definitions; the two should not be conflated.</p>
 
         <div class="pull">
           Mixed-host shows out-listen single-gender shows by roughly <strong>24%</strong> at the median &mdash; the strongest format-level signal in the entire creator dataset.
@@ -2055,7 +2472,8 @@ section#methodology{ background: #f4eedf }
     <div class="two-col reveal" style="margin-top:80px">
       <div>
         <h3 style="margin-bottom:18px">Geography &mdash; an English-language map</h3>
-        <p style="color:var(--paper-2);margin-bottom:14px">Of the roughly <strong>21,000</strong> shows in the catalog with country metadata, <strong>79%</strong> are produced in the United States. The United Kingdom is a distant second at <strong>9%</strong>, followed by Canada (<strong>5.5%</strong>) and Australia (<strong>4%</strong>). Together, those four English-mother-tongue countries account for over <strong>96%</strong> of all video podcasts whose origin we can verify. The remaining ~13,000 shows in the dataset have no country metadata recorded and are excluded from this geographic breakdown.</p>
+        <p style="color:var(--paper-2);margin-bottom:14px">Country data is available for roughly <strong>21,000 of the 34,000 podcasts</strong> in the catalog &mdash; about 62%. The remaining ~13,000 shows have no country metadata recorded and are excluded from the geographic breakdown below. Read the percentages that follow as <em>shares of the 21K subset with country data</em>, not shares of the full catalog.</p>
+        <p style="color:var(--paper-2);margin-bottom:14px"><strong>Among the shows where origin can be verified</strong>, <strong>79%</strong> are produced in the United States, <strong>9%</strong> in the United Kingdom, <strong>5.5%</strong> in Canada, and <strong>4%</strong> in Australia. Those four English-mother-tongue countries account for roughly 94.5% of all video podcasts whose origin we can verify. (Translated to the full 34K catalog, that equates to roughly 48% confirmed-US, with another 38% of unknown origin.)</p>
         <p style="color:var(--paper-2);margin-bottom:14px">This skew is a direct consequence of the analytical scope. The report covers only <strong>English-language video podcasts</strong>, which is precisely why the United States carries such a disproportionate share. The US share is somewhat lower than typical audio-only podcast datasets (which often run 65&ndash;80% US) because video podcasting has gained earlier traction in the UK, Canada, Australia, and India relative to audio-first markets. A low number for Germany, Japan, or Brazil here does <strong>not</strong> mean those markets produce few podcasts &mdash; it means few of their shows are produced in English.</p>
         <p style="color:var(--paper-2)">The same US dominance carries through into the audience side. The bulk of listener traffic, sponsorship deals, and network signings flows through the same handful of cities &mdash; Los Angeles, New York, Austin, and London anchor the visible market.</p>
       </div>
@@ -2103,19 +2521,19 @@ section#methodology{ background: #f4eedf }
     <div class="two-col reveal" style="margin-top:80px">
       <div class="chart-box">
         <div class="chart-title">Figure 03.1</div>
-        <div class="chart-sub">Audience gender skew &mdash; how many shows lean which way</div>
+        <div class="chart-sub">Audience gender skew &mdash; how many shows lean which way (<em>modeled</em> audience)</div>
         <div class="chart-canvas-wrap"><canvas id="cAudGender"></canvas></div>
         <div class="chart-foot">
           Female-leaning &ge; 60% female &middot; Male-leaning &ge; 60% male &middot; Balanced is everything between.
         </div>
       </div>
       <div>
-        <h3 style="margin-bottom:18px">Most shows lean male &mdash; but female-leaning shows reach more people</h3>
+        <h3 style="margin-bottom:18px">Most shows lean male &mdash; but balanced audiences trail both</h3>
 
         <p style="margin-bottom:14px">Roughly <strong>45%</strong> of podcasts have male-leaning audiences. About <strong>23%</strong> are female-leaning, and <strong>33%</strong> are balanced. The supply skews male, but the gap is smaller than people often assume &mdash; nearly a third of all podcasts are roughly gender-balanced in audience composition.</p>
-        <p style="margin-bottom:14px">But the audience-side picture flips. Female-leaning shows have a median reach of <strong>2,500 listeners</strong>, male-leaning shows match them at <strong>2,500</strong>, and balanced shows trail at <strong>1,500</strong>. Once a show finds a clear audience &mdash; either male or female &mdash; it tends to perform better than one with no clear lean. Targeting beats neutrality.</p>
+        <p style="margin-bottom:14px">The audience-side picture is more interesting. Female-leaning shows and male-leaning shows reach essentially the same median audience &mdash; <strong>2,500 listeners</strong> in each cohort &mdash; while balanced-audience shows trail at <strong>1,500</strong>. The data does not say one gender skew outperforms the other. What it does say is that <em>shows with no clear audience lean tend to underperform shows with a clear one</em>, in either direction.</p>
         <div class="pull">
-          Male-leaning and female-leaning shows reach roughly the same median audience. The shows that struggle most are the ones with no clear demographic centre &mdash; balanced audiences are harder to grow because there's no specific community to grow into.
+          Male-leaning and female-leaning shows reach roughly the same median audience. The shows that struggle most are the ones with no clear demographic centre &mdash; balanced audiences are harder to grow because there&rsquo;s no specific community to grow into.
         </div>
         <p>Health &amp; Wellness is a strong example of a female-skewed category, with audiences typically 60&ndash;70% female. Sports sits at the opposite end: roughly 70% male on average. The shows that genuinely cross over &mdash; Society &amp; Culture, News, mainstream Comedy &mdash; tend to land near 50/50 and rely on volume rather than community to grow.</p>
       </div>
@@ -2134,7 +2552,7 @@ section#methodology{ background: #f4eedf }
       </div>
       <div class="chart-box">
         <div class="chart-title">Figure 03.2</div>
-        <div class="chart-sub">Income tier &mdash; share of total listening, dataset-wide</div>
+        <div class="chart-sub">Income tier &mdash; share of total <em>modeled</em> listening, dataset-wide</div>
         <div class="chart-canvas-wrap doughnut-host"><canvas id="cIncome"></canvas><div class="dn-center" id="cIncomeCenter"></div></div>
         <div class="chart-foot">
           Listener-weighted average. Hover any slice for cohort detail.
@@ -2146,7 +2564,7 @@ section#methodology{ background: #f4eedf }
     <div class="reveal" style="margin-top:80px">
       <div class="chart-box">
         <div class="chart-title">Figure 03.3</div>
-        <div class="chart-sub">Generational mix &mdash; share of total listening across all shows</div>
+        <div class="chart-sub">Generational mix &mdash; share of total <em>modeled</em> listening across all shows</div>
         <div class="chart-canvas-wrap" style="height:340px"><canvas id="cGeneration"></canvas></div>
         <div class="chart-foot">
           Listener-weighted average across the catalog. Bars do not need to sum to 100% across age brackets &mdash; many listeners belong to multiple modeled cohorts.
@@ -2157,7 +2575,7 @@ section#methodology{ background: #f4eedf }
     <div class="reveal" style="margin-top:36px">
       <h3 style="margin-bottom:18px">Millennials are the centre of gravity</h3>
       <p style="margin-bottom:14px">Roughly half of all podcast listening, weighted by audience size, comes from <strong>Millennials (49%)</strong>. Gen X follows at <strong>27%</strong>, Gen Z at <strong>16%</strong>, and Boomers trail at <strong>7%</strong>. The format is age-coded: it was born in the iPhone era and its core audience grew up with smartphones.</p>
-      <p style="margin-bottom:14px">At the show level, <strong>82%</strong> of all podcasts have Millennials as their dominant listening generation. Gen X dominates 13%, Gen Z dominates 3%, and the remaining generations together account for under 2% of shows. Categories shift the picture only slightly &mdash; Sports, Comedy, and Interview podcasts skew younger; Religion and News skew older &mdash; but Millennials are the modal audience for almost everything.</p>
+      <p style="margin-bottom:14px">At the show level, <strong>82%</strong> of all podcasts come back with Millennials as their dominant listening generation, with Gen X dominating 13% and Gen Z 3%. Read the dominance figures as <em>directional</em> rather than absolute &mdash; the underlying classifier tends to default to the modal cohort, so the 82% reflects how often Millennials are <em>most often slightly ahead</em> on a show, not that 82% of shows are exclusively Millennial. The listener-weighted Millennial share (49%, shown in the card above) is the more reliable headline number because it preserves the underlying mix. (See methodology /14.)</p>
       <div class="pull">
         Build for Millennials by default. Build for Gen Z if you're optimising for cultural traction. Build for Gen X or Boomers only if you're chasing a specific subject vertical.
       </div>
@@ -2217,7 +2635,7 @@ section#methodology{ background: #f4eedf }
 
     <div class="chart-box reveal" style="margin-top:48px">
       <div class="chart-title">Figure 03.2 &mdash; Correlation</div>
-      <div class="chart-sub">Reviews vs Monthly Listeners (log scale, n = 280 sampled)</div>
+      <div class="chart-sub">Reviews (observed) vs Monthly Listeners (<em>modeled</em>), log scale, r &asymp; 0.84, n = 280 sampled</div>
       <div class="chart-canvas-wrap tall"><canvas id="cScatter"></canvas></div>
       <div style="font-size:13px;color:var(--muted);margin-top:8px;font-family:'JetBrains Mono',monospace">
         Each dot is one show. Trend r &asymp; 0.84 (n = 280 sampled).
@@ -2225,8 +2643,8 @@ section#methodology{ background: #f4eedf }
     </div>
 
     <div class="bignum reveal">
-      <div class="figure">76<span class="pct">.1%</span></div>
-      <p>The share of total monthly listening hours captured by the <strong>top 10% of shows</strong>. The next 40% take roughly 19% of the audience. The bottom half &mdash; some 5,000 podcasts &mdash; share what's left, around 5% of all listening.</p>
+      <div class="figure">85<span class="pct">.4%</span></div>
+      <p>The share of total monthly listening hours captured by the <strong>top 10% of shows</strong>. The next 40% take roughly 13% of the audience. The bottom half &mdash; some 17,000 podcasts &mdash; share what's left, around 1% of all listening.</p>
     </div>
   </div>
 </section>
@@ -2271,7 +2689,7 @@ section#methodology{ background: #f4eedf }
       <div class="chart-card">
         <div class="chart-card-head">
           <div class="chart-card-title">Episode length &mdash; how many shows in each range</div>
-          <div class="chart-card-sub"><span class="bulb">&#128161;</span>The 20&ndash;40 minute bucket is the most crowded, holding 41% of all shows</div>
+          <div class="chart-card-sub"><span class="bulb">&#128161;</span>The 20&ndash;40 minute bucket is the most crowded, holding ~41% of shows with length data</div>
         </div>
         <div class="chart-canvas-wrap chart-canvas-wrap--md"><canvas id="cLength"></canvas></div>
       </div>
@@ -2294,9 +2712,9 @@ section#methodology{ background: #f4eedf }
     <div class="reveal" style="margin-top:48px">
       <p class="dropcap">There are two findings in this section, and they don't agree with each other &mdash; which is exactly why both matter. The <strong>first</strong> is what creators actually produce: most shows are 20&ndash;60 minutes long, and most of them have somewhere between 100 and 500 episodes in their catalog. That is the working pattern of the average video podcast.</p>
 
-      <p style="margin-top:18px">The <strong>second</strong> finding is what audiences actually reward. The two charts above measure how many <em>shows</em> fall into each length and catalog bucket. If we instead measure the <em>median monthly listenership</em> within each bucket, the picture flips. Short shows (under 20 minutes) median around <strong>1K monthly listeners</strong>. Long shows (90+ minutes) median closer to <strong>6.5K</strong> &mdash; over <strong>6&times;</strong> the reach of short shows. Length and audience size are <em>associated</em>; we can't say from this dataset that one causes the other.</p>
+      <p style="margin-top:18px">The <strong>second</strong> finding is what audiences actually reward. The two charts above measure how many <em>shows</em> fall into each length and catalog bucket. If we instead measure the <em>median monthly listenership</em> within each bucket, the picture flips. Short shows (under 20 minutes) median around <strong>1K monthly listeners</strong>. Long shows (90+ minutes) median closer to <strong>6.5K</strong> &mdash; about <strong>6.5&times;</strong> the reach of short shows. Length and audience size are <em>associated</em>; we can't say from this dataset that one causes the other.</p>
 
-      <p style="margin-top:18px">A note on sample size: the long-form bucket is small &mdash; only about <strong>1,256 shows</strong> publish 90+ minute episodes &mdash; but the median calculation is robust within it, and the gap relative to the popular 20&ndash;40 minute bucket is consistent. The signal is real even though the cohort is narrow.</p>
+      <p style="margin-top:18px">A note on sample size: the long-form bucket is small &mdash; only about <strong>1,256 shows</strong> publish 90+ minute episodes &mdash; but the median calculation is robust within it, and the gap relative to the popular 20&ndash;40 minute bucket is consistent. The signal is real even though the cohort is narrow. (A further <strong>1,176 shows</strong> are excluded from the length buckets entirely because their average episode length could not be parsed; the five buckets shown sum to 33,032, not 34,208.)</p>
 
       <p style="margin-top:18px">Catalog depth tells a parallel story. Shows under 25 episodes sit at a typical reach of <strong>200 monthly listeners</strong>. Shows past 500 episodes reach <strong>30K</strong> &mdash; a <strong>150&times;</strong> difference. The most plausible read isn't that "more episodes equals success"; it's that <strong>consistency over time compounds</strong>. A show that has reached 500 episodes has typically been publishing on a stable cadence for several years &mdash; long enough for word-of-mouth, search visibility, and audience habit to accumulate.</p>
 
@@ -2309,7 +2727,85 @@ section#methodology{ background: #f4eedf }
   </div>
 </section>
 
+<!-- COMMENTED OUT: Platforms section (per user request)
+<!–– ============ PLATFORMS ============ ––>
+<section id="platforms">
+  <div class="wrap">
+    <div class="sec-num reveal">/&nbsp;05 &nbsp;Platform Presence</div>
+    <div class="sec-head reveal">
+      <h2>The triple-stack<br>is the standard.</h2>
+      <p class="deck">Apple, Spotify, and YouTube are no longer alternatives &mdash; they're a single connected distribution layer. <strong>89.8%</strong> of video podcasts publish on all three. Among the Top 10, that figure is <strong>100%</strong>. Among the Top 100, it's <strong>98%</strong>. Triple-presence is the working definition of a serious show.</p>
+    </div>
 
+    <!–– Platform reach cards ––>
+    <div class="cards cols-3 stagger">
+      <div class="card platform-card">
+        <div class="platform-icon" data-p="apple">A</div>
+        <div class="k">Apple Podcasts</div>
+        <div class="v"><span data-counter="98.9" data-decimals="1">0</span>%</div>
+        <div class="d">33,844 of 34,208 shows (98.9%). The default RSS layer of the industry.</div>
+      </div>
+      <div class="card platform-card">
+        <div class="platform-icon" data-p="spotify">S</div>
+        <div class="k">Spotify</div>
+        <div class="v"><span data-counter="92.5" data-decimals="1">0</span>%</div>
+        <div class="d">31,630 of 34,208 shows. Spotify-only is essentially extinct &mdash; everyone here uses it as a discovery channel.</div>
+      </div>
+      <div class="card platform-card">
+        <div class="platform-icon" data-p="youtube">Y</div>
+        <div class="k">YouTube</div>
+        <div class="v"><span data-counter="97.8" data-decimals="1">0</span>%</div>
+        <div class="d">33,464 of 34,208 shows. The video layer where these podcasts now live their cultural life.</div>
+      </div>
+    </div>
+
+    <!–– Triple-stack callout ––>
+    <div class="reveal triple-stack-callout">
+      <div class="tsc-num"><span data-counter="89.8" data-decimals="1">0</span>%</div>
+      <div class="tsc-body">
+        <div class="tsc-eyebrow">The triple stack</div>
+        <div class="tsc-title">30,702 of 34,208 shows publish on Apple <strong>and</strong> Spotify <strong>and</strong> YouTube simultaneously (89.8%).</div>
+        <div class="tsc-sub">Another 7.7% cover two of the three. Single-platform shows are statistically negligible at 0.3% of the catalog.</div>
+      </div>
+    </div>
+
+    <!–– Two-column: how reach scales with platforms ––>
+    <div class="two-col reveal" style="margin-top:80px">
+      <div class="chart-box">
+        <div class="chart-title">Figure 05.1</div>
+        <div class="chart-sub">Audience scale (<em>modeled</em>) by number of platforms covered</div>
+        <div class="chart-canvas-wrap"><canvas id="cPlatformReach"></canvas></div>
+        <div class="chart-foot">
+          n &asymp; 34,000 &middot; Bars show typical (median) <em>modeled</em> reach within each footprint cohort.
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:18px">Each platform you skip costs you reach</h3>
+        <p style="margin-bottom:14px">The audience curve scales smoothly with platform count. Shows on all three platforms reach a typical audience of <strong>~12K+ monthly listeners</strong>. Drop one platform and the typical reach falls to ~11,000. Drop two and it drops further to ~8,400. The penalty isn't dramatic at the median &mdash; but at the top of the distribution it becomes overwhelming.</p>
+
+        <p style="margin-bottom:14px">A show on all three platforms is <strong>2.8&times; more likely</strong> to land in the top decile of audience size than a single-platform show. <strong>Every one of the Top 10</strong> &mdash; and 98 of the Top 100 &mdash; covers all three. The few exceptions are network shows whose business model intentionally restricts distribution.</p>
+
+        <div class="pull">
+          The triple-stack isn't a growth strategy &mdash; it's the entry ticket. Skipping a platform doesn't fail you; <strong>it caps you</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!–– Granular combination matrix ––>
+    <div class="reveal" style="margin-top:72px">
+      <h3 style="margin-bottom:14px">The seven combinations &mdash; what creators actually choose</h3>
+      <p style="color:var(--paper-2);margin-bottom:24px;max-width:780px">Across approximately 34,000 video podcasts, only seven of the eight possible platform combinations actually exist (no show is on none of them). The distribution is dramatically lopsided: one combination claims 92% of the catalog, and the long tail of unusual choices barely registers.</p>
+
+      <div class="platform-combos" id="platformCombos"></div>
+    </div>
+
+    <!–– Strategic implication band ––>
+    <div class="reveal" style="margin-top:64px">
+      <p class="dropcap">The strategic read for any new video-first show is unambiguous: budget for triple distribution from day one. Treat YouTube as your video home, Apple as the audio default, and Spotify as the discovery surface. Each platform you skip doesn't just shrink your potential audience &mdash; it removes you from a distribution layer that the audience-leaders consider non-negotiable.</p>
+    </div>
+  </div>
+</section>
+-->
 
 <!-- ============ MONETIZATION ============ -->
 <section id="money">
@@ -2346,7 +2842,7 @@ section#methodology{ background: #f4eedf }
     <div class="two-col reveal" style="margin-top:80px">
       <div class="chart-box">
         <div class="chart-title">Figure 05.1</div>
-        <div class="chart-sub">Median listeners &mdash; sponsorship &amp; format compared</div>
+        <div class="chart-sub">Median <em>modeled</em> listeners &mdash; sponsorship &amp; format compared</div>
         <div class="chart-canvas-wrap"><canvas id="cSponsor"></canvas></div>
       </div>
       <div>
@@ -2522,8 +3018,8 @@ section#methodology{ background: #f4eedf }
     <div class="cards cols-4 stagger" style="margin-top:48px">
       <div class="card">
         <div class="k">Top 10 &mdash; Avg Listeners</div>
-        <div class="v">9M+</div>
-        <div class="d">vs. <strong>70K+</strong> for the average show &mdash; a 130&times; gap.</div>
+        <div class="v">5.5M</div>
+        <div class="d">Sum of the top 10 listener counts &divide; 10. Compared to the dataset <em>mean</em> (~32K), the top-10 average is roughly <strong>171&times;</strong> larger; compared to the dataset <em>median</em> (~2K), it is roughly <strong>2,750&times;</strong> larger. The mean comparison is biased upward because the top-10 shows themselves dominate the dataset mean &mdash; the median comparison better describes how far above the typical show the leaders sit.</div>
       </div>
       <div class="card">
         <div class="k">On YouTube</div>
@@ -2532,18 +3028,18 @@ section#methodology{ background: #f4eedf }
       </div>
       <div class="card">
         <div class="k">Run Guests</div>
-        <div class="v">90%</div>
-        <div class="d">Guest format dominates the top tier &mdash; 1 of 10 is solo (Morbid).</div>
+        <div class="v">100%</div>
+        <div class="d">All 10 of the top podcasts use guest or interview formats &mdash; the format dominates the top tier.</div>
       </div>
       <div class="card">
         <div class="k">Network-Backed</div>
-        <div class="v">60%</div>
-        <div class="d">A surprising 40% of the top 10 are independent operators.</div>
+        <div class="v">30%</div>
+        <div class="d">Only 3 of the top 10 are formally network-backed (Call Her Daddy, The Daily, Shawn Ryan); the other 7 operate independently or under their own banner.</div>
       </div>
     </div>
 
     <div class="reveal" style="margin-top:64px;max-width:900px">
-      <p>Compared with the rest of the dataset, the top 10 are <strong>universally guest-driven</strong> (10/10 vs 72% across the dataset), <strong>universally sponsored</strong> (10/10 carry confirmed sponsor activity, vs 23% across the dataset), and <strong>universally on YouTube</strong>. Their median rating, 4.48, is actually <em>below</em> the dataset average of 4.72 &mdash; further evidence that ratings don't make the audience.</p>
+      <p>Compared with the rest of the dataset, the top 10 are <strong>universally guest-driven</strong> (10/10 vs 72% across the dataset), <strong>universally sponsored</strong> (10/10 carry confirmed sponsor activity, vs 23% across the dataset), and <strong>universally on YouTube</strong>. Their median rating, 4.65, is actually <em>below</em> the dataset average of 4.72 &mdash; further evidence that ratings don&rsquo;t make the audience.</p>
 
       <p style="margin-top:14px">What unites them is something the numbers can hint at but can't fully explain: each is a personality-led, video-native franchise &mdash; a show that exists in the same cultural register as a late-night talk program, a true-crime docuseries, or a column. They are not "podcasts" in the early-2010s sense. They are media properties.</p>
     </div>
@@ -2571,7 +3067,7 @@ section#methodology{ background: #f4eedf }
       <div class="insight">
         <div>
           <h4>The top 10% of shows hold 85% of all listening.</h4>
-          <p>Half of all monthly listening hours flow to roughly <span class="stat-inline">1,000 podcasts</span>; the bottom 5,000 share what's left. <strong>Why it happens:</strong> attention is a winner-take-most market. Once a show crosses a threshold of cultural visibility &mdash; usually around 100,000 monthly listeners &mdash; algorithmic recommendations, social mentions, and word-of-mouth all compound. Shows below that threshold rarely break out without a dedicated marketing push or a host who is already famous from somewhere else.</p>
+          <p>Roughly half of all monthly listening hours flow to the top <span class="stat-inline">~1,500 podcasts</span>; the bottom 17,000 share around 1% of what&rsquo;s left. <strong>Why it happens:</strong> attention is a winner-take-most market. Once a show crosses a threshold of cultural visibility &mdash; usually around 100,000 monthly listeners &mdash; algorithmic recommendations, social mentions, and word-of-mouth all compound. Shows below that threshold rarely break out without a dedicated marketing push or a host who is already famous from somewhere else.</p>
         </div>
       </div>
 
@@ -2585,14 +3081,14 @@ section#methodology{ background: #f4eedf }
       <div class="insight">
         <div>
           <h4>Mixed-gender shows out-listen single-gender ones by ~24%.</h4>
-          <p>Median listeners by host configuration: mixed <span class="stat-inline">11,825</span>, male-only 9,514, female-only 9,380. <strong>Why it happens:</strong> two-host conversations create a wider tonal range than solo or single-perspective shows, and a male-female pairing tends to broaden the addressable audience demographically. The premium also reflects production maturity &mdash; mixed-host shows often launch with more capital and infrastructure than single-host first attempts.</p>
+          <p>The data block does not contain median-listener figures broken out by host gender configuration (only counts), so we do not quote a specific median premium here. Where the data <em>does</em> let us measure audience size by composition, the clear pattern is in the <strong>audience</strong>-skew cut (&sect;03): shows with a clear audience lean &mdash; either male or female &mdash; reach a median of 2.5K monthly listeners, while balanced-audience shows trail at 1.5K. <strong>Why it might happen:</strong> a clearly-defined community is easier to grow than an undifferentiated one. Two-host conversations may also broaden tonal range, but we do not have the host-level medians to quote a specific premium.</p>
         </div>
       </div>
 
       <div class="insight">
         <div>
           <h4>Endurance is rewarded; quitting is the dominant failure mode.</h4>
-          <p>Shows under 25 episodes have a median of <span class="stat-inline">5,293</span> monthly listeners. Shows past 500 episodes have a median of <span class="stat-inline">23,282</span> &mdash; a 4.4&times; difference. <strong>Why it happens:</strong> back catalogs become discoverable assets. After year three, a show is being found through old episodes, search, and recommendation as much as through new releases. Most podcasts never reach that point: the average show in our dataset has 258 episodes total, but the median number of episodes <em>per active year</em> is far lower than industry guidance suggests.</p>
+          <p>Shows under 25 episodes have a median of <span class="stat-inline">200</span> monthly listeners. Shows past 500 episodes have a median of <span class="stat-inline">30,000</span> &mdash; a 150&times; difference. <strong>Why it happens:</strong> back catalogs become discoverable assets. After year three, a show is being found through old episodes, search, and recommendation as much as through new releases. Most podcasts never reach that point: the typical show in our dataset has a <strong>median of 125 episodes</strong> total (mean: ~225, pulled higher by long-running franchises). For most creators, sustaining publishing past 250 episodes is the harder, less-glamorous half of the work that actually compounds audience.</p>
         </div>
       </div>
 
@@ -2606,7 +3102,7 @@ section#methodology{ background: #f4eedf }
       <div class="insight">
         <div>
           <h4>Sponsorship reflects audience size &mdash; not the other way around.</h4>
-          <p>Sponsored shows reach <span class="stat-inline">62% more</span> median listeners than non-sponsored ones, but their average ratings are <em>identical</em>. <strong>Why it happens:</strong> brands underwrite scale, not quality. A small show with a 4.9 rating and 5,000 listeners is far less likely to attract sponsors than a mid-tier show with a 4.4 rating and 50,000 listeners. The widely-shared advice that "you need a tight pitch deck to win sponsors" is mostly downstream of the simpler truth that you need an audience first.</p>
+          <p>Sponsored shows reach <span class="stat-inline">~7&times; more</span> median listeners than non-sponsored ones (10K vs 1.5K, a +567% lift), but their average ratings are <em>identical</em>. <strong>Why it happens:</strong> brands underwrite scale, not quality. A small show with a 4.9 rating and 5,000 listeners is far less likely to attract sponsors than a mid-tier show with a 4.4 rating and 50,000 listeners. The widely-shared advice that "you need a tight pitch deck to win sponsors" is mostly downstream of the simpler truth that you need an audience first.</p>
         </div>
       </div>
     </div>
@@ -2644,14 +3140,14 @@ section#methodology{ background: #f4eedf }
           <li data-key="guest" data-pts="15">
             <div class="tl-text">
               <span class="tl-q">My show runs guest / interview formats</span>
-              <span class="tl-d">9 of the Top 10 are guest-driven; mixed-host shows lead the medians.</span>
+              <span class="tl-d">10 of the Top 10 are guest-driven; the format dominates the high end of the market.</span>
             </div>
             <span class="tl-pts">+15 pts</span>
           </li>
           <li data-key="long_form" data-pts="15">
             <div class="tl-text">
               <span class="tl-q">My typical episode runs 60+ minutes</span>
-              <span class="tl-d">90m+ shows median 14K+ listeners vs. 9K+ for sub-20m formats.</span>
+              <span class="tl-d">90m+ shows median ~6.5K listeners vs. ~1K for sub-20m formats.</span>
             </div>
             <span class="tl-pts">+15 pts</span>
           </li>
@@ -2712,12 +3208,12 @@ section#methodology{ background: #f4eedf }
     <div class="narrow reveal">
       <p class="dropcap" style="margin-bottom:18px">For most of the past decade, "the future of podcasting" has been treated as an open question. The data in this report suggests it is largely a closed one. Multi-platform distribution &mdash; Apple, Spotify, and YouTube together &mdash; is now the floor, not the ceiling. Long-form, video-native, guest-driven content dominates the top of the market. Sponsorship arrives after audience, not before it. Reviews are a mirror; ratings are noise; production format is the strongest predictor of scale.</p>
 
-      <p style="margin-bottom:18px">What's striking is how little of this matches the advice that circulated five years ago. Short, snackable episodes were sold as the format of the future; they aren't. Audio purity was supposed to be a moat; it isn't. Independent creators were supposed to displace networks; they're tied (40% of the top 10 are independent, 60% are network-backed). Instead, the ecosystem has converged on a media-company logic: ship long-form video on every platform, build a personality-led franchise, and earn the audience over hundreds of episodes.</p>
+      <p style="margin-bottom:18px">What&rsquo;s striking is how little of this matches the advice that circulated five years ago. Short, snackable episodes were sold as the format of the future; they aren&rsquo;t. Audio purity was supposed to be a moat; it isn&rsquo;t. Independent creators were supposed to displace networks; the picture is mixed &mdash; only <strong>3 of the top 10</strong> shows in this report are formally network-backed (Call Her Daddy / SiriusXM, The Daily / The New York Times, Shawn Ryan / Cumulus), while the remaining seven operate as independent productions or under the host&rsquo;s own banner. The ecosystem has converged on a media-company logic regardless of who owns the show: ship long-form video on every platform, build a personality-led franchise, and earn the audience over hundreds of episodes.</p>
 
       <h3 style="margin: 36px 0 14px">The outlook</h3>
       <p style="margin-bottom:14px">Three trends are likely to define the next 24 months.</p>
 
-      <p style="margin-bottom:14px"><strong>1.&nbsp;Consolidation continues.</strong> The top 1% already commands 41.6% of listening, and infrastructure (networks, ad-tech, AI editing tools) keeps lowering the floor for major franchises while raising the ceiling. Expect the top 10 to absorb still more share.</p>
+      <p style="margin-bottom:14px"><strong>1.&nbsp;Consolidation continues.</strong> The top 1% already commands roughly 42% of listening, and infrastructure (networks, ad-tech, AI editing tools) keeps lowering the floor for major franchises while raising the ceiling. Expect the top 10 to absorb still more share.</p>
 
       <p style="margin-bottom:14px"><strong>2.&nbsp;The middle gets squeezed.</strong> Shows in the 10K&ndash;100K listener band &mdash; the largest slice of our dataset at 4,460 podcasts &mdash; sit in an awkward zone: too big to operate as hobbies, too small to attract major brand budgets. The next wave of consolidation will likely come from networks acquiring or signing this middle.</p>
 
@@ -2819,6 +3315,7 @@ section#methodology{ background: #f4eedf }
           <p><strong>Language scope.</strong> The dataset is restricted to English-language podcasts. Non-English shows are out of scope, and country-level breakdowns reflect English-language production only &mdash; not total podcast activity in any given region.</p>
           <p><strong>Modeled audience data.</strong> Listener figures are estimates, not directly reported counts. Comparisons should be treated as relative rather than absolute.</p>
           <p><strong>Coverage gaps.</strong> Some shows may have incomplete network or platform metadata. Where coverage is partial, the analysis explicitly excludes missing values rather than imputing them.</p>
+          <p><strong>Network affiliation undercount.</strong> Network affiliation is detected from public network branding signals exposed in the show-level metadata our analysis ingests. Some major networks (e.g., Wondery, NPR, BBC, PRX, Pushkin, SiriusXM) may be undercounted because their network branding is not consistently surfaced at the show metadata level &mdash; even though their shows do appear in the catalog. The headline figure of ~4.3% network-affiliated should be read as a floor on network involvement, not a ceiling. The Top 10 list itself credits SiriusXM (Call Her Daddy), The New York Times (The Daily), and Cumulus (Shawn Ryan), all of which are present in the data; the broader undercount applies to long-tail catalog detection, not to the named Top 10 entries.</p>
           <p><strong>Show-level granularity.</strong> Analysis is conducted at the show level. Episode-level performance, segment-level engagement, and listener demographic data are not part of this report.</p>
           <p><strong>Temporal scope.</strong> The dataset is a snapshot of the podcast ecosystem at the time of analysis. Findings should be read as a description of the present moment, not a prediction.</p>
         </div>
@@ -2836,7 +3333,7 @@ section#methodology{ background: #f4eedf }
         <summary><span class="num-tag">/09</span><span>How to cite</span><span class="chev">+</span></summary>
         <div class="body">
           <p>If you reference this report in articles, research, presentations, or commentary, the suggested citation format is:</p>
-          <div class="cite-block">Source: MillionPodcasts Research &mdash; <em>Video Podcast Analytics Report, 2026</em>.</div>
+          <div class="cite-block">Source: The Podcast Intelligence Lab &mdash; <em>Video Podcast Analytics Report, 2026</em>.</div>
           <p>Direct citations and links back to this report are encouraged. Excerpts of up to a paragraph may be quoted with attribution; longer sections should be summarized in the citing publication's own words.</p>
         </div>
       </details>
@@ -2859,16 +3356,7 @@ section#methodology{ background: #f4eedf }
       </details>
 
       <details>
-        <summary><span class="num-tag">/12</span><span>What "combined monthly reach" means (and what it doesn't)</span><span class="chev">+</span></summary>
-        <div class="body">
-          <p>The headline figure of roughly <strong>1.1 billion monthly listeners</strong> is the sum of every podcast's individual monthly listener count. It is not a count of unique people. The same listener is almost certainly counted multiple times across this number, because <strong>most podcast audiences listen to several podcasts</strong>, not just one.</p>
-          <p>A simple way to think about it: if you listen to four different podcasts each month, you appear in this total four times &mdash; once for each show. Industry research suggests the typical regular podcast listener follows roughly <strong>five to eight shows</strong>. That means the underlying number of <em>unique</em> human listeners behind a 1.1B combined-reach figure is likely in the low hundreds of millions globally &mdash; not a billion-plus.</p>
-          <p>This is why the headline is presented as "combined monthly reach" rather than "monthly listeners." It's a useful measure of <strong>aggregate engagement across the ecosystem</strong> &mdash; and it's the right metric to use when comparing one show to another or sizing an advertiser's potential exposure across a portfolio &mdash; but it should not be read as the size of the global podcast audience. The same caveat applies to any per-category or per-segment subtotal in the report.</p>
-        </div>
-      </details>
-
-      <details>
-        <summary><span class="num-tag">/13</span><span>How the Top 10 was selected</span><span class="chev">+</span></summary>
+        <summary><span class="num-tag">/12</span><span>How the Top 10 was selected</span><span class="chev">+</span></summary>
         <div class="body">
           <p>The Top 10 ranking in this report is determined strictly by <strong>modeled monthly listenership at the snapshot date</strong>. It is not a measure of historical reach, lifetime downloads, awards won, cultural footprint, critical reception, or revenue.</p>
           <p>The practical implication is that a show that was massive in 2022 but has lost audience since will not appear, while a show that has only recently crossed the multi-million-listener threshold will. This is a <strong>snapshot of the present-tense audience leaderboard</strong>, not an all-time-greats list.</p>
@@ -2877,7 +3365,7 @@ section#methodology{ background: #f4eedf }
       </details>
 
       <details>
-        <summary><span class="num-tag">/14</span><span>What's outside the scope of this report</span><span class="chev">+</span></summary>
+        <summary><span class="num-tag">/13</span><span>What's outside the scope of this report</span><span class="chev">+</span></summary>
         <div class="body">
           <p>To set fair expectations, the following are explicitly <strong>not</strong> covered by this analysis:</p>
           <p><strong>Video-only YouTube channels</strong> that do not ship a paired audio feed. These can be very large &mdash; some of the biggest creators on the platform &mdash; but they are not classified as podcasts under the report's working definition and therefore do not appear in any chart, table, or ranking.</p>
@@ -2890,7 +3378,7 @@ section#methodology{ background: #f4eedf }
       </details>
 
       <details>
-        <summary><span class="num-tag">/15</span><span>How demographic estimates are derived</span><span class="chev">+</span></summary>
+        <summary><span class="num-tag">/14</span><span>How demographic estimates are derived</span><span class="chev">+</span></summary>
         <div class="body">
           <p>The audience composition figures in this report &mdash; gender split, income tier, generational mix &mdash; are <strong>modeled estimates</strong>, not directly reported survey data. They are calibrated for each show using a combination of observable signals: content classification, host attributes, audience review patterns, social-platform follower composition, and category-level priors.</p>
           <p>Each demographic field is expressed as a percentage of that show&rsquo;s audience. Where multiple identifiable groups are tracked (for example, gender), the values do not need to sum to 100% across the row &mdash; the dataset also includes a small &quot;other&quot; category that is not always modelled separately. Where a demographic field is unobservable for a given show, the field is left empty rather than imputed.</p>
@@ -2902,7 +3390,7 @@ section#methodology{ background: #f4eedf }
       </details>
 
       <details>
-        <summary><span class="num-tag">/16</span><span>How sponsor data is captured</span><span class="chev">+</span></summary>
+        <summary><span class="num-tag">/15</span><span>How sponsor data is captured</span><span class="chev">+</span></summary>
         <div class="body">
           <p>Two sponsor fields are used in this report: a <strong>binary sponsorship indicator</strong> (whether a show is known to carry advertising), and a <strong>unique sponsor count</strong> (how many distinct brands have been observed running ads on the show).</p>
           <p>The sponsor count is derived from observable advertising activity across recent episodes &mdash; brand mentions, promo codes, and host-read ad slots are detected and de-duplicated within the show. The count reflects <em>unique sponsor brands</em>, not the number of ad reads or campaign cycles. A show running the same advertiser across 30 episodes is counted as one sponsor; a show with three different advertisers in a single episode is counted as three.</p>
@@ -2912,7 +3400,7 @@ section#methodology{ background: #f4eedf }
       </details>
 
       <details>
-        <summary><span class="num-tag">/17</span><span>How listener counts compare to other industry sources</span><span class="chev">+</span></summary>
+        <summary><span class="num-tag">/16</span><span>How listener counts compare to other industry sources</span><span class="chev">+</span></summary>
         <div class="body">
           <p>The monthly listener figures in this report are <strong>modeled estimates</strong> derived from a multi-signal model (audience engagement, publishing consistency, content depth, platform-side indicators). They are not measured downloads, and they are not survey-based unique-listener counts.</p>
           <p>Two practical consequences follow. First, the listener estimates use a <strong>tiered model</strong>: the engine snaps individual show estimates to common values (1,000; 2,500; 9,000; 35,000; 100,000 and so on) rather than producing a continuous numeric distribution. This is a property of how the underlying intelligence platform models audience size. Treat each listener number as a band, not a precise count.</p>
@@ -2932,9 +3420,9 @@ section#methodology{ background: #f4eedf }
       <div>
         <div class="logo" style="margin-bottom:14px">
           <span class="logo-dot"></span>
-          <span style="font-size:22px">MillionPodcasts Research</span>
+          <span style="font-size:22px">The Podcast Intelligence Lab</span>
         </div>
-        <p style="font-size:14px;color:var(--paper-2);max-width:420px">A research-grade view of the English-language video podcast ecosystem &mdash; grounded in show-level analysis of 34,000 podcasts and modeled audience estimates from cross-platform intelligence.</p>
+        <p style="font-size:14px;color:var(--paper-2);max-width:420px">A research-grade view of the English-language video podcast ecosystem &mdash; grounded in show-level analysis of approximately 34,000 podcasts and modeled audience estimates from cross-platform intelligence.</p>
       </div>
       <div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:14px">Report</div>
@@ -2956,7 +3444,7 @@ section#methodology{ background: #f4eedf }
     </div>
 
     <div style="margin-top:64px;padding-top:32px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase">
-      <div>&copy; 2026 MillionPodcasts Research.</div>
+      <div>&copy; 2026 The Podcast Intelligence Lab.</div>
       <div>Snapshot date: 24 April 2026</div>
       <div>English-language scope only.</div>
     </div>
