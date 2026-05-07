@@ -2165,6 +2165,123 @@ section#methodology{ background: #f4eedf }
 .bignum .figure .pct{font-size:.55em;color:var(--paper);font-style:normal;margin-left:6px}
 .bignum p{font-size:18px;color:var(--paper-2);line-height:1.6}
 @media (max-width:820px){.bignum{grid-template-columns:1fr}}
+
+/* =====================================================================
+   MOBILE-FRIENDLY OVERRIDES (added)
+   Tightens spacing, compresses typography, and ensures tables/charts
+   never break horizontal layout on phones. Desktop styles untouched.
+   ===================================================================== */
+
+/* --- Prevent any element from forcing horizontal scroll --- */
+html, body { overflow-x: hidden; max-width: 100%; }
+img, svg, canvas, video { max-width: 100%; height: auto; }
+
+/* --- Tablets and below (≤880px) --- */
+@media (max-width: 880px){
+  .wrap{ padding: 0 22px }
+  section{ padding: 80px 0 }
+  h1{ font-size: clamp(40px, 11vw, 72px) }
+  h2{ font-size: clamp(28px, 7vw, 44px) }
+  h3{ font-size: clamp(20px, 4.5vw, 26px) }
+  .deck, .lead, section p{ font-size: 16px; line-height: 1.6 }
+
+  /* Nav: tighten padding */
+  nav .nav-inner{ padding: 14px 22px }
+
+  /* Long monospace numbers: allow wrapping so they don't blow out cards */
+  .num, .mono, [class*="mono"]{ word-break: break-word; overflow-wrap: anywhere }
+
+  /* Big-figure stat cards: reduce excessive scale */
+  .bignum .figure{ font-size: clamp(64px, 18vw, 110px) }
+
+  /* Generic card grids — collapse 3- and 4-up to single column */
+  .cards.cols-3{ grid-template-columns: 1fr; gap: 16px }
+  .stat-strip{ grid-template-columns: 1fr 1fr; gap: 14px }
+
+  /* TOC stays at 1 column for readability */
+  .toc{ grid-template-columns: 1fr; gap: 8px }
+  .toc a{ padding: 14px 16px }
+
+  /* Tables: scrollable inside their wrapper, with edge-fade hint */
+  .demo-table-wrap, .reveal[style*="overflow-x"]{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tbl{ font-size: 13px; min-width: 640px }
+  .tbl th, .tbl td{ padding: 10px 8px; white-space: nowrap }
+  .tbl .ttl{ font-size: 14px; white-space: normal }
+
+  /* Demo table: compress padding */
+  .demo-table th, .demo-table td{ padding: 10px 8px; font-size: 13px }
+  .demo-table{ min-width: 560px }
+
+  /* Format matrix: shrink rows, allow long labels to wrap */
+  .format-matrix-wrap{ padding: 18px }
+  .fm-row{ grid-template-columns: 1fr 56px; gap: 8px }
+  .fm-row .fm-bar-track{ height: 36px }
+  .fm-label{ font-size: 12px !important; line-height: 1.3 }
+
+  /* Scorecard: stack toggle list and result */
+  .scorecard{ grid-template-columns: 1fr; gap: 24px }
+
+  /* Charts: cap height so they don't dominate the screen */
+  .chart-canvas-wrap, .chart-canvas-wrap--md{ height: 240px !important }
+
+  /* Hero right-side stat tile */
+  .hero-right{ max-width: 100% !important; margin: 0 auto }
+
+  /* Section number badge */
+  .sec-num{ font-size: 11px }
+}
+
+/* --- Phones (≤560px) --- */
+@media (max-width: 560px){
+  .wrap{ padding: 0 18px }
+  section{ padding: 64px 0 }
+  h1{ font-size: clamp(34px, 12vw, 54px); letter-spacing: -.03em }
+  h2{ font-size: clamp(26px, 8vw, 36px) }
+  h3{ font-size: 19px }
+  .deck, .lead{ font-size: 15px }
+
+  nav .nav-inner{ padding: 12px 18px }
+
+  /* Stat strips collapse to single column on very small screens */
+  .stat-strip{ grid-template-columns: 1fr }
+
+  /* Big numbers: cap aggressively */
+  .bignum .figure{ font-size: clamp(56px, 22vw, 96px) }
+
+  /* Cards: tighter padding */
+  .card{ padding: 20px !important }
+
+  /* Section number/eyebrow tighter */
+  .sec-num{ margin-bottom: 14px }
+
+  /* Footer / dense blocks */
+  footer .wrap{ padding: 0 18px }
+
+  /* Triple-stack callout: tighter */
+  .triple-stack-callout{ padding: 20px 18px !important }
+
+  /* Format matrix detail panel: tighter */
+  .fmd-grid{ grid-template-columns: 1fr 1fr; gap: 12px }
+
+  /* Larger tap targets on toggles */
+  #toggleList li{ padding: 14px 12px !important }
+}
+
+/* --- Very small phones (≤380px) --- */
+@media (max-width: 380px){
+  .wrap{ padding: 0 14px }
+  h1{ font-size: 32px }
+  .bignum .figure{ font-size: 56px }
+}
+
+/* --- Touch device niceties --- */
+@media (hover: none){
+  *{ -webkit-tap-highlight-color: rgba(184,101,26,.15) }
+  .toc a, nav a, .card, #toggleList li, .fm-row{ cursor: pointer }
+}
 </style>
 </head>
 <body>
