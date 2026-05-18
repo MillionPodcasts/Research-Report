@@ -2605,7 +2605,7 @@
             <div class="finding-mark">Finding 05</div>
             <div class="finding-theme">The Format Inversion</div>
           </div>
-          <h3 class="finding-title">Solo shows dominate the field. Panel shows dominate the top.</h3>
+          <h3 class="finding-title">Solo shows dominate the field. Multi-host formats dominate the top.</h3>
           <p class="finding-deck">The format mix flips between the broad ecosystem and the highest-reach tier. Solo shows are the easiest format to launch but the hardest to scale; multi-host formats produce most of the audience leadership in the category.</p>
 
           <div class="finding-mobile-chart">
@@ -2630,7 +2630,8 @@
 
           <div class="finding-block">
             <span class="finding-block-label">Findings</span>
-            <p>About <strong>67%</strong> of active NBA podcasts are solo-hosted; duos make up <strong>~13%</strong>, panels (3+ hosts) <strong>~20%</strong>. But of the top ten, only <strong>one is solo</strong> (Mostly Hoops), <strong>two are duos</strong> (Bill Simmons, Buckets), and <strong>seven are panels</strong>. Medians tell the same story: panel shows cluster around the <strong>~800 band</strong>, duos near <strong>~375</strong>, solos near <strong>~245</strong> — all modeled medians, useful for rank order rather than exact size.</p>
+            <p>About <strong>67%</strong> of active NBA podcasts are solo-hosted; duos make up <strong>~13%</strong>, panels (3+ hosts) <strong>~20%</strong>. The top ten flip that distribution: only <strong>two are solo</strong> (Bill Simmons, Mostly Hoops), <strong>four are duos</strong> (The Steam Room, Old Man and the Three, Buckets, The Mismatch), and <strong>four are panels</strong>. Solo formats — the majority of the field — are the minority at the top. Medians reinforce the pattern: panel shows cluster around the <strong>~800 band</strong>, duos near <strong>~375</strong>, solos near <strong>~245</strong> — all modeled medians, useful for rank order rather than exact size.</p>
+            <p class="finding-note" style="font-size: 12.5px; color: var(--gray); font-style: italic; line-height: 1.6; margin-top: 14px; padding: 10px 14px; border-left: 2px solid var(--court); background: rgba(200, 84, 27, 0.04); border-radius: 0 4px 4px 0;"><strong style="font-style: normal; color: var(--ink);">A note on top-10 formats.</strong> The top-10 format labels above were manually verified against each show's actual on-air host count. For the full 2,215-show universe, format is inferred from the number of distinct contact rows associated with each feed — see the methodology section.</p>
             <p>Multi-host formats trade incremental host cost for production resilience and scale: they survive any single host being unavailable, attract larger guest networks, and produce more clip-friendly moments for social. Solo shows are easier to start, which is why they dominate the long tail — but the path from solo launch to scale almost always runs through adding co-hosts.</p>
           </div>
 
@@ -2827,10 +2828,10 @@
       </div>
       <div class="chart-card reveal delay-1">
         <div class="chart-card-title">Top sponsor brands</div>
-        <div class="chart-card-sub">Fantasy and betting platforms (PrizePicks, FanDuel, DraftKings, Underdog Fantasy) lead the inventory, followed by ticketing (Gametime, SeatGeek), fintech (Monarch), and convenience / DTC (DoorDash, Amazon, StreamYard).</div>
+        <div class="chart-card-sub">Number of distinct shows each brand appears on, across the 279 monetized shows. Fantasy and betting platforms (PrizePicks, FanDuel, DraftKings, Underdog Fantasy) lead the inventory, followed by ticketing (Gametime, SeatGeek), fintech (Monarch), and convenience / DTC (DoorDash, Amazon, StreamYard).</div>
         <div class="chart-canvas-wrap"><canvas id="brandChart"></canvas></div>
         <div class="chart-card-footnote" style="font-size: 11px; color: var(--gray); margin-top: 8px; font-style: italic; line-height: 1.5;">
-          Counts are the number of distinct shows each brand appears on, across the 279 monetized shows. The category is a long tail: roughly 1,300 distinct brands appear in the data, but about 85% of them show up on just a single show — the ten brands above together account for only ~11% of all brand-show placements. Fantasy and betting names are the exception to that fragmentation, with at least one such sponsor on roughly 33% of all monetized shows.
+          The category is a long tail: roughly 1,300 distinct brands appear in the data, but about 85% of them show up on just a single show — the ten brands above together account for only ~11% of all brand-show placements. Fantasy and betting names are the exception to that fragmentation, with at least one such sponsor on roughly 33% of all monetized shows.
         </div>
       </div>
     </div>
@@ -3120,6 +3121,7 @@
         <div class="meth-entry-content" id="meth-content-01" role="region">
           <div class="meth-entry-body">
           <p>The primary analysis covers <strong>2,200+ active English-language NBA podcasts in 2026</strong>, where "active" is defined as any show with at least one episode published in 2026 as of the May 2026 snapshot date. Inactive shows, foreign-language shows, and shows outside the NBA topic boundary are excluded from the trend analysis but may appear in the global-context section.</p>
+          <p><strong>What counts as an "NBA podcast."</strong> The universe is the union of (a) pure-NBA shows whose content is overwhelmingly basketball-focused and (b) broader sports / pop-culture shows whose catalog includes substantial, recurring NBA coverage (e.g., <em>The Bill Simmons Podcast</em>, <em>Mostly Hoops</em>). Inclusion was driven by an automated NBA-relevance classifier applied to each show's metadata and recent episode signals. This is a permissive boundary by design — it captures the show-level conversation around the league as listeners actually encounter it, not only podcasts that cover nothing else. Readers should keep this in mind when interpreting the top of the leaderboard: a few flagship shows are general-sports properties that anchor a large share of NBA listening but are not exclusively NBA.</p>
           <p>Show-level deduplication uses <strong>RSS feed identifier</strong> as the primary key, with podcast title as a fallback for entries that lack a stable feed ID. Where multiple rows describe the same show, listener counts use the maximum value, ratings take the mean, and binary flags (sponsor, guests, video) take the logical OR.</p>
           <p><strong>On sample sizes.</strong> Dataset A contains <strong>2,215 deduplicated active English-language NBA podcasts</strong> — this is the canonical population, displayed throughout as "2,200+". Individual subsections analyze smaller subsets where metadata availability differs: <strong>1,968 shows</strong> carry a modeled listener estimate (used for reach tiers and monetization-by-scale), and <strong>~2,150 shows</strong> publish audience-composition data (used for demographics). These are not competing totals — they are coverage subsets of the same 2,215-show universe, and each chart labels its own n-size where it differs from the full population.</p>
           <p>Show format (<strong>solo / duo / panel</strong>) is inferred from the number of distinct host or contact rows associated with each feed — one row is read as solo, two as duo, three or more as panel. Because the dataset captures listed contacts rather than a verified on-air host count, a show with a single listed contact but multiple actual hosts can be coded as "solo." The reported solo share (~67%) should therefore be treated as an <strong>upper bound</strong>, with the true duo and panel shares likely modestly higher.</p>
@@ -3373,13 +3375,13 @@
 <script>
 // ========= DATA =========
 const TOP10 = [
-  {rank:1, title:"The Bill Simmons Podcast", network:"The Ringer", format:"Duo", listeners:"~352K", spon:true, yt:true, rating:"4.4"},
-  {rank:2, title:"The Steam Room", network:"Independent", format:"Panel", listeners:"~117K", spon:false, yt:false, rating:"4.8"},
+  {rank:1, title:"The Bill Simmons Podcast", network:"The Ringer", format:"Solo", listeners:"~352K", spon:true, yt:true, rating:"4.4"},
+  {rank:2, title:"The Steam Room", network:"Independent", format:"Duo", listeners:"~117K", spon:false, yt:false, rating:"4.8"},
   {rank:3, title:"The Mismatch", network:"The Ringer", format:"Panel", listeners:"~104K", spon:false, yt:true, rating:"4.7"},
   {rank:4, title:"Mostly Hoops with Mark Titus", network:"Barstool Sports", format:"Solo", listeners:"~84K", spon:true, yt:true, rating:"4.7"},
   {rank:5, title:"Brian Windhorst & The Hoop Collective", network:"ESPN", format:"Panel", listeners:"~78K", spon:false, yt:false, rating:"4.0"},
   {rank:6, title:"The Rights To Ricky Sanchez (76ers)", network:"Independent", format:"Panel", listeners:"~72K", spon:true, yt:false, rating:"4.8"},
-  {rank:7, title:"The Old Man and the Three", network:"Wondery", format:"Panel", listeners:"~68K", spon:true, yt:true, rating:"4.8"},
+  {rank:7, title:"The Old Man and the Three", network:"Wondery", format:"Duo", listeners:"~68K", spon:true, yt:true, rating:"4.8"},
   {rank:8, title:"Inside the Green Room w/ Danny Green", network:"Independent", format:"Panel", listeners:"~65K", spon:true, yt:true, rating:"4.9"},
   {rank:9, title:"Open Floor: SI's NBA Show", network:"Sports Illustrated", format:"Panel", listeners:"~56K", spon:true, yt:true, rating:"4.5"},
   {rank:10, title:"Buckets with Amir Blumenfeld", network:"Independent", format:"Duo", listeners:"~55K", spon:false, yt:false, rating:"4.9"},
@@ -3813,7 +3815,7 @@ const frameChartConfigs = {
       labels: ['Solo', 'Duo', 'Panel'],
       datasets: [
         { label:'All shows (n=2,215)', data: [67, 13, 20], backgroundColor: '#b8b0a3', borderRadius: 3 },
-        { label:'Top 10 (n=10)', data: [10, 20, 70], backgroundColor: COURT, borderRadius: 3 }
+        { label:'Top 10 (n=10)', data: [20, 40, 40], backgroundColor: COURT, borderRadius: 3 }
       ]
     },
     options: { responsive:true, maintainAspectRatio:false,
@@ -3875,7 +3877,7 @@ chartFns.formatChart = () => new Chart(document.getElementById('formatChart'), {
     labels: ['Solo', 'Duo', 'Panel'],
     datasets: [
       { label:'% of all active shows', data: [67, 13, 20], backgroundColor: '#b8b0a3', borderRadius: 4 },
-      { label:'% of top 10 shows', data: [10, 20, 70], backgroundColor: COURT, borderRadius: 4 }
+      { label:'% of top 10 shows', data: [20, 40, 40], backgroundColor: COURT, borderRadius: 4 }
     ]
   },
   options: { responsive:true, maintainAspectRatio:false,
