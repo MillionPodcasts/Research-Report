@@ -59,6 +59,8 @@
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 1px 3px rgba(80, 60, 30, .04);
+    /* Smooth grow/collapse for mobile menu open/close */
+    transition: height .32s cubic-bezier(.22,.61,.36,1), background .32s ease;
   }
   .mp-header-inner {
     max-width: 1280px;
@@ -146,6 +148,8 @@
   .mp-dropdown-panel a:hover {
     background: rgba(200, 84, 27, 0.08); color: var(--court);
   }
+  /* Hide link icons on desktop — they appear only inside the open mobile menu */
+  .mp-dropdown-panel a .mp-link-icon { display: none; }
   .mp-nav-right {
     display: flex; align-items: center; gap: 18px; flex-shrink: 0;
   }
@@ -170,43 +174,189 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 16px -4px rgba(110, 58, 12, .32);
   }
+
+  /* Mobile-only Pricing pill (sits in header row beside the toggle) — hidden on desktop */
+  .mp-mobile-pricing-pill { display: none; }
+
   .mp-mobile-toggle {
     display: none;
     background: none; border: none; cursor: pointer;
-    padding: 8px; margin-left: auto;
+    padding: 8px;
+    width: 40px; height: 40px;
+    align-items: center; justify-content: center;
   }
-  .mp-mobile-toggle span {
-    display: block; width: 22px; height: 2px;
-    background: var(--ink); margin: 4px 0;
-    transition: transform .2s ease, opacity .2s ease;
+  .mp-mobile-toggle .mp-icon-hamburger,
+  .mp-mobile-toggle .mp-icon-close {
+    display: none;
+    width: 22px; height: 22px;
+    color: var(--court);
   }
+  .mp-mobile-toggle .mp-icon-hamburger { display: block; }
+
   @media (max-width: 980px) {
-    .mp-nav-left, .mp-nav-right { display: none; }
-    .mp-mobile-toggle { display: block; }
-    .mp-header-inner.is-open {
-      flex-wrap: wrap;
-      max-height: calc(100vh - 20px);
+    /* Explicit closed-state height so the height transition to 100vh animates smoothly */
+    .mp-header { height: 64px; }
+    /* Header row: logo | Pricing pill | hamburger/X */
+    .mp-header-inner {
+      padding: 12px 18px;
+      gap: 12px;
+    }
+    /* When menu opens, header expands to fill the viewport with a solid cream bg.
+       Height animates from natural (~56-64px) to 100vh for a smooth slide-down. */
+    .mp-header.is-open {
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(250, 247, 242, 1);
+      overflow: hidden;
+    }
+    .mp-header.is-open .mp-header-inner {
+      height: 100%;
+      align-content: flex-start;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
-    .mp-header-inner.is-open .mp-nav-left,
+    .mp-nav-left, .mp-nav-right { display: none; }
+    .mp-mobile-toggle { display: inline-flex; margin-left: 0; }
+    .mp-mobile-pricing-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-left: auto;
+      background: var(--court);
+      color: #fff !important;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 600;
+      text-decoration: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      letter-spacing: 0;
+      transition: background .15s ease;
+      box-shadow: 0 1px 2px rgba(110, 58, 12, .18);
+    }
+    .mp-mobile-pricing-pill:hover { background: var(--court-deep); }
+
+    /* Swap hamburger -> X when menu is open */
+    .mp-header-inner.is-open .mp-mobile-toggle .mp-icon-hamburger { display: none; }
+    .mp-header-inner.is-open .mp-mobile-toggle .mp-icon-close { display: block; }
+
+    /* Open menu: header row pinned at top; nav lists wrap below as full-width blocks.
+       Logo (order 0) → Pricing pill (order 1) → Toggle (order 2) form the top row.
+       Nav-left (order 3) and Nav-right (order 4) get flex-basis 100% so they wrap to new rows below. */
+    .mp-header-inner.is-open {
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .mp-header-inner.is-open .mp-logo            { order: 0; }
+    .mp-header-inner.is-open .mp-mobile-pricing-pill { order: 1; }
+    .mp-header-inner.is-open .mp-mobile-toggle   { order: 2; }
+    .mp-header-inner.is-open .mp-nav-left        { order: 3; flex-basis: 100%; }
+    .mp-header-inner.is-open .mp-nav-right       { order: 4; flex-basis: 100%; }
+
+    .mp-header-inner.is-open .mp-nav-left {
+      display: flex; flex-direction: column;
+      align-items: stretch; gap: 0;
+      width: calc(100% + 36px);
+      max-width: calc(100% + 36px);
+      margin: 14px -18px 0;
+      padding: 0;
+      border-top: 1px solid var(--line);
+    }
+    .mp-header-inner.is-open .mp-nav-left > a,
+    .mp-header-inner.is-open .mp-nav-left .mp-dropdown-trigger {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%;
+      padding: 16px 18px;
+      margin: 0;
+      font-size: 15px; font-weight: 500;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      text-align: left;
+    }
+    /* Dropdown trigger chevron — replace the rotated-arrow ::after with a clean chevron via SVG bg */
+    .mp-header-inner.is-open .mp-nav-left .mp-dropdown-trigger::after {
+      content: ''; width: 18px; height: 18px;
+      border: none; transform: none; margin: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c8541b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: center;
+      background-size: 18px 18px;
+      transition: transform .2s ease;
+    }
+    .mp-header-inner.is-open .mp-dropdown.is-open .mp-dropdown-trigger::after {
+      transform: rotate(180deg);
+    }
+
+    /* Resources accordion panel — collapsed by default, opens on click */
+    .mp-header-inner.is-open .mp-dropdown-panel {
+      position: static;
+      opacity: 1; visibility: visible; transform: none;
+      box-shadow: none; border: none; border-radius: 0;
+      padding: 0; min-width: 0;
+      background: transparent;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      display: none;
+      width: 100%;
+    }
+    .mp-header-inner.is-open .mp-dropdown.is-open .mp-dropdown-panel {
+      display: block;
+      padding: 4px 18px 12px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .mp-header-inner.is-open .mp-dropdown-section {
+      padding: 8px 0;
+    }
+    .mp-header-inner.is-open .mp-dropdown-section + .mp-dropdown-section {
+      border-top: none; margin-top: 0; padding-top: 8px;
+    }
+    .mp-header-inner.is-open .mp-dropdown-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 500;
+      letter-spacing: .04em; text-transform: capitalize;
+      color: var(--gray); margin: 4px 0 6px 0;
+    }
+    .mp-header-inner.is-open .mp-dropdown-panel a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 4px; margin: 0;
+      font-size: 14px; font-weight: 500;
+      color: var(--ink);
+      border-radius: 0;
+    }
+    .mp-header-inner.is-open .mp-dropdown-panel a:hover {
+      background: transparent; color: var(--court);
+    }
+    .mp-header-inner.is-open .mp-dropdown-panel a .mp-link-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; flex-shrink: 0;
+      color: var(--court);
+    }
+    .mp-header-inner.is-open .mp-dropdown-panel a .mp-link-icon svg {
+      width: 100%; height: 100%; display: block;
+    }
+
+    /* In-menu Pricing row (matches the bare link rows above it) */
     .mp-header-inner.is-open .mp-nav-right {
       display: flex; flex-direction: column;
-      align-items: flex-start; gap: 14px;
-      width: 100%; margin: 0; padding-top: 16px;
-      border-top: 1px solid var(--line); margin-top: 14px;
+      align-items: stretch; gap: 0;
+      width: calc(100% + 36px);
+      max-width: calc(100% + 36px);
+      margin: 0 -18px;
+      padding: 0;
     }
+    .mp-header-inner.is-open .mp-nav-right > a:not(.mp-cta-btn) {
+      display: flex; align-items: center;
+      width: 100%;
+      padding: 16px 18px;
+      font-size: 15px; font-weight: 500;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+    /* The Start Free Trial primary button — full-width at the bottom (36px inset from edges) */
     .mp-header-inner.is-open .mp-nav-right .mp-cta-btn {
-      align-self: flex-start;
-    }
-    .mp-header-inner.is-open .mp-dropdown-panel {
-      position: static; opacity: 1; visibility: visible;
-      transform: none; box-shadow: none; border: none;
-      border-left: 2px solid var(--line); border-radius: 0;
-      padding: 8px 0 8px 14px; margin-top: 8px;
-      min-width: 0; background: transparent;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
+      align-self: stretch;
+      margin: 20px 36px 16px;
+      padding: 14px 20px;
+      text-align: center;
+      font-size: 15px;
+      border-radius: 8px;
+      border-bottom: none;
     }
   }
   @media (max-width: 560px) {
@@ -2109,18 +2259,18 @@
         <div class="mp-dropdown-panel" id="mpResourcesPanel" role="menu">
           <div class="mp-dropdown-section">
             <span class="mp-dropdown-label">Content</span>
-            <a href="https://www.millionpodcasts.com/blog/" role="menuitem">Blog</a>
-            <a href="https://www.millionpodcasts.com/blog/category/platform-guide" role="menuitem">Platform Guide</a>
-            <a href="https://www.millionpodcasts.com/blog/category/for-podcasters" role="menuitem">For Podcasters</a>
-            <a href="https://www.millionpodcasts.com/blog/category/for-advertisers/" role="menuitem">For Advertisers</a>
-            <a href="https://www.millionpodcasts.com/blog/category/for-businesses" role="menuitem">For Businesses</a>
-            <a href="https://www.millionpodcasts.com/blog/category/for-pr-pros" role="menuitem">For PR Pros</a>
-            <a href="https://www.millionpodcasts.com/blog/category/industry-data" role="menuitem">Industry Data</a>
+            <a href="https://www.millionpodcasts.com/blog/" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg></span>Blog</a>
+            <a href="https://www.millionpodcasts.com/blog/category/platform-guide" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4.5A2.5 2.5 0 0 1 4.5 2H11v18H4.5A2.5 2.5 0 0 1 2 17.5z"/><path d="M22 4.5A2.5 2.5 0 0 0 19.5 2H13v18h6.5a2.5 2.5 0 0 0 2.5-2.5z"/></svg></span>Platform Guide</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-podcasters" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="2.2"/><path d="M7.5 15.5a6 6 0 1 1 9 0"/><path d="M5 18a9 9 0 1 1 14 0"/><line x1="12" y1="20" x2="12" y2="22"/></svg></span>For Podcasters</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-advertisers/" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 15V9l2.5 4L13 9v6"/><line x1="16" y1="13" x2="18.5" y2="13"/><path d="M17 9v6"/></svg></span>For Advertisers</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-businesses" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="3" y1="12" x2="21" y2="12"/></svg></span>For Businesses</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-pr-pros" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M14 8a4 4 0 0 1 0 8"/><path d="M17 5a7 7 0 0 1 0 14"/></svg></span>For PR Pros</a>
+            <a href="https://www.millionpodcasts.com/blog/category/industry-data" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></span>Industry Data</a>
           </div>
           <div class="mp-dropdown-section">
             <span class="mp-dropdown-label">Customers</span>
-            <a href="https://www.millionpodcasts.com/customers" role="menuitem">Customer Reviews</a>
-            <a href="https://help.millionpodcasts.com" role="menuitem">Help Center</a>
+            <a href="https://www.millionpodcasts.com/customers" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 14.5 9 21 9.5 16 13.8 17.6 20 12 16.8 6.4 20 8 13.8 3 9.5 9.5 9"/></svg></span>Customer Reviews</a>
+            <a href="https://help.millionpodcasts.com" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span>Help Center</a>
           </div>
         </div>
       </div>
@@ -2129,8 +2279,10 @@
       <a href="https://www.millionpodcasts.com/pricing">Pricing</a>
       <a href="https://www.millionpodcasts.com/register" class="mp-cta-btn">Start Free Trial</a>
     </div>
+    <a href="https://www.millionpodcasts.com/pricing" class="mp-mobile-pricing-pill" aria-label="Pricing">Pricing</a>
     <button class="mp-mobile-toggle" id="mpMobileToggle" aria-label="Toggle menu" aria-expanded="false">
-      <span></span><span></span><span></span>
+      <svg class="mp-icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      <svg class="mp-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
     </button>
   </div>
 </header>
@@ -2166,21 +2318,28 @@
     if(e.key === 'Escape' || e.keyCode === 27){ closeDropdown(); }
   });
   if(mobileBtn && headerNav){
-    mobileBtn.addEventListener('click', function(e){
-      e.stopPropagation();
-      var open = headerNav.classList.toggle('is-open');
+    var headerEl = document.querySelector('.mp-header');
+    function setOpen(open){
+      if(open){
+        headerNav.classList.add('is-open');
+        if(headerEl) headerEl.classList.add('is-open');
+      } else {
+        headerNav.classList.remove('is-open');
+        if(headerEl) headerEl.classList.remove('is-open');
+      }
       mobileBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       document.body.style.overflow = open ? 'hidden' : '';
       if(!open) closeDropdown();
+    }
+    mobileBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      setOpen(!headerNav.classList.contains('is-open'));
     });
     // Close mobile menu when a link inside it is tapped
     headerNav.addEventListener('click', function(e){
-      var t = e.target;
-      if (t && t.tagName === 'A' && headerNav.classList.contains('is-open')) {
-        headerNav.classList.remove('is-open');
-        mobileBtn.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-        closeDropdown();
+      var link = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (link && headerNav.contains(link) && headerNav.classList.contains('is-open')) {
+        setOpen(false);
       }
     });
     // Close on outside tap (mobile)
@@ -2188,18 +2347,13 @@
       if (headerNav.classList.contains('is-open') &&
           !headerNav.contains(e.target) &&
           !mobileBtn.contains(e.target)) {
-        headerNav.classList.remove('is-open');
-        mobileBtn.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-        closeDropdown();
+        setOpen(false);
       }
     });
     // Reset on resize back to desktop
     window.addEventListener('resize', function(){
       if (window.innerWidth > 980 && headerNav.classList.contains('is-open')) {
-        headerNav.classList.remove('is-open');
-        mobileBtn.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
+        setOpen(false);
       }
     });
   }
