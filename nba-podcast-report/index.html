@@ -3594,6 +3594,8 @@ const valueLabel = {
   id: 'valueLabel',
   afterDatasetsDraw(chart, args, opts) {
     const {ctx} = chart;
+    // Detect orientation: horizontal bar charts have indexAxis === 'y'
+    const isHorizontal = chart.options.indexAxis === 'y';
     chart.data.datasets.forEach((ds, dsi) => {
       const meta = chart.getDatasetMeta(dsi);
       if (meta.type !== 'bar') return;
@@ -3604,9 +3606,17 @@ const valueLabel = {
         ctx.save();
         ctx.fillStyle = INK;
         ctx.font = `600 11px ${FONT}`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(txt, bar.x, bar.y - 4);
+        if (isHorizontal) {
+          // Place label just past the bar's right edge, vertically centered on the bar
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(txt, bar.x + 6, bar.y);
+        } else {
+          // Vertical bars: centered above the bar tip
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(txt, bar.x, bar.y - 4);
+        }
         ctx.restore();
       });
     });
