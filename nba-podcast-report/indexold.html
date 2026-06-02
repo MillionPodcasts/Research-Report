@@ -7,25 +7,24 @@
 <meta name="description" content="The NBA Podcast Ecosystem: 2026 Edition — a research-grade analysis of 2,200+ active English-language NBA podcasts for 2026: who leads, who monetizes, who's growing, and where the audience is shifting.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    /* Million Podcasts Design System */
-    --court: #5E77FB;        /* Primary */
-    --court-deep: #4B5FC9;   /* Primary / Hover */
-    --court-light: #8B9DFC;  /* Primary (light tint) */
-    --court-glow: rgba(94, 119, 251, 0.4);
-    --cream: #FAFBFF;        /* Page Background */
-    --cream-dark: #EFF1FF;   /* Section Selected */
-    --ink: #000000;          /* Headings */
-    --ink-soft: #333333;     /* Sub Headings */
-    --ink-mid: #333333;      /* Sub Headings (dark) */
-    --gray: #72727D;         /* Paragraph Text */
-    --gray-light: #95959D;   /* Secondary Text */
-    --line: #DFE4FE;         /* Border */
-    --accent: #17C653;       /* Success (secondary chart hue) */
-    --gold: #4B5FC9;         /* tertiary accent */
+    --court: #c8541b;
+    --court-deep: #9a3e10;
+    --court-light: #e07a3e;
+    --court-glow: rgba(200, 84, 27, 0.4);
+    --cream: #faf7f2;
+    --cream-dark: #f0ebe1;
+    --ink: #0a0a0b;
+    --ink-soft: #1a1a1c;
+    --ink-mid: #2a2a2c;
+    --gray: #6b6357;
+    --gray-light: #b8b0a3;
+    --line: #d8d2c4;
+    --accent: #1d4ed8;
+    --gold: #b8860b;
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
     --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
     --shadow-lg: 0 16px 48px rgba(0,0,0,0.12);
@@ -42,7 +41,7 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
-  .serif { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+  .serif { font-family: 'Fraunces', Georgia, serif; font-feature-settings: 'ss01' on; }
   .mono { font-family: 'JetBrains Mono', monospace; }
   .container {
     max-width: 1280px;
@@ -55,11 +54,11 @@
   .mp-header {
     position: fixed; top: 0; left: 0; right: 0;
     z-index: 100;
-    background: rgba(250, 251, 255, 0.88);
+    background: rgba(250, 247, 242, 0.88);
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     border-bottom: 1px solid var(--line);
-    box-shadow: 0 1px 3px rgba(40, 50, 90, .04);
+    box-shadow: 0 1px 3px rgba(80, 60, 30, .04);
     /* Smooth grow/collapse for mobile menu open/close */
     transition: height .32s cubic-bezier(.22,.61,.36,1), background .32s ease;
   }
@@ -108,12 +107,12 @@
   .mp-dropdown { position: relative; }
   .mp-dropdown-panel {
     position: absolute; top: calc(100% + 14px); left: -20px;
-    background: rgba(250, 251, 255, 0.96);
+    background: rgba(250, 247, 242, 0.96);
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid var(--line);
     border-radius: 12px;
-    box-shadow: 0 16px 40px -12px rgba(40, 50, 90, .20), 0 4px 12px rgba(40, 50, 90, .06);
+    box-shadow: 0 16px 40px -12px rgba(80, 60, 30, .20), 0 4px 12px rgba(80, 60, 30, .06);
     padding: 18px 20px; min-width: 240px;
     opacity: 0; visibility: hidden; transform: translateY(-6px);
     transition: opacity .18s ease, transform .18s ease, visibility .18s;
@@ -147,7 +146,7 @@
     transition: background .12s ease, color .12s ease;
   }
   .mp-dropdown-panel a:hover {
-    background: rgba(94, 119, 251, 0.08); color: var(--court);
+    background: rgba(200, 84, 27, 0.08); color: var(--court);
   }
   /* Hide link icons on desktop — they appear only inside the open mobile menu */
   .mp-dropdown-panel a .mp-link-icon { display: none; }
@@ -168,12 +167,12 @@
     padding: 9px 18px; border-radius: 8px;
     font-weight: 600 !important; font-size: 14px;
     transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
-    box-shadow: 0 1px 2px rgba(75, 95, 201, .18);
+    box-shadow: 0 1px 2px rgba(110, 58, 12, .18);
   }
   .mp-cta-btn:hover {
     background: var(--court-deep) !important; color: #fff !important;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px -4px rgba(75, 95, 201, .32);
+    box-shadow: 0 6px 16px -4px rgba(110, 58, 12, .32);
   }
 
   /* Mobile-only Pricing pill (sits in header row beside the toggle) — hidden on desktop */
@@ -207,7 +206,7 @@
     .mp-header.is-open {
       height: 100vh;
       height: 100dvh;
-      background: rgba(250, 251, 255, 1);
+      background: rgba(250, 247, 242, 1);
       overflow: hidden;
     }
     .mp-header.is-open .mp-header-inner {
@@ -230,7 +229,7 @@
       border-radius: 8px;
       letter-spacing: 0;
       transition: background .15s ease;
-      box-shadow: 0 1px 2px rgba(75, 95, 201, .18);
+      box-shadow: 0 1px 2px rgba(110, 58, 12, .18);
     }
     .mp-mobile-pricing-pill:hover { background: var(--court-deep); }
 
@@ -401,7 +400,7 @@
     -webkit-backdrop-filter: blur(8px) saturate(140%);
     color: var(--ink-soft);
     border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 1px 2px rgba(40, 50, 90, 0.04),
+    box-shadow: 0 1px 2px rgba(60, 40, 20, 0.04),
                 inset 0 1px 0 rgba(255, 255, 255, 0.6);
     border-radius: 100px;
     font-family: 'Inter', sans-serif;
@@ -422,10 +421,10 @@
   }
   .hero-chip:hover {
     background: rgba(255, 255, 255, 0.85);
-    border-color: rgba(94, 119, 251, 0.35);
+    border-color: rgba(200, 84, 27, 0.35);
     color: var(--court);
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(94, 119, 251, 0.10),
+    box-shadow: 0 3px 10px rgba(200, 84, 27, 0.10),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
   .hero-chip:hover::before { transform: scale(1.3); opacity: 1; }
@@ -490,7 +489,7 @@
 
   /* ========= HERO ========= */
   .hero {
-    background: linear-gradient(180deg, var(--cream) 0%, #EFF1FF 100%);
+    background: linear-gradient(180deg, var(--cream) 0%, #f5f0e5 100%);
     color: var(--ink);
     padding: 120px 0 60px;
     position: relative;
@@ -507,7 +506,7 @@
     position: absolute;
     top: -100px; right: -200px;
     width: 700px; height: 700px;
-    background: radial-gradient(circle, rgba(94, 119, 251, 0.10) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(200, 84, 27, 0.10) 0%, transparent 60%);
     pointer-events: none;
     animation: pulse 8s ease-in-out infinite;
   }
@@ -516,7 +515,7 @@
     position: absolute;
     bottom: -200px; left: -150px;
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(23, 198, 83, 0.05) 0%, transparent 60%);
+    background: radial-gradient(circle, rgba(29, 78, 216, 0.05) 0%, transparent 60%);
     pointer-events: none;
     animation: pulse 10s ease-in-out infinite reverse;
   }
@@ -532,7 +531,7 @@
   @media (max-width: 980px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
   .hero-content { position: relative; }
   .hero h1 {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Fraunces', serif;
     font-weight: 600; font-size: clamp(38px, 5.6vw, 76px);
     line-height: 0.98; letter-spacing: -0.025em;
     margin-bottom: 28px;
@@ -546,8 +545,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    /* headroom so italic ascenders aren't clipped by the text-clip paint box */
-    padding: 0.18em 0.06em 0.06em 0;
   }
   .hero-sub {
     font-size: clamp(16px, 1.4vw, 19px); line-height: 1.6;
@@ -580,7 +577,7 @@
     line-height: 1.6;
     padding: 14px 18px; margin: 4px 0 20px;
     border-left: 2px solid var(--court);
-    background: rgba(94, 119, 251, 0.04);
+    background: rgba(200, 84, 27, 0.04);
     border-radius: 0 4px 4px 0;
   }
   .hero-note p {
@@ -599,13 +596,13 @@
   .court-container:active { cursor: grabbing; }
   .court-svg {
     width: 100%; height: 100%;
-    filter: drop-shadow(0 20px 40px rgba(94, 119, 251, 0.15));
+    filter: drop-shadow(0 20px 40px rgba(200, 84, 27, 0.15));
     transform-style: preserve-3d;
     animation: tiltCourt 12s ease-in-out infinite;
     transition: filter 0.4s ease;
   }
   .court-container:hover .court-svg {
-    filter: drop-shadow(0 24px 48px rgba(94, 119, 251, 0.28));
+    filter: drop-shadow(0 24px 48px rgba(200, 84, 27, 0.28));
   }
   @keyframes tiltCourt {
     0%, 100% { transform: rotateX(15deg) rotateY(-8deg); }
@@ -616,12 +613,12 @@
     width: 88px; height: 88px;
     top: 22%; right: 8%;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 28%, #8B9DFC 0%, var(--court) 50%, var(--court-deep) 100%);
+    background: radial-gradient(circle at 35% 28%, #f29659 0%, var(--court) 50%, var(--court-deep) 100%);
     box-shadow:
       inset -10px -10px 25px rgba(0,0,0,0.4),
       inset 8px 8px 20px rgba(255,255,255,0.15),
-      0 20px 50px rgba(94, 119, 251, 0.6),
-      0 0 80px rgba(94, 119, 251, 0.3);
+      0 20px 50px rgba(200, 84, 27, 0.6),
+      0 0 80px rgba(200, 84, 27, 0.3);
     animation: bounceBall 3s ease-in-out infinite;
     z-index: 3;
     transition: animation-duration 0.3s;
@@ -657,7 +654,7 @@
     border-radius: 8px;
     padding: 14px 18px;
     z-index: 4;
-    box-shadow: 0 12px 32px rgba(40, 50, 90, 0.12);
+    box-shadow: 0 12px 32px rgba(80, 60, 30, 0.12);
   }
   .art-overlay.top {
     top: 8%; left: -10%;
@@ -683,7 +680,7 @@
     50% { transform: translateY(10px); }
   }
   .art-overlay-num {
-    font-family: 'Inter', sans-serif; font-weight: 700;
+    font-family: 'Fraunces', serif; font-weight: 700;
     font-size: 22px; color: var(--court); line-height: 1;
   }
   .art-overlay-lab {
@@ -716,7 +713,7 @@
     color: inherit;
   }
   .hstat:hover {
-    background: rgba(94, 119, 251, 0.04);
+    background: rgba(200, 84, 27, 0.04);
     transform: translateY(-2px);
   }
   .hstat::after {
@@ -739,7 +736,7 @@
     .hstat:nth-child(odd)::after { left: 8px; }
   }
   .hstat-num {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: clamp(28px, 3.4vw, 44px); line-height: 1;
     color: var(--ink); margin-bottom: 10px;
     letter-spacing: -0.02em;
@@ -795,7 +792,7 @@
     background: var(--court);
   }
   .section-title {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: clamp(30px, 3.8vw, 50px); line-height: 1.05;
     letter-spacing: -0.02em; margin-bottom: 24px;
   }
@@ -843,7 +840,7 @@
     margin-bottom: 16px; letter-spacing: 0.06em;
   }
   .exec-stat {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 38px; line-height: 1.1; margin-bottom: 12px;
     letter-spacing: -0.015em; color: var(--ink);
   }
@@ -872,7 +869,7 @@
     transform: translateY(-2px);
   }
   .chart-card-title {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 19px; margin-bottom: 6px; color: var(--ink);
     letter-spacing: -0.01em;
   }
@@ -900,8 +897,8 @@
     line-height: 1.4;
   }
   .source-pill.context-only {
-    background: rgba(94, 119, 251, 0.06);
-    border-color: rgba(94, 119, 251, 0.25);
+    background: rgba(200, 84, 27, 0.06);
+    border-color: rgba(200, 84, 27, 0.25);
     color: var(--court);
   }
   @media (max-width: 480px) { .source-pill { font-size: 9.5px; padding: 3px 8px; } }
@@ -974,7 +971,7 @@
     color: var(--court); margin-bottom: 8px;
   }
   .team-callout h4 {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 18px; line-height: 1.25;
     color: var(--ink); margin-bottom: 10px;
     letter-spacing: -0.01em;
@@ -993,7 +990,7 @@
   .limitations-recap {
     margin-top: 40px;
     padding: 22px 26px;
-    background: rgba(149, 149, 157, 0.04);
+    background: rgba(120, 110, 95, 0.04);
     border-left: 3px solid var(--gray);
     border-radius: 0 6px 6px 0;
   }
@@ -1024,8 +1021,8 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(250, 251, 255, 0.45);
-    border-top: 1px solid rgba(250, 251, 255, 0.12);
+    color: rgba(247, 240, 224, 0.45);
+    border-top: 1px solid rgba(247, 240, 224, 0.12);
     padding-top: 22px;
     max-width: 540px;
     margin-left: auto;
@@ -1061,7 +1058,7 @@
   }
   .tile:hover::after { width: 100%; }
   .tile-num {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 32px; color: var(--court); line-height: 1; margin-bottom: 8px;
     letter-spacing: -0.015em;
   }
@@ -1091,7 +1088,7 @@
   }
   .lb-table tbody tr:hover { background: var(--cream-dark); }
   .lb-rank {
-    font-family: 'Inter', sans-serif; font-weight: 700;
+    font-family: 'Fraunces', serif; font-weight: 700;
     font-size: 18px; color: var(--court); width: 50px;
   }
   .lb-title { font-weight: 600; color: var(--ink); }
@@ -1100,8 +1097,8 @@
     display: inline-block; padding: 4px 10px; border-radius: 100px;
     font-size: 11px; font-weight: 600; line-height: 1.3;
   }
-  .pill-yes { background: rgba(23, 198, 83, 0.12); color: #0E8C42; }
-  .pill-no { background: rgba(149, 149, 157, 0.1); color: var(--gray); }
+  .pill-yes { background: rgba(34, 139, 34, 0.12); color: #1f7a1f; }
+  .pill-no { background: rgba(120, 120, 120, 0.1); color: var(--gray); }
 
   /* ========= STANDOUT ========= */
   .standout {
@@ -1118,11 +1115,11 @@
   }
   .standout::before {
     top: -150px; left: -100px;
-    background: radial-gradient(circle, rgba(94, 119, 251,0.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(200,84,27,0.18) 0%, transparent 70%);
   }
   .standout::after {
     bottom: -150px; right: -100px;
-    background: radial-gradient(circle, rgba(23, 198, 83,0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(29,78,216,0.15) 0%, transparent 70%);
   }
   .standout > .container { position: relative; z-index: 2; }
   .standout-grid {
@@ -1131,27 +1128,25 @@
   }
   @media (max-width: 880px) { .standout-grid { grid-template-columns: 1fr; gap: 40px; } }
   .standout-num {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: clamp(56px, 8vw, 100px); line-height: 0.95;
     background: linear-gradient(180deg, var(--court-light) 0%, var(--court) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: -0.03em; margin-bottom: 12px;
-    /* headroom so glyph tops aren't clipped by the text-clip paint box; offset to keep layout */
-    padding-top: 0.12em; margin-top: -0.12em;
   }
   .standout-label {
-    font-family: 'Inter', sans-serif; font-weight: 500;
-    font-style: italic; font-size: 17px; color: rgba(250, 251, 255, 0.78);
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-style: italic; font-size: 17px; color: rgba(250, 247, 242, 0.78);
     line-height: 1.4; max-width: 24ch; margin: 0 auto;
   }
   .standout h2 {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: clamp(28px, 3.5vw, 42px); line-height: 1.1;
     margin-bottom: 12px; color: var(--cream);
   }
-  .standout-intro { color: rgba(250, 251, 255, 0.6); font-size: 16px; max-width: 56ch; margin: 0 auto; }
+  .standout-intro { color: rgba(250, 247, 242, 0.6); font-size: 16px; max-width: 56ch; margin: 0 auto; }
 
   /* ========= STRATEGIC ========= */
   .strat-grid {
@@ -1179,7 +1174,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   .strat-card h3 {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 22px; margin-bottom: 16px; letter-spacing: -0.01em;
     color: var(--ink);
   }
@@ -1241,7 +1236,7 @@
     color: var(--court); margin-bottom: 6px;
   }
   .meth-overview-value {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 18px; line-height: 1.25;
     color: var(--ink); letter-spacing: -0.005em;
   }
@@ -1299,7 +1294,7 @@
     }
   }
   .meth-entry-num {
-    font-family: 'Inter', sans-serif; font-weight: 500;
+    font-family: 'Fraunces', serif; font-weight: 500;
     font-size: 32px; line-height: 1;
     color: var(--court); letter-spacing: -0.03em;
   }
@@ -1314,7 +1309,7 @@
     flex-wrap: wrap;
   }
   .meth-entry-title {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 17px; line-height: 1.3;
     color: var(--ink); letter-spacing: -0.01em;
   }
@@ -1324,7 +1319,7 @@
     font-size: 9.5px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--court);
-    background: rgba(94, 119, 251, 0.08);
+    background: rgba(200, 84, 27, 0.08);
     padding: 3px 8px; border-radius: 100px;
     flex-shrink: 0;
   }
@@ -1401,14 +1396,14 @@
     border: 1px solid var(--court);
     border-left: 4px solid var(--court);
     border-radius: 6px;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Fraunces', serif;
     font-weight: 500;
     font-style: italic;
     font-size: 15px;
     line-height: 1.5;
     color: var(--ink);
     letter-spacing: -0.005em;
-    box-shadow: 0 2px 8px rgba(94, 119, 251, 0.08);
+    box-shadow: 0 2px 8px rgba(200, 84, 27, 0.08);
   }
   .meth-citation::before {
     content: 'Suggested citation';
@@ -1510,7 +1505,7 @@
 
   /* ========= CONCLUSION ========= */
   .conclusion-quote {
-    font-family: 'Inter', sans-serif; font-style: italic; font-weight: 400;
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 400;
     font-size: clamp(22px, 2.6vw, 32px); line-height: 1.4;
     color: var(--ink); max-width: 36ch; margin: 48px auto;
     text-align: center; letter-spacing: -0.01em; position: relative;
@@ -1561,7 +1556,7 @@
   }
   .hstat:hover .hstat-num {
     transform: translateY(-2px);
-    text-shadow: 0 8px 24px rgba(94, 119, 251, 0.18);
+    text-shadow: 0 8px 24px rgba(200, 84, 27, 0.18);
   }
   .exec-card:hover .exec-stat {
     color: var(--court);
@@ -1573,11 +1568,11 @@
   }
   .tile:hover .tile-num {
     transform: scale(1.04);
-    text-shadow: 0 6px 16px rgba(94, 119, 251, 0.22);
+    text-shadow: 0 6px 16px rgba(200, 84, 27, 0.22);
   }
   .standout-grid > div:hover .standout-num {
     transform: scale(1.04);
-    filter: drop-shadow(0 8px 24px rgba(94, 119, 251, 0.35));
+    filter: drop-shadow(0 8px 24px rgba(200, 84, 27, 0.35));
   }
   .meth-overview-cell:hover .meth-overview-value {
     color: var(--court);
@@ -1618,7 +1613,7 @@
     .hero-art { max-width: 300px; margin: 8px auto 0; }
     /* Flatten the 3D tilt — it looks cramped/broken on small screens */
     .court-svg { animation: none; transform: none; }
-    .court-container:hover .court-svg { filter: drop-shadow(0 16px 32px rgba(94, 119, 251, 0.18)); }
+    .court-container:hover .court-svg { filter: drop-shadow(0 16px 32px rgba(200, 84, 27, 0.18)); }
     /* Keep the stat badges inside the viewport instead of bleeding off the edges */
     .art-overlay.top { top: 4%; left: 0; }
     .art-overlay.bottom { bottom: 2%; right: 0; }
@@ -1873,12 +1868,12 @@
     font-size: 10px; font-weight: 700;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--court);
-    background: rgba(94, 119, 251, 0.08);
+    background: rgba(200, 84, 27, 0.08);
     padding: 5px 10px;
     border-radius: 100px;
   }
   .signal-headline {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 22px; line-height: 1.2;
     letter-spacing: -0.01em; color: var(--ink);
     margin-bottom: 14px;
@@ -1891,7 +1886,7 @@
     border-radius: 0 6px 6px 0;
   }
   .signal-big-num {
-    font-family: 'Inter', sans-serif; font-weight: 700;
+    font-family: 'Fraunces', serif; font-weight: 700;
     font-size: 36px; line-height: 1; color: var(--court);
     letter-spacing: -0.02em;
   }
@@ -1946,7 +1941,7 @@
     color: var(--court); margin-bottom: 10px;
   }
   .takeaway-text {
-    font-family: 'Inter', sans-serif; font-weight: 500;
+    font-family: 'Fraunces', serif; font-weight: 500;
     font-size: 17.5px; line-height: 1.55;
     color: var(--ink-soft);
     letter-spacing: -0.005em;
@@ -2024,7 +2019,7 @@
     color: var(--court); margin-bottom: 4px;
   }
   .findings-chart-title {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 14px; line-height: 1.3;
     color: var(--ink); margin-bottom: 14px;
     letter-spacing: -0.005em;
@@ -2088,7 +2083,7 @@
     margin-bottom: 18px; flex-wrap: wrap;
   }
   .finding-mark {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Fraunces', serif;
     font-weight: 600; font-size: 14px;
     color: var(--court); letter-spacing: 0.04em;
     border: 1px solid var(--court);
@@ -2101,13 +2096,13 @@
     color: var(--gray);
   }
   .finding-title {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: clamp(26px, 2.8vw, 36px); line-height: 1.18;
     letter-spacing: -0.018em; color: var(--ink);
     margin-bottom: 16px;
   }
   .finding-deck {
-    font-family: 'Inter', sans-serif; font-weight: 400;
+    font-family: 'Fraunces', serif; font-weight: 400;
     font-style: italic;
     font-size: 18px; line-height: 1.55;
     color: var(--gray);
@@ -2138,7 +2133,7 @@
     .finding-stat-cell:last-child { border-bottom: none; padding-bottom: 0; }
   }
   .finding-stat-num {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 30px; line-height: 1; color: var(--ink);
     margin-bottom: 4px;
     letter-spacing: -0.02em;
@@ -2217,7 +2212,7 @@
     content: ''; position: absolute;
     top: -60px; right: -60px;
     width: 220px; height: 220px;
-    background: radial-gradient(circle, rgba(94, 119, 251,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(200,84,27,0.08) 0%, transparent 70%);
     pointer-events: none;
   }
   .findings-hero-header {
@@ -2226,7 +2221,7 @@
     position: relative; z-index: 2;
   }
   .findings-hero h3 {
-    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-family: 'Fraunces', serif; font-weight: 600;
     font-size: 22px; color: var(--ink);
     letter-spacing: -0.01em;
   }
@@ -2404,54 +2399,54 @@
           <svg class="court-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <radialGradient id="courtGrad" cx="50%" cy="50%" r="60%">
-                <stop offset="0%" stop-color="#4257C2"/>
-                <stop offset="50%" stop-color="#3A4FB5"/>
-                <stop offset="100%" stop-color="#2A3A8C"/>
+                <stop offset="0%" stop-color="#6b3a18"/>
+                <stop offset="50%" stop-color="#4a2810"/>
+                <stop offset="100%" stop-color="#2a180a"/>
               </radialGradient>
               <linearGradient id="floorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="rgba(94, 119, 251,0.20)"/>
-                <stop offset="100%" stop-color="rgba(94, 119, 251,0.08)"/>
+                <stop offset="0%" stop-color="rgba(200,84,27,0.20)"/>
+                <stop offset="100%" stop-color="rgba(200,84,27,0.08)"/>
               </linearGradient>
             </defs>
             <!-- Court floor -->
             <rect x="20" y="60" width="360" height="280" fill="url(#courtGrad)" rx="6"/>
             <rect x="20" y="60" width="360" height="280" fill="url(#floorGrad)" rx="6"/>
             <!-- Court outline -->
-            <rect x="20" y="60" width="360" height="280" fill="none" stroke="#5E77FB" stroke-width="2" rx="6" opacity="0.85"/>
+            <rect x="20" y="60" width="360" height="280" fill="none" stroke="#c8541b" stroke-width="2" rx="6" opacity="0.85"/>
             <!-- Mid-line -->
-            <line x1="200" y1="60" x2="200" y2="340" stroke="#5E77FB" stroke-width="1.5" opacity="0.7"/>
+            <line x1="200" y1="60" x2="200" y2="340" stroke="#c8541b" stroke-width="1.5" opacity="0.7"/>
             <!-- Center circle -->
-            <circle cx="200" cy="200" r="42" fill="none" stroke="#5E77FB" stroke-width="1.5" opacity="0.7"/>
-            <circle cx="200" cy="200" r="14" fill="none" stroke="#5E77FB" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="200" cy="200" r="42" fill="none" stroke="#c8541b" stroke-width="1.5" opacity="0.7"/>
+            <circle cx="200" cy="200" r="14" fill="none" stroke="#c8541b" stroke-width="1.5" opacity="0.5"/>
             <!-- Left key -->
-            <rect x="20" y="140" width="70" height="120" fill="none" stroke="#5E77FB" stroke-width="1.5" opacity="0.7"/>
-            <circle cx="90" cy="200" r="34" fill="none" stroke="#5E77FB" stroke-width="1.5" opacity="0.7"/>
+            <rect x="20" y="140" width="70" height="120" fill="none" stroke="#c8541b" stroke-width="1.5" opacity="0.7"/>
+            <circle cx="90" cy="200" r="34" fill="none" stroke="#c8541b" stroke-width="1.5" opacity="0.7"/>
             <!-- Right key -->
-            <rect x="310" y="140" width="70" height="120" fill="none" stroke="#5E77FB" stroke-width="1.5" opacity="0.7"/>
-            <circle cx="310" cy="200" r="34" fill="none" stroke="#5E77FB" stroke-width="1.5" opacity="0.7"/>
+            <rect x="310" y="140" width="70" height="120" fill="none" stroke="#c8541b" stroke-width="1.5" opacity="0.7"/>
+            <circle cx="310" cy="200" r="34" fill="none" stroke="#c8541b" stroke-width="1.5" opacity="0.7"/>
             <!-- Hoops -->
-            <circle cx="32" cy="200" r="6" fill="none" stroke="#8B9DFC" stroke-width="2"/>
-            <circle cx="368" cy="200" r="6" fill="none" stroke="#8B9DFC" stroke-width="2"/>
+            <circle cx="32" cy="200" r="6" fill="none" stroke="#e07a3e" stroke-width="2"/>
+            <circle cx="368" cy="200" r="6" fill="none" stroke="#e07a3e" stroke-width="2"/>
             <!-- 3pt arcs (simple) -->
-            <path d="M 20 100 Q 165 200 20 300" fill="none" stroke="#5E77FB" stroke-width="1.2" opacity="0.45"/>
-            <path d="M 380 100 Q 235 200 380 300" fill="none" stroke="#5E77FB" stroke-width="1.2" opacity="0.45"/>
+            <path d="M 20 100 Q 165 200 20 300" fill="none" stroke="#c8541b" stroke-width="1.2" opacity="0.45"/>
+            <path d="M 380 100 Q 235 200 380 300" fill="none" stroke="#c8541b" stroke-width="1.2" opacity="0.45"/>
             <!-- Sparkle dots representing podcast activity -->
-            <circle cx="120" cy="120" r="2.5" fill="#8B9DFC" opacity="0.8">
+            <circle cx="120" cy="120" r="2.5" fill="#e07a3e" opacity="0.8">
               <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
             </circle>
-            <circle cx="280" cy="160" r="2" fill="#17C653" opacity="0.7">
+            <circle cx="280" cy="160" r="2" fill="#1d4ed8" opacity="0.7">
               <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" repeatCount="indefinite"/>
             </circle>
-            <circle cx="160" cy="280" r="2.5" fill="#8B9DFC" opacity="0.8">
+            <circle cx="160" cy="280" r="2.5" fill="#e07a3e" opacity="0.8">
               <animate attributeName="opacity" values="0.3;1;0.3" dur="2.8s" repeatCount="indefinite"/>
             </circle>
-            <circle cx="320" cy="270" r="2" fill="#4B5FC9" opacity="0.7">
+            <circle cx="320" cy="270" r="2" fill="#b8860b" opacity="0.7">
               <animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite"/>
             </circle>
-            <circle cx="80" cy="240" r="2" fill="#17C653" opacity="0.6">
+            <circle cx="80" cy="240" r="2" fill="#1d4ed8" opacity="0.6">
               <animate attributeName="opacity" values="0.3;1;0.3" dur="2.6s" repeatCount="indefinite"/>
             </circle>
-            <circle cx="240" cy="100" r="2.5" fill="#8B9DFC" opacity="0.8">
+            <circle cx="240" cy="100" r="2.5" fill="#e07a3e" opacity="0.8">
               <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite"/>
             </circle>
           </svg>
@@ -2790,7 +2785,7 @@
           <div class="finding-block">
             <span class="finding-block-label">Findings</span>
             <p>About <strong>67%</strong> of active NBA podcasts are solo-hosted; duos make up <strong>~13%</strong>, panels (3+ hosts) <strong>~20%</strong>. The top ten flip that distribution: only <strong>two are solo</strong> (Bill Simmons, Mostly Hoops), <strong>four are duos</strong> (The Steam Room, Old Man and the Three, Buckets, The Mismatch), and <strong>four are panels</strong>. Solo formats — the majority of the field — are the minority at the top. Medians reinforce the pattern: panel shows cluster around the <strong>~800 band</strong>, duos near <strong>~375</strong>, solos near <strong>~245</strong> — all modeled medians, useful for rank order rather than exact size.</p>
-            <p class="finding-note" style="font-size: 12.5px; color: var(--gray); font-style: italic; line-height: 1.6; margin-top: 14px; padding: 10px 14px; border-left: 2px solid var(--court); background: rgba(94, 119, 251, 0.04); border-radius: 0 4px 4px 0;"><strong style="font-style: normal; color: var(--ink);">A note on top-10 formats.</strong> The top-10 format labels above were manually verified against each show's actual on-air host count. For the full 2,215-show universe, format is inferred from the number of distinct contact rows associated with each feed — see the methodology section.</p>
+            <p class="finding-note" style="font-size: 12.5px; color: var(--gray); font-style: italic; line-height: 1.6; margin-top: 14px; padding: 10px 14px; border-left: 2px solid var(--court); background: rgba(200, 84, 27, 0.04); border-radius: 0 4px 4px 0;"><strong style="font-style: normal; color: var(--ink);">A note on top-10 formats.</strong> The top-10 format labels above were manually verified against each show's actual on-air host count. For the full 2,215-show universe, format is inferred from the number of distinct contact rows associated with each feed — see the methodology section.</p>
             <p>Multi-host formats trade incremental host cost for production resilience and scale: they survive any single host being unavailable, attract larger guest networks, and produce more clip-friendly moments for social. Solo shows are easier to start, which is why they dominate the long tail — but the path from solo launch to scale almost always runs through adding co-hosts.</p>
           </div>
 
@@ -3073,7 +3068,7 @@
     <div class="section-tag">Top 10 by Reach</div>
     <h2 class="section-title reveal">The shows that anchor the ecosystem.</h2>
     <p class="section-intro reveal">Ranked by modeled monthly listenership. Together these ten shows account for roughly 23% of all NBA podcast attention.</p>
-    <div class="lb-disclaimer reveal" style="font-size: 12.5px; color: var(--gray); font-style: italic; line-height: 1.6; padding: 12px 16px; margin-bottom: 20px; border-left: 2px solid var(--court); background: rgba(94, 119, 251, 0.04); border-radius: 0 4px 4px 0;">
+    <div class="lb-disclaimer reveal" style="font-size: 12.5px; color: var(--gray); font-style: italic; line-height: 1.6; padding: 12px 16px; margin-bottom: 20px; border-left: 2px solid var(--court); background: rgba(200, 84, 27, 0.04); border-radius: 0 4px 4px 0;">
       The "listeners" column shows <strong style="font-style: normal; color: var(--ink);">modeled relative audience estimates</strong> — not audited downloads, platform-reported listens, or industry-standard audience measurement. The model intentionally compresses scale so that shows can be ranked and compared against each other; the figures are reliable for <strong style="font-style: normal; color: var(--ink);">rank order and order-of-magnitude comparison</strong>, not as exact audience counts. Adjacent positions should be read as approximate.
     </div>
     <div class="lb-table-wrap reveal">
@@ -3735,13 +3730,13 @@ const statObs = new IntersectionObserver((entries) => {
 allStats.forEach(el => statObs.observe(el));
 
 // ========= CHART STYLE =========
-const COURT = '#5E77FB';
-const COURT_DEEP = '#4B5FC9';
-const COURT_LIGHT = '#8B9DFC';
-const INK = '#000000';
-const GRAY = '#72727D';
-const ACCENT = '#17C653';
-const GOLD = '#4B5FC9';
+const COURT = '#c8541b';
+const COURT_DEEP = '#9a3e10';
+const COURT_LIGHT = '#e07a3e';
+const INK = '#0a0a0b';
+const GRAY = '#6b6357';
+const ACCENT = '#1d4ed8';
+const GOLD = '#b8860b';
 const FONT = "'Inter', sans-serif";
 
 Chart.defaults.font.family = FONT;
@@ -3804,7 +3799,7 @@ chartFns.creatorPowerMini = () => new Chart(document.getElementById('creatorPowe
   type: 'bar',
   data: {
     labels: ['Independents', 'Networked'],
-    datasets: [{ data: [4.81, 4.68], backgroundColor: [COURT, '#B1B3B9'], borderRadius: 4, barPercentage: 0.6 }]
+    datasets: [{ data: [4.81, 4.68], backgroundColor: [COURT, '#b8b0a3'], borderRadius: 4, barPercentage: 0.6 }]
   },
   options: { responsive:true, maintainAspectRatio:false, plugins:{ valueLabel:{fmt: v => v.toFixed(2)} },
     scales:{ y:{beginAtZero:false, min:4.4, max:5, display:false}, x:{grid:{display:false}, ticks:{color:GRAY, font:{size:11}}} } },
@@ -3815,7 +3810,7 @@ chartFns.teamSponMini = () => new Chart(document.getElementById('teamSponMini'),
   type: 'bar',
   data: {
     labels: ['Team-specific', 'Non-team'],
-    datasets: [{ data: [22, 12], backgroundColor: [COURT, '#B1B3B9'], borderRadius: 4, barPercentage: 0.6 }]
+    datasets: [{ data: [22, 12], backgroundColor: [COURT, '#b8b0a3'], borderRadius: 4, barPercentage: 0.6 }]
   },
   options: { responsive:true, maintainAspectRatio:false, plugins:{ valueLabel:{fmt: v => v + '%'} },
     scales:{ y:{display:false, max:30}, x:{grid:{display:false}, ticks:{color:GRAY, font:{size:11}}} } },
@@ -3827,7 +3822,7 @@ chartFns.guestMini = () => new Chart(document.getElementById('guestMini'), {
   type: 'bar',
   data: {
     labels: ['Guest-driven\n(n=949)', 'No-guest\n(n=1,266)'],
-    datasets: [{ data: [785, 138], backgroundColor: [COURT, '#B1B3B9'], borderRadius: 4, barPercentage: 0.55 }]
+    datasets: [{ data: [785, 138], backgroundColor: [COURT, '#b8b0a3'], borderRadius: 4, barPercentage: 0.55 }]
   },
   options: { responsive:true, maintainAspectRatio:false, indexAxis: 'y',
     animation: { duration: 700, easing: 'easeOutQuart' },
@@ -3858,7 +3853,7 @@ chartFns.heroTop10Chart = () => {
   ];
   const data = [352, 117, 104, 84, 78, 72, 68, 65, 56, 55]; // in thousands
   // Court-tone gradient by rank — top sits darkest, descending
-  const colors = ['#3A4FB5','#4257C2','#4B5FC9','#5469E0','#5E77FB','#6E85FC','#8092FC','#94A3FD','#A9B5FE','#BDC7FE'];
+  const colors = ['#9a3e10','#a64613','#b04c16','#b85019','#c0541b','#c8541b','#cf6024','#d76c2d','#df7836','#e07a3e'];
   // Mobile detection for responsive label sizing
   const isNarrow = () => window.innerWidth < 640;
   return new Chart(document.getElementById('heroTop10Chart'), {
@@ -3889,7 +3884,7 @@ chartFns.heroTop10Chart = () => {
       scales: {
         x: {
           beginAtZero: true,
-          grid: { color: '#EFF1FF' },
+          grid: { color: '#f0ebe1' },
           ticks: {
             color: GRAY,
             font: () => ({ size: isNarrow() ? 10 : 11 }),
@@ -3931,7 +3926,7 @@ const frameChartConfigs = {
     type: 'bar',
     data: {
       labels: ['Top 10', 'Top 5%', 'Top 1%', 'Bottom 50%'],
-      datasets: [{ data: [23, 59, 32, 2], backgroundColor: [COURT, COURT_DEEP, COURT_LIGHT, '#DFE4FE'], borderRadius: 4, barPercentage: 0.7 }]
+      datasets: [{ data: [23, 59, 32, 2], backgroundColor: [COURT, COURT_DEEP, COURT_LIGHT, '#d8d2c4'], borderRadius: 4, barPercentage: 0.7 }]
     },
     options: { responsive:true, maintainAspectRatio:false,
       animation: { duration: 700, easing: 'easeOutQuart' },
@@ -3943,7 +3938,7 @@ const frameChartConfigs = {
     type: 'bar',
     data: {
       labels: ['On YouTube', 'Audio only'],
-      datasets: [{ data: [2772, 304], backgroundColor: [ACCENT, '#B1B3B9'], borderRadius: 4, barPercentage: 0.55 }]
+      datasets: [{ data: [2772, 304], backgroundColor: [ACCENT, '#b8b0a3'], borderRadius: 4, barPercentage: 0.55 }]
     },
     options: { responsive:true, maintainAspectRatio:false,
       animation: { duration: 700, easing: 'easeOutQuart' },
@@ -3970,7 +3965,7 @@ const frameChartConfigs = {
     type: 'bar',
     data: {
       labels: ['Network (n≈185)', 'Independent (n≈2,030)'],
-      datasets: [{ data: [2161, 304], backgroundColor: [COURT, '#B1B3B9'], borderRadius: 4, barPercentage: 0.55 }]
+      datasets: [{ data: [2161, 304], backgroundColor: [COURT, '#b8b0a3'], borderRadius: 4, barPercentage: 0.55 }]
     },
     options: { responsive:true, maintainAspectRatio:false,
       animation: { duration: 700, easing: 'easeOutQuart' },
@@ -3983,7 +3978,7 @@ const frameChartConfigs = {
     data: {
       labels: ['Solo', 'Duo', 'Panel'],
       datasets: [
-        { label:'All shows (n=2,215)', data: [67, 13, 20], backgroundColor: '#B1B3B9', borderRadius: 3 },
+        { label:'All shows (n=2,215)', data: [67, 13, 20], backgroundColor: '#b8b0a3', borderRadius: 3 },
         { label:'Top 10 (n=10)', data: [20, 40, 40], backgroundColor: COURT, borderRadius: 3 }
       ]
     },
@@ -4036,7 +4031,7 @@ chartFns.lenChart = () => new Chart(document.getElementById('lenChart'), {
     datasets: [{ data: [241, 463, 459, 235, 64], backgroundColor: COURT, borderRadius: 4 }]
   },
   options: { responsive:true, maintainAspectRatio:false, plugins:{ valueLabel:{fmt: v => v} },
-    scales:{ y:{beginAtZero:true, grid:{color:'#EFF1FF'}, ticks:{color:GRAY}}, x:{grid:{display:false}, ticks:{color:GRAY}} } },
+    scales:{ y:{beginAtZero:true, grid:{color:'#f0ebe1'}, ticks:{color:GRAY}}, x:{grid:{display:false}, ticks:{color:GRAY}} } },
   plugins: [valueLabel]
 });
 
@@ -4045,13 +4040,13 @@ chartFns.formatChart = () => new Chart(document.getElementById('formatChart'), {
   data: {
     labels: ['Solo', 'Duo', 'Panel'],
     datasets: [
-      { label:'% of all active shows', data: [67, 13, 20], backgroundColor: '#B1B3B9', borderRadius: 4 },
+      { label:'% of all active shows', data: [67, 13, 20], backgroundColor: '#b8b0a3', borderRadius: 4 },
       { label:'% of top 10 shows', data: [20, 40, 40], backgroundColor: COURT, borderRadius: 4 }
     ]
   },
   options: { responsive:true, maintainAspectRatio:false,
     plugins:{ legend:{display:true, position:'bottom', labels:{font:{size:11}, color:GRAY}}, valueLabel:{fmt:fmtPct} },
-    scales:{ y:{beginAtZero:true, max:90, grid:{color:'#EFF1FF'}, ticks:{color:GRAY, callback: v => v+'%'}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600}}} } },
+    scales:{ y:{beginAtZero:true, max:90, grid:{color:'#f0ebe1'}, ticks:{color:GRAY, callback: v => v+'%'}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600}}} } },
   plugins: [valueLabel]
 });
 
@@ -4066,7 +4061,7 @@ chartFns.sponTierChart = () => new Chart(document.getElementById('sponTierChart'
       valueLabel:{fmt:fmtPct},
       tooltip:{ callbacks:{ title: ctx => ctx[0].label.replace('\n', ' ') } }
     },
-    scales:{ y:{beginAtZero:true, max:70, grid:{color:'#EFF1FF'}, ticks:{color:GRAY, callback: v => v+'%'}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600, size:10.5}, autoSkip:false, maxRotation:0}} } },
+    scales:{ y:{beginAtZero:true, max:70, grid:{color:'#f0ebe1'}, ticks:{color:GRAY, callback: v => v+'%'}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600, size:10.5}, autoSkip:false, maxRotation:0}} } },
   plugins: [valueLabel]
 });
 
@@ -4078,14 +4073,14 @@ chartFns.brandChart = () => new Chart(document.getElementById('brandChart'), {
   },
   options: { responsive:true, maintainAspectRatio:false, indexAxis: 'y',
     plugins:{ valueLabel:{fmt: v => v} },
-    scales:{ x:{beginAtZero:true, grid:{color:'#EFF1FF'}, ticks:{color:GRAY}}, y:{grid:{display:false}, ticks:{color:INK, font:{size:11}}} } }
+    scales:{ x:{beginAtZero:true, grid:{color:'#f0ebe1'}, ticks:{color:GRAY}}, y:{grid:{display:false}, ticks:{color:INK, font:{size:11}}} } }
 });
 
 chartFns.genChart = () => new Chart(document.getElementById('genChart'), {
   type: 'doughnut',
   data: {
     labels: ['Millennials', 'Gen Z', 'Gen X', 'Boomers'],
-    datasets: [{ data: [49, 28, 24, 11], backgroundColor: [COURT, ACCENT, '#8B9DFC', '#95959D'], borderWidth: 2, borderColor: '#fff', hoverOffset: 10 }]
+    datasets: [{ data: [49, 28, 24, 11], backgroundColor: [COURT, ACCENT, '#b45309', '#6b6357'], borderWidth: 2, borderColor: '#fff', hoverOffset: 10 }]
   },
   options: { responsive:true, maintainAspectRatio:false, cutout: '55%',
     plugins:{ legend:{display:true, position:'bottom', labels:{font:{size:12}, boxWidth:14, color:INK, padding:10, generateLabels: c => c.data.labels.map((l,i) => ({text: `${l}: ${c.data.datasets[0].data[i]}%`, fillStyle: c.data.datasets[0].backgroundColor[i], index:i}))}} } }
@@ -4095,7 +4090,7 @@ chartFns.incomeChart = () => new Chart(document.getElementById('incomeChart'), {
   type: 'doughnut',
   data: {
     labels: ['Mid-income', 'Low-income', 'High-income'],
-    datasets: [{ data: [56, 26, 17], backgroundColor: [COURT, '#B1B3B9', GOLD], borderWidth: 2, borderColor: '#fff', hoverOffset: 10 }]
+    datasets: [{ data: [56, 26, 17], backgroundColor: [COURT, '#b8b0a3', GOLD], borderWidth: 2, borderColor: '#fff', hoverOffset: 10 }]
   },
   options: { responsive:true, maintainAspectRatio:false, cutout: '55%',
     plugins:{ legend:{display:true, position:'bottom', labels:{font:{size:12}, boxWidth:14, color:INK, padding:10, generateLabels: c => c.data.labels.map((l,i) => ({text: `${l}: ${c.data.datasets[0].data[i]}%`, fillStyle: c.data.datasets[0].backgroundColor[i], index:i}))}} } }
@@ -4133,7 +4128,7 @@ chartFns.epCountChart = () => new Chart(document.getElementById('epCountChart'),
   },
   options: { responsive:true, maintainAspectRatio:false,
     plugins:{ valueLabel:{fmt: v => v >= 1000 ? (v/1000).toFixed(1)+'K' : v} },
-    scales:{ y:{type:'logarithmic', grid:{color:'#EFF1FF'}, ticks:{color:GRAY, callback: v => v >= 1000 ? (v/1000)+'K' : v}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600}}} } },
+    scales:{ y:{type:'logarithmic', grid:{color:'#f0ebe1'}, ticks:{color:GRAY, callback: v => v >= 1000 ? (v/1000)+'K' : v}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600}}} } },
   plugins: [valueLabel]
 });
 
@@ -4141,10 +4136,10 @@ chartFns.recencyChart = () => new Chart(document.getElementById('recencyChart'),
   type: 'bar',
   data: {
     labels: ['Last 7d', '8–30d', '31–90d', '91–180d'],
-    datasets: [{ data: [866, 655, 506, 188], backgroundColor: [COURT, COURT_LIGHT, '#B9C4FD', '#B1B3B9'], borderRadius: 4 }]
+    datasets: [{ data: [866, 655, 506, 188], backgroundColor: [COURT, COURT_LIGHT, '#d8a070', '#b8b0a3'], borderRadius: 4 }]
   },
   options: { responsive:true, maintainAspectRatio:false, plugins:{ valueLabel:{fmt: v => v} },
-    scales:{ y:{beginAtZero:true, grid:{color:'#EFF1FF'}, ticks:{color:GRAY}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600, size:10}}} } },
+    scales:{ y:{beginAtZero:true, grid:{color:'#f0ebe1'}, ticks:{color:GRAY}}, x:{grid:{display:false}, ticks:{color:INK, font:{weight:600, size:10}}} } },
   plugins: [valueLabel]
 });
 
@@ -4170,7 +4165,7 @@ chartFns.countryChart = () => new Chart(document.getElementById('countryChart'),
   },
   options: { responsive:true, maintainAspectRatio:false, indexAxis:'y',
     plugins:{ valueLabel:{fmt: v => v.toLocaleString()} },
-    scales:{ x:{type:'logarithmic', grid:{color:'#EFF1FF'}, ticks:{color:GRAY}}, y:{grid:{display:false}, ticks:{color:INK, font:{weight:600, size:11}}} } }
+    scales:{ x:{type:'logarithmic', grid:{color:'#f0ebe1'}, ticks:{color:GRAY}}, y:{grid:{display:false}, ticks:{color:INK, font:{weight:600, size:11}}} } }
 });
 
 // ========= TEAM FOOTPRINT — interactive toggle chart =========
@@ -4245,7 +4240,7 @@ function buildTeamChartConfig(metric) {
       scales: {
         x: {
           beginAtZero: true,
-          grid: { color: '#EFF1FF' },
+          grid: { color: '#f0ebe1' },
           ticks: { color: GRAY, font: { size: 10.5 }, callback: v => meta.fmt(v) },
           title: { display: true, text: meta.label, font: { size: 11 }, color: GRAY },
         },
