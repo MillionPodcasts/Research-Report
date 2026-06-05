@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Report Palette &amp; UI Theme, Million Podcasts</title>
+<meta name="description" content="Extended colour palette and UI theme used to polish Million Podcasts reports, to be shared alongside the core MP design-system palette.">
+<link href="https://www.millionpodcasts.com/research/assets/inter.css" rel="stylesheet">
+<style>
+  :root{
+    --primary:#5E77FB; --primary-hover:#4B5FC9; --indigo:#3A4BA0;
+    --page:#FAFBFF; --white:#FFFFFF; --sel:#EFF1FF; --border:#DFE4FE;
+    --heading:#000000; --sub:#333333; --para:#72727D; --secondary:#95959D;
+    --shadow-soft:0 1px 2px rgba(40,46,82,.05), 0 12px 28px -16px rgba(40,46,82,.14);
+    --grad:linear-gradient(90deg,#5E77FB 0%,#7C6CF0 50%,#22B8CF 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Inter',sans-serif; background:var(--page); color:var(--para);
+    -webkit-font-smoothing:antialiased; line-height:1.6; padding:0 0 80px;
+  }
+  .serif{font-family:'Fraunces',Georgia,serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  @media(max-width:640px){.wrap{padding:0 18px}}
+
+  /* Hero band */
+  .head{background:var(--white);border-bottom:1px solid var(--border);padding:56px 0 40px;position:relative}
+  .head::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;background:var(--grad)}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin-bottom:14px}
+  .head h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(34px,5vw,52px);letter-spacing:-.02em;color:var(--heading);line-height:1.02}
+  .head p{margin-top:14px;max-width:660px;font-size:15px;color:var(--para)}
+
+  /* Group */
+  .group{margin-top:56px}
+  .group > h2{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:500;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:14px;
+  }
+  .group > h2::after{content:"";flex:1;height:1px;background:var(--border)}
+  .group .note{font-size:13.5px;color:var(--secondary);margin-bottom:20px;max-width:720px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+
+  .sw{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--white);box-shadow:var(--shadow-soft)}
+  .sw .chip{height:84px;display:flex;align-items:flex-end;padding:10px 12px}
+  .sw .meta{padding:11px 12px 13px}
+  .sw .name{font-size:13.5px;font-weight:600;color:var(--heading);letter-spacing:-.01em}
+  .sw .hex{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--secondary);margin-top:3px;text-transform:uppercase}
+  .sw .use{font-size:11.5px;color:var(--para);margin-top:7px;line-height:1.45}
+  .chip .tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.78);color:#1A1D29}
+
+  /* UI theme block */
+  .theme{margin-top:56px;background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px 30px;box-shadow:var(--shadow-soft);position:relative;overflow:hidden}
+  .theme::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+  .theme h3{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:22px;color:var(--heading);margin-bottom:18px;letter-spacing:-.01em}
+  .trow{display:grid;grid-template-columns:200px 1fr;gap:8px 24px;padding:14px 0;border-top:1px solid var(--border);align-items:start}
+  .trow:first-of-type{border-top:none}
+  .trow .k{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);padding-top:3px}
+  .trow .v{font-size:14px;color:var(--para)}
+  .trow .v code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--sel);color:var(--indigo);padding:2px 7px;border-radius:6px}
+  @media(max-width:640px){.trow{grid-template-columns:1fr;gap:6px}}
+
+  .bar{height:14px;border-radius:999px;background:var(--grad);margin:6px 0 2px;max-width:380px}
+  .cards-demo{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+  .demo-card{flex:1;min-width:140px;border:1px solid var(--border);border-radius:14px;height:62px;background:var(--white);box-shadow:var(--shadow-soft);position:relative;overflow:hidden}
+  .demo-card::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="wrap">
+    <div class="eyebrow">Million Podcasts &middot; Report System</div>
+    <h1 class="serif">Report Palette &amp; UI Theme</h1>
+    <p>The extended colour set and interface treatment used to polish the video-podcasting report. Share this alongside the core Million Podcasts design-system palette. Blue (#5E77FB) remains primary throughout; every added hue is cool-leaning to stay on-brand.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- PRIMARY -->
+  <section class="group">
+    <h2>Primary (core)</h2>
+    <p class="note">The brand blue. Used for links, key actions, the lead chart series, and emphasis. Straight from the MP guideline palette.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#5E77FB"><span class="tag">core</span></div><div class="meta"><div class="name">Primary</div><div class="hex">#5E77FB</div><div class="use">Buttons, links, primary chart bars.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#4B5FC9"></div><div class="meta"><div class="name">Primary / Hover</div><div class="hex">#4B5FC9</div><div class="use">Hover / pressed states.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#DFE4FE"></div><div class="meta"><div class="name">Primary / Disable</div><div class="hex">#DFE4FE</div><div class="use">Also doubles as the border colour.</div></div></div>
+    </div>
+  </section>
+
+  <!-- EXTENDED COOL ACCENTS -->
+  <section class="group">
+    <h2>Extended cool accents (added)</h2>
+    <p class="note">A cohesive cool ramp added for chart variety and accents. Use indigo &rarr; violet &rarr; periwinkle &rarr; blue &rarr; cyan as a natural gradient when a chart needs several distinct, attractive hues.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#3A4BA0"></div><div class="meta"><div class="name">Deep Indigo</div><div class="hex">#3A4BA0</div><div class="use">Darkest cool, deep emphasis.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#5B4BD1"></div><div class="meta"><div class="name">Violet</div><div class="hex">#5B4BD1</div><div class="use">Secondary accent.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#7C6CF0"></div><div class="meta"><div class="name">Periwinkle</div><div class="hex">#7C6CF0</div><div class="use">Tertiary chart series.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#8B7CF6"></div><div class="meta"><div class="name">Lavender</div><div class="hex">#8B7CF6</div><div class="use">Soft accent / tints.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#7C8FFF"></div><div class="meta"><div class="name">Light Primary</div><div class="hex">#7C8FFF</div><div class="use">Mid emphasis tier.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#93A4FF"></div><div class="meta"><div class="name">Pale Primary</div><div class="hex">#93A4FF</div><div class="use">Highlight tint.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#16B8CF"></div><div class="meta"><div class="name">Teal</div><div class="hex">#16B8CF</div><div class="use">Cool ramp endpoint.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#22B8CF"></div><div class="meta"><div class="name">Sky</div><div class="hex">#22B8CF</div><div class="use">Gradient + accent cyan.</div></div></div>
+    </div>
+  </section>
+
+  <!-- CHART SUPPORT TINTS -->
+  <section class="group">
+    <h2>Chart support tints (added)</h2>
+    <p class="note">Soft, on-theme replacements for flat gray. Used for de-emphasised / context bars so charts stay cohesive and clean while the saturated colours above carry the emphasis.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#AEB8EE"></div><div class="meta"><div class="name">Soft Periwinkle</div><div class="hex">#AEB8EE</div><div class="use">Default de-emphasised bars.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#D3DAFB"></div><div class="meta"><div class="name">Soft Blue</div><div class="hex">#D3DAFB</div><div class="use">Lightest context fill.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#9AA6D8"></div><div class="meta"><div class="name">Muted Blue</div><div class="hex">#9AA6D8</div><div class="use">Mid neutral, cool.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#C7CBD6"></div><div class="meta"><div class="name">Cool Gray</div><div class="hex">#C7CBD6</div><div class="use">Faint borders / dividers.</div></div></div>
+    </div>
+  </section>
+
+  <!-- SEMANTIC + GREENS -->
+  <section class="group">
+    <h2>Semantic &amp; greens</h2>
+    <p class="note">Success greens (with chart tiers + a light section tint) and the error red. Success / Error come from the MP guideline palette; the green tiers are added for charts.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#17C653"><span class="tag">core</span></div><div class="meta"><div class="name">Success</div><div class="hex">#17C653</div><div class="use">Positive / growth.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#129E4C"></div><div class="meta"><div class="name">Success Deep</div><div class="hex">#129E4C</div><div class="use">Second-rank emphasis.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#2BD06B"></div><div class="meta"><div class="name">Success Light</div><div class="hex">#2BD06B</div><div class="use">Lighter tier.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#11A877"></div><div class="meta"><div class="name">Teal-Green</div><div class="hex">#11A877</div><div class="use">Blended accent.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#E8F8EF"></div><div class="meta"><div class="name">Success Tint</div><div class="hex">#E8F8EF</div><div class="use">Section / card wash.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#F8285A"><span class="tag">core</span></div><div class="meta"><div class="name">Error</div><div class="hex">#F8285A</div><div class="use">Negative / warnings.</div></div></div>
+    </div>
+  </section>
+
+  <!-- RESERVE ACCENTS -->
+  <section class="group">
+    <h2>Reserve accents (use sparingly)</h2>
+    <p class="note">Warm pops kept in reserve for the rare highlight or callout, never as a primary. Upgrade BG is from the MP guideline palette.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#F8567B"></div><div class="meta"><div class="name">Coral</div><div class="hex">#F8567B</div><div class="use">High-contrast highlight.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#F4B740"><span class="tag">on dark</span></div><div class="meta"><div class="name">Gold</div><div class="hex">#F4B740</div><div class="use">Single-point emphasis.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#FFF8DE"></div><div class="meta"><div class="name">Upgrade BG</div><div class="hex">#FFF8DE</div><div class="use">Upgrade / promo surfaces.</div></div></div>
+    </div>
+  </section>
+
+  <!-- NEUTRALS & TEXT -->
+  <section class="group">
+    <h2>Neutrals &amp; text</h2>
+    <p class="note">Text hierarchy and structural neutrals. The cool near-blacks (Ink / Slate) read warmer-free against the blue theme and are used for the darkest chart bars and deep UI.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#000000"></div><div class="meta"><div class="name">Headings</div><div class="hex">#000000</div><div class="use">H1 / H2.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#333333"></div><div class="meta"><div class="name">Sub Headings</div><div class="hex">#333333</div><div class="use">H3 / H4.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#72727D"></div><div class="meta"><div class="name">Paragraph</div><div class="hex">#72727D</div><div class="use">Body copy.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#95959D"></div><div class="meta"><div class="name">Secondary</div><div class="hex">#95959D</div><div class="use">Captions / faint labels.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#B1B3B9"></div><div class="meta"><div class="name">Icons</div><div class="hex">#B1B3B9</div><div class="use">Iconography.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#DFE4FE"></div><div class="meta"><div class="name">Border</div><div class="hex">#DFE4FE</div><div class="use">Card / divider borders.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#1A1D29"></div><div class="meta"><div class="name">Ink (cool)</div><div class="hex">#1A1D29</div><div class="use">Darkest bars / deep UI.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#243A57"></div><div class="meta"><div class="name">Slate</div><div class="hex">#243A57</div><div class="use">Deep cool accent.</div></div></div>
+    </div>
+  </section>
+
+  <!-- SURFACES -->
+  <section class="group">
+    <h2>Surfaces</h2>
+    <p class="note">Background layers, lightest to white. Section rhythm alternates Page Background and White; Section Selected marks the active / highlighted block.</p>
+    <div class="grid">
+      <div class="sw"><div class="chip" style="background:#FAFBFF"></div><div class="meta"><div class="name">Page Background</div><div class="hex">#FAFBFF</div><div class="use">App / page base.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#EFF1FF"></div><div class="meta"><div class="name">Section Selected</div><div class="hex">#EFF1FF</div><div class="use">Active / hover surfaces.</div></div></div>
+      <div class="sw"><div class="chip" style="background:#FFFFFF"></div><div class="meta"><div class="name">Universal White</div><div class="hex">#FFFFFF</div><div class="use">Cards.</div></div></div>
+    </div>
+  </section>
+
+  <!-- UI THEME -->
+  <section class="theme">
+    <h3 class="serif">UI theme &amp; treatment</h3>
+
+    <div class="trow"><div class="k">Signature gradient</div><div class="v">
+      <div class="bar"></div>
+      <code>linear-gradient(90deg, #5E77FB, #7C6CF0, #22B8CF)</code><br>
+      Thin 3px cap on cards, the hero KPI strip, and section dividers.
+    </div></div>
+
+    <div class="trow"><div class="k">Cards</div><div class="v">
+      <div class="cards-demo"><div class="demo-card"></div><div class="demo-card"></div><div class="demo-card"></div></div>
+      14px radius, <code>1px solid #DFE4FE</code> border, soft blue-tinted shadow, gradient top cap, gentle hover lift.
+    </div></div>
+
+    <div class="trow"><div class="k">Shadow / soft</div><div class="v"><code>0 1px 2px rgba(40,46,82,.05), 0 12px 28px -16px rgba(40,46,82,.14)</code></div></div>
+    <div class="trow"><div class="k">Shadow / lift</div><div class="v"><code>0 3px 10px rgba(40,46,82,.08), 0 28px 56px -22px rgba(94,119,251,.30)</code> on hover.</div></div>
+
+    <div class="trow"><div class="k">Section accents</div><div class="v">Each section header number cycles a cool hue for wayfinding: <code>#5E77FB</code> &rarr; <code>#7C6CF0</code> &rarr; <code>#2DB6C9</code> &rarr; <code>#5B4BD1</code>.</div></div>
+
+    <div class="trow"><div class="k">Type / display</div><div class="v"><span class="serif" style="font-size:20px;color:var(--heading)">Fraunces</span>: headlines, big numbers, decks (italic for emphasis).</div></div>
+    <div class="trow"><div class="k">Type / body</div><div class="v"><span style="font-size:16px;color:var(--heading)">Inter</span>: all body copy and UI.</div></div>
+    <div class="trow"><div class="k">Type / labels</div><div class="v"><span class="mono" style="font-size:13px;color:var(--heading)">JetBrains Mono</span>: eyebrows, tags, axis labels. Uppercase, letter-spacing .14&ndash;.16em.</div></div>
+
+    <div class="trow"><div class="k">Fonts hosting</div><div class="v">Self-hosted, never a public CDN: <code>millionpodcasts.com/research/assets/inter.css</code> (ships Inter, Fraunces &amp; JetBrains Mono together).</div></div>
+
+    <div class="trow"><div class="k">Chart logic</div><div class="v">Emphasise the key bars in saturated colour; render the rest in the soft cool tints above. Keeps charts readable and clean rather than rainbow.</div></div>
+  </section>
+
+</div>
+</body>
+</html>
