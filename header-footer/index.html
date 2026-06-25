@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Million Podcasts, Report Template</title>
+<meta name="description" content="Header and footer template for Million Podcasts reports.">
+
+<!-- Self-hosted fonts + base styles (Inter, Fraunces, JetBrains Mono) from millionpodcasts.com.
+     Do NOT swap this for a Google Fonts / CDN link, the fonts ship from here. -->
+<link href="https://www.millionpodcasts.com/research/assets/inter.css" rel="stylesheet">
+
+<style>
+  /* ============ DESIGN TOKENS (Million Podcasts blue theme) ============ */
+  :root{
+  /* ============================================================
+     MILLION PODCASTS, DESIGN SYSTEM TOKENS
+     ============================================================ */
+  --mp-primary:         #5E77FB;   /* Primary (blue) */
+  --mp-primary-hover:   #4B5FC9;   /* Primary / Hover */
+  --mp-primary-disable: #DFE4FE;   /* Primary / Disable */
+  --mp-upgrade-bg:      #FFF8DE;   /* Upgrade Button BG */
+  --mp-error:           #F8285A;   /* Error */
+  --mp-success:         #17C653;   /* Success */
+  --mp-icons:           #B1B3B9;   /* Icons */
+  --mp-border:          #DFE4FE;   /* Border */
+  --mp-page-bg:         #FAFBFF;   /* Page Background */
+  --mp-section-sel:     #EFF1FF;   /* Section Selected */
+  --mp-heading:         #000000;   /* Headings */
+  --mp-subheading:      #333333;   /* Sub Headings */
+  --mp-paragraph:       #72727D;   /* Paragraph Text */
+  --mp-secondary:       #95959D;   /* Secondary Text */
+  --mp-white:           #FFFFFF;   /* Universal White */
+
+  /* Extended cool-tone accents (same blue-led theme, for chart variety) */
+  --mp-indigo:          #3A4BA0;   /* deep primary */
+  --mp-periwinkle:      #7C6CF0;   /* secondary accent */
+  --mp-violet:          #5B4BD1;   /* tertiary accent */
+  --mp-teal:            #2DB6C9;   /* quaternary accent */
+
+  /* ---- Legacy variable names remapped onto the new theme ---- */
+  --ink:        var(--mp-page-bg);     /* page background */
+  --ink-2:      var(--mp-white);       /* card surface */
+  --ink-3:      var(--mp-section-sel); /* card hover / selected */
+  --paper:      var(--mp-heading);     /* primary / heading ink */
+  --paper-2:    var(--mp-subheading);  /* sub-headings */
+  --rule:       var(--mp-border);      /* dividers */
+  --muted:      var(--mp-paragraph);   /* paragraph / muted */
+  --muted-2:    var(--mp-secondary);   /* faint labels */
+  --amber:      var(--mp-primary);     /* accent -> primary blue */
+  --amber-2:    var(--mp-primary-hover);
+  --amber-deep: var(--mp-indigo);
+  --rust:       var(--mp-periwinkle);
+  --moss:       var(--mp-success);
+  --plum:       var(--mp-violet);
+  --teal:       var(--mp-teal);
+  --line:        rgba(13,17,38,.08);
+  --line-strong: rgba(13,17,38,.14);
+  --shadow: 0 24px 60px -24px rgba(94,119,251,.22);
+}
+
+  /* ============ BASE / RESET / TYPOGRAPHY ============ */
+  *{box-sizing:border-box;margin:0;padding:0}
+  *{ -webkit-tap-highlight-color: rgba(94,119,251,.15) }
+  html{scroll-behavior:smooth}
+  body{
+    background: var(--mp-page-bg);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .serif{font-family:'Fraunces', Georgia, serif}
+  .mono{font-family:'JetBrains Mono', monospace}
+  h1,h2,h3,h4{font-family:'Fraunces', Georgia, serif;font-weight:500;letter-spacing:-.01em}
+  h1{font-size: clamp(54px, 8vw, 128px); line-height:.92; letter-spacing:-.04em; font-weight:400}
+  h2{font-size: clamp(34px, 4.2vw, 60px); line-height:1.02; letter-spacing:-.025em; font-weight:500}
+  h3{font-size: clamp(22px, 2.4vw, 30px); line-height:1.15; letter-spacing:-.015em}
+  h4{font-size: 20px; line-height:1.25}
+  h1,h2{ color: var(--mp-heading); }
+  h3,h4{ color: var(--mp-subheading); }
+  p{ color: var(--mp-paragraph); }
+  a{ color: var(--mp-primary); }
+  a:hover{ color: var(--mp-primary-hover); }
+  ::selection{ background: var(--mp-section-sel); color: var(--mp-heading); }
+
+  /* ============ MILLIONPODCASTS HEADER ============ */
+.mp-header{
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(250,251,255,.88);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--mp-border);
+  box-shadow: 0 1px 3px rgba(40,46,82,.04);
+  /* Smooth grow/collapse for mobile menu open/close */
+  transition: height .32s cubic-bezier(.22,.61,.36,1), background .32s ease;
+}
+.mp-header-inner{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.mp-logo{ display: flex; align-items: center; flex-shrink: 0; }
+.mp-logo img{ height: 32px; width: auto; display: block; }
+.mp-nav-left{
+  display: flex; align-items: center; gap: 28px;
+  flex: 1; margin-left: 32px;
+}
+.mp-nav-left > a,
+.mp-nav-left .mp-dropdown-trigger{
+  color: var(--paper);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  text-decoration: none; letter-spacing: 0;
+  text-transform: none; cursor: pointer;
+  background: none; border: none; padding: 0;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: color .15s ease;
+}
+.mp-nav-left > a:hover,
+.mp-nav-left .mp-dropdown-trigger:hover{ color: var(--mp-primary); }
+.mp-nav-left .mp-dropdown-trigger::after{
+  content: ''; display: inline-block;
+  width: 7px; height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  margin-left: 4px; transition: transform .2s ease;
+}
+.mp-dropdown{ position: relative; }
+.mp-dropdown-panel{
+  position: absolute; top: calc(100% + 14px); left: -20px;
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--mp-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px -12px rgba(40,46,82,.20), 0 4px 12px rgba(40,46,82,.06);
+  padding: 18px 20px; min-width: 240px;
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s;
+  z-index: 110;
+}
+.mp-dropdown:hover .mp-dropdown-panel,
+.mp-dropdown:focus-within .mp-dropdown-panel,
+.mp-dropdown.is-open .mp-dropdown-panel{
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.mp-dropdown:hover .mp-dropdown-trigger::after,
+.mp-dropdown.is-open .mp-dropdown-trigger::after{
+  transform: rotate(225deg) translate(2px, 2px);
+}
+.mp-dropdown-section{ padding: 6px 0; }
+.mp-dropdown-section + .mp-dropdown-section{
+  border-top: 1px solid var(--mp-border); margin-top: 6px; padding-top: 12px;
+}
+.mp-dropdown-label{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px; display: block;
+}
+.mp-dropdown-panel a{
+  display: block; padding: 7px 10px; margin: 0 -10px;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--paper); text-decoration: none;
+  transition: background .12s ease, color .12s ease;
+}
+.mp-dropdown-panel a:hover{
+  background: var(--ink-3); color: var(--mp-primary);
+}
+/* Hide link icons on desktop, they appear only inside the open mobile menu */
+.mp-dropdown-panel a .mp-link-icon{ display: none; }
+.mp-nav-right{
+  display: flex; align-items: center; gap: 18px; flex-shrink: 0;
+}
+.mp-nav-right a{
+  color: var(--paper);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  text-decoration: none; text-transform: none; letter-spacing: 0;
+  transition: color .15s ease;
+}
+.mp-nav-right a:hover{ color: var(--mp-primary); }
+.mp-cta-btn{
+  background: var(--mp-primary) !important;
+  color: #fff !important;
+  padding: 9px 18px; border-radius: 8px;
+  font-weight: 600 !important; font-size: 14px;
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 2px rgba(58,75,160,.18);
+}
+.mp-cta-btn:hover{
+  background: var(--mp-primary-hover) !important; color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(58,75,160,.32);
+}
+
+/* Mobile-only Pricing pill (sits in header row beside the toggle), hidden on desktop */
+.mp-mobile-pricing-pill{ display: none; }
+
+.mp-mobile-toggle{
+  display: none;
+  background: none; border: none; cursor: pointer;
+  padding: 8px;
+  width: 40px; height: 40px;
+  align-items: center; justify-content: center;
+}
+.mp-mobile-toggle .mp-icon-hamburger,
+.mp-mobile-toggle .mp-icon-close{
+  display: none;
+  width: 22px; height: 22px;
+  color: var(--mp-primary);
+}
+.mp-mobile-toggle .mp-icon-hamburger{ display: block; }
+
+@media (max-width: 980px){
+  /* Explicit closed-state height so the height transition to 100vh animates smoothly */
+  .mp-header{ height: 64px; }
+  /* Header row: logo | Pricing pill | hamburger/X */
+  .mp-header-inner{
+    padding: 12px 18px;
+    gap: 12px;
+  }
+  /* When menu opens, header expands to fill the viewport with a solid bg. */
+  .mp-header.is-open{
+    height: 100vh;
+    height: 100dvh;
+    background: var(--mp-page-bg);
+    overflow: hidden;
+  }
+  .mp-header.is-open .mp-header-inner{
+    height: 100%;
+    align-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mp-nav-left, .mp-nav-right{ display: none; }
+  .mp-mobile-toggle{ display: inline-flex; margin-left: 0; }
+  .mp-mobile-pricing-pill{
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: auto;
+    background: var(--mp-primary);
+    color: #fff !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    letter-spacing: 0;
+    transition: background .15s ease;
+    box-shadow: 0 1px 2px rgba(58,75,160,.18);
+  }
+  .mp-mobile-pricing-pill:hover{ background: var(--mp-primary-hover); }
+
+  /* Swap hamburger -> X when menu is open */
+  .mp-header-inner.is-open .mp-mobile-toggle .mp-icon-hamburger{ display: none; }
+  .mp-header-inner.is-open .mp-mobile-toggle .mp-icon-close{ display: block; }
+
+  /* Open menu: header row pinned at top; nav lists wrap below as full-width blocks. */
+  .mp-header-inner.is-open{
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .mp-header-inner.is-open .mp-logo            { order: 0; }
+  .mp-header-inner.is-open .mp-mobile-pricing-pill { order: 1; }
+  .mp-header-inner.is-open .mp-mobile-toggle   { order: 2; }
+  .mp-header-inner.is-open .mp-nav-left        { order: 3; flex-basis: 100%; }
+  .mp-header-inner.is-open .mp-nav-right       { order: 4; flex-basis: 100%; }
+
+  .mp-header-inner.is-open .mp-nav-left{
+    display: flex; flex-direction: column;
+    align-items: stretch; gap: 0;
+    width: calc(100% + 36px);
+    max-width: calc(100% + 36px);
+    margin: 14px -18px 0;
+    padding: 0;
+    border-top: 1px solid var(--mp-border);
+  }
+  .mp-header-inner.is-open .mp-nav-left > a,
+  .mp-header-inner.is-open .mp-nav-left .mp-dropdown-trigger{
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%;
+    padding: 16px 18px;
+    margin: 0;
+    font-size: 15px; font-weight: 500;
+    color: var(--paper);
+    border-bottom: 1px solid var(--mp-border);
+    border-radius: 0;
+    text-align: left;
+  }
+  /* Dropdown trigger chevron, clean chevron via SVG bg (recolored to primary blue) */
+  .mp-header-inner.is-open .mp-nav-left .mp-dropdown-trigger::after{
+    content: ''; width: 18px; height: 18px;
+    border: none; transform: none; margin: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E77FB' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center;
+    background-size: 18px 18px;
+    transition: transform .2s ease;
+  }
+  .mp-header-inner.is-open .mp-dropdown.is-open .mp-dropdown-trigger::after{
+    transform: rotate(180deg);
+  }
+
+  /* Resources accordion panel, collapsed by default, opens on click */
+  .mp-header-inner.is-open .mp-dropdown-panel{
+    position: static;
+    opacity: 1; visibility: visible; transform: none;
+    box-shadow: none; border: none; border-radius: 0;
+    padding: 0; min-width: 0;
+    background: transparent;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    display: none;
+    width: 100%;
+  }
+  .mp-header-inner.is-open .mp-dropdown.is-open .mp-dropdown-panel{
+    display: block;
+    padding: 4px 18px 12px 18px;
+    border-bottom: 1px solid var(--mp-border);
+  }
+  .mp-header-inner.is-open .mp-dropdown-section{
+    padding: 8px 0;
+  }
+  .mp-header-inner.is-open .mp-dropdown-section + .mp-dropdown-section{
+    border-top: none; margin-top: 0; padding-top: 8px;
+  }
+  .mp-header-inner.is-open .mp-dropdown-label{
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: .04em; text-transform: capitalize;
+    color: var(--muted); margin: 4px 0 6px 0;
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a{
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 4px; margin: 0;
+    font-size: 14px; font-weight: 500;
+    color: var(--paper);
+    border-radius: 0;
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a:hover{
+    background: transparent; color: var(--mp-primary);
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a .mp-link-icon{
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; flex-shrink: 0;
+    color: var(--mp-primary);
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a .mp-link-icon svg{
+    width: 100%; height: 100%; display: block;
+  }
+
+  /* In-menu Pricing row (matches the bare link rows above it) */
+  .mp-header-inner.is-open .mp-nav-right{
+    display: flex; flex-direction: column;
+    align-items: stretch; gap: 0;
+    width: calc(100% + 36px);
+    max-width: calc(100% + 36px);
+    margin: 0 -18px;
+    padding: 0;
+  }
+  .mp-header-inner.is-open .mp-nav-right > a:not(.mp-cta-btn){
+    display: flex; align-items: center;
+    width: 100%;
+    padding: 16px 18px;
+    font-size: 15px; font-weight: 500;
+    color: var(--paper);
+    border-bottom: 1px solid var(--mp-border);
+  }
+  /* The Start Free Trial primary button, full-width at the bottom (36px inset) */
+  .mp-header-inner.is-open .mp-nav-right .mp-cta-btn{
+    align-self: stretch;
+    margin: 20px 36px 16px;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 8px;
+    border-bottom: none;
+  }
+}
+@media (max-width: 560px){
+  .mp-header-inner{ padding: 12px 18px; }
+  .mp-logo img{ height: 28px; }
+}
+
+  /* ============ MILLIONPODCASTS FOOTER ============ */
+.mp-footer{
+  background: var(--mp-section-sel);
+  color: var(--paper-2);
+  padding: 28px 0 22px;
+  font-family: 'Inter', sans-serif;
+  border-top: 1px solid var(--mp-border);
+}
+.mp-footer-inner{
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 40px;
+  display: flex; flex-direction: column;
+  gap: 18px;
+}
+.mp-footer-row{
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 18px 32px;
+}
+.mp-footer-copyright{
+  font-size: 14px; color: var(--muted);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; flex-shrink: 0;
+}
+.mp-footer-links{
+  display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center;
+  gap: 8px 36px; font-size: 14px; margin-left: auto;
+}
+.mp-footer-links a{
+  color: var(--paper-2); text-decoration: none;
+  transition: color .15s ease; font-weight: 400;
+}
+.mp-footer-links a:hover{ color: var(--mp-primary); }
+.mp-footer-social{
+  display: flex; align-items: center; justify-content: center;
+  gap: 22px; width: 100%;
+  padding-top: 14px;
+  border-top: 1px solid var(--mp-border);
+}
+.mp-footer-social a{
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  transition: color .15s ease, transform .15s ease;
+}
+.mp-footer-social a:hover{
+  color: var(--mp-primary); transform: translateY(-1px);
+}
+.mp-footer-social svg{
+  width: 18px; height: 18px; fill: currentColor; display: block;
+}
+@media (max-width: 980px){
+  .mp-footer-inner{ padding: 0 24px; }
+  .mp-footer-row{ flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+  .mp-footer-links{ justify-content: center; margin-left: 0; }
+}
+@media (max-width: 720px){
+  .mp-footer-inner{ padding: 0 18px; gap: 14px; }
+  .mp-footer-row{ gap: 12px 20px; }
+  .mp-footer-links{ gap: 6px 18px; font-size: 13px; }
+  .mp-footer-copyright{ font-size: 13px; }
+  .mp-footer-social{ gap: 18px; padding-top: 12px; }
+  .mp-footer-social svg{ width: 16px; height: 16px; }
+}
+@media (max-width: 480px){
+  .mp-footer{ padding: 24px 0 18px; }
+}
+
+/* ============================================================
+   REPORT HERO META — breadcrumb · download · published date
+   ------------------------------------------------------------
+   Canonical, shared block. KEEP THIS IDENTICAL across every
+   report and the HeaderFooter template so the three blocks
+   line up at the same height, padding and styling.
+   Colours fall back to the MP blue palette if a report does
+   not define the --mp-* design tokens.
+   ============================================================ */
+
+/* Top bar: breadcrumb (left) + download cluster (right), one line */
+.hero-topbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+.hero-topbar .hero-breadcrumb{ margin-bottom: 0; }
+
+/* Breadcrumb */
+.hero-breadcrumb{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--mp-paragraph, #72727D);
+  letter-spacing: .02em;
+}
+.hero-breadcrumb a{
+  color: var(--mp-paragraph, #72727D);
+  text-decoration: none;
+  transition: color .15s ease;
+}
+.hero-breadcrumb a:hover{ color: var(--mp-primary, #5E77FB); }
+.hero-breadcrumb .crumb-sep{ color: var(--mp-secondary, #95959D); font-size: 11px; }
+.hero-breadcrumb .crumb-current{ color: var(--mp-heading, #000000); font-weight: 500; }
+
+/* Download cluster: button + meta line */
+.hero-download{
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.btn-download-pdf{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--mp-primary, #5E77FB);
+  color: var(--mp-white, #FFFFFF) !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1;
+  padding: 11px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(94,119,251,.28);
+  transition: background .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.btn-download-pdf:hover{
+  background: var(--mp-primary-hover, #4B5FC9);
+  color: var(--mp-white, #FFFFFF) !important;
+  box-shadow: 0 6px 18px rgba(94,119,251,.36);
+  transform: translateY(-1px);
+}
+.btn-download-pdf svg{
+  width: 15px; height: 15px;
+  flex: 0 0 auto; display: block;
+  transition: transform .15s ease;
+}
+.btn-download-pdf:hover svg{ transform: translateY(2px); }
+.download-meta{
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--mp-secondary, #95959D);
+  white-space: nowrap;
+}
+
+/* Published-date pill (sits above the H1 in the hero lead column) */
+.hero-published{
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--mp-paragraph, #72727D);
+  margin: -8px 0 18px;
+}
+.hero-published::before{
+  content: "";
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--mp-primary, #5E77FB);
+  opacity: .7;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 720px){
+  .hero-topbar{ flex-direction: column; align-items: stretch; gap: 12px; margin-bottom: 20px; }
+  .hero-download{ width: 100%; }
+  .btn-download-pdf{ flex: 1 1 auto; justify-content: center; padding: 13px 18px; font-size: 14px; }
+}
+/* ===================== END REPORT HERO META ===================== */
+
+  /* ============ BODY PLACEHOLDER (replace this whole <main> in real reports) ============ */
+  .hf-body{
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 88px 32px 120px;   /* top pad clears the fixed header */
+    min-height: 72vh;
+  }
+  @media (max-width: 768px){ .hf-body{ padding: 120px 20px 80px } }
+</style>
+</head>
+<body>
+
+<!-- ========================= HEADER ========================= -->
+<header class="mp-header">
+  <div class="mp-header-inner" id="mpHeaderInner">
+    <a href="https://www.millionpodcasts.com/" class="mp-logo" aria-label="Million Podcasts Home">
+      <img src="https://www.millionpodcasts.com/mpassets/img/logo/millionpodcasts-full.svg" alt="Million Podcasts">
+    </a>
+    <nav class="mp-nav-left" aria-label="Primary">
+      <a href="https://www.millionpodcasts.com/">Home</a>
+      <a href="https://www.millionpodcasts.com/charts">Podcast Charts</a>
+      <a href="https://www.millionpodcasts.com/about">About</a>
+      <div class="mp-dropdown" id="mpResourcesDropdown">
+        <button type="button" class="mp-dropdown-trigger" id="mpResourcesTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="mpResourcesPanel">Resources</button>
+        <div class="mp-dropdown-panel" id="mpResourcesPanel" role="menu">
+          <div class="mp-dropdown-section">
+            <span class="mp-dropdown-label">Content</span>
+            <a href="https://www.millionpodcasts.com/blog/" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg></span>Blog</a>
+            <a href="https://www.millionpodcasts.com/blog/category/platform-guide" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4.5A2.5 2.5 0 0 1 4.5 2H11v18H4.5A2.5 2.5 0 0 1 2 17.5z"/><path d="M22 4.5A2.5 2.5 0 0 0 19.5 2H13v18h6.5a2.5 2.5 0 0 0 2.5-2.5z"/></svg></span>Platform Guide</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-podcasters" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="2.2"/><path d="M7.5 15.5a6 6 0 1 1 9 0"/><path d="M5 18a9 9 0 1 1 14 0"/><line x1="12" y1="20" x2="12" y2="22"/></svg></span>For Podcasters</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-advertisers/" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 15V9l2.5 4L13 9v6"/><line x1="16" y1="13" x2="18.5" y2="13"/><path d="M17 9v6"/></svg></span>For Advertisers</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-businesses" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="3" y1="12" x2="21" y2="12"/></svg></span>For Businesses</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-pr-pros" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M14 8a4 4 0 0 1 0 8"/><path d="M17 5a7 7 0 0 1 0 14"/></svg></span>For PR Pros</a>
+            <a href="https://www.millionpodcasts.com/blog/category/industry-data" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></span>Industry Data</a>
+          </div>
+          <div class="mp-dropdown-section">
+            <span class="mp-dropdown-label">Customers</span>
+            <a href="https://www.millionpodcasts.com/customers" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 14.5 9 21 9.5 16 13.8 17.6 20 12 16.8 6.4 20 8 13.8 3 9.5 9.5 9"/></svg></span>Customer Reviews</a>
+            <a href="https://help.millionpodcasts.com" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span>Help Center</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="mp-nav-right">
+      <a href="https://www.millionpodcasts.com/pricing">Pricing</a>
+      <a href="https://www.millionpodcasts.com/register" class="mp-cta-btn">Start Free Trial</a>
+    </div>
+    <a href="https://www.millionpodcasts.com/pricing" class="mp-mobile-pricing-pill" aria-label="Pricing">Pricing</a>
+    <button class="mp-mobile-toggle" id="mpMobileToggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg class="mp-icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      <svg class="mp-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+<script>
+(function(){
+  var dropdown   = document.getElementById('mpResourcesDropdown');
+  var trigger    = document.getElementById('mpResourcesTrigger');
+  var panel      = document.getElementById('mpResourcesPanel');
+  var headerNav  = document.getElementById('mpHeaderInner');
+  var mobileBtn  = document.getElementById('mpMobileToggle');
+
+  function closeDropdown(){
+    if(!dropdown) return;
+    dropdown.classList.remove('is-open');
+    if(trigger) trigger.setAttribute('aria-expanded', 'false');
+  }
+  function openDropdown(){
+    if(!dropdown) return;
+    dropdown.classList.add('is-open');
+    if(trigger) trigger.setAttribute('aria-expanded', 'true');
+  }
+  if(trigger){
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(dropdown.classList.contains('is-open')){ closeDropdown(); } else { openDropdown(); }
+    });
+  }
+  if(panel){ panel.addEventListener('click', function(e){ e.stopPropagation(); }); }
+  document.addEventListener('click', function(e){
+    if(dropdown && !dropdown.contains(e.target)){ closeDropdown(); }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' || e.keyCode === 27){ closeDropdown(); }
+  });
+  if(mobileBtn && headerNav){
+    var headerEl = document.querySelector('.mp-header');
+    function setOpen(open){
+      if(open){
+        headerNav.classList.add('is-open');
+        if(headerEl) headerEl.classList.add('is-open');
+      } else {
+        headerNav.classList.remove('is-open');
+        if(headerEl) headerEl.classList.remove('is-open');
+      }
+      mobileBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if(!open) closeDropdown();
+    }
+    mobileBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      setOpen(!headerNav.classList.contains('is-open'));
+    });
+    // Close mobile menu when a link inside it is tapped
+    headerNav.addEventListener('click', function(e){
+      var link = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (link && headerNav.contains(link) && headerNav.classList.contains('is-open')) {
+        setOpen(false);
+      }
+    });
+    // Close on outside tap (mobile)
+    document.addEventListener('click', function(e){
+      if (headerNav.classList.contains('is-open') &&
+          !headerNav.contains(e.target) &&
+          !mobileBtn.contains(e.target)) {
+        setOpen(false);
+      }
+    });
+    // Reset on resize back to desktop
+    window.addEventListener('resize', function(){
+      if (window.innerWidth > 980 && headerNav.classList.contains('is-open')) {
+        setOpen(false);
+      }
+    });
+  }
+})();
+</script>
+
+<!-- ========================= BODY (single h1 placeholder) ========================= -->
+<main class="hf-body">
+
+  <!-- ============================================================
+       REPORT META — copy this block to the top of each report hero.
+       Keep the markup identical so the breadcrumb / download /
+       published date line up the same way across every report.
+         • Home      -> millionpodcasts.com (leave as-is)
+         • Research  -> "#" while the Research landing page is under
+           development; swap to /research once that page is live.
+       Then update: the crumb title, the PDF href + download name,
+       the download-meta size, and the published date.
+       ============================================================ -->
+  <div class="hero-topbar">
+    <nav class="hero-breadcrumb" aria-label="Breadcrumb">
+      <a href="https://www.millionpodcasts.com/">Home</a>
+      <span class="crumb-sep">›</span>
+      <a href="#">Research</a>
+      <span class="crumb-sep">›</span>
+      <span class="crumb-current">Report title goes here</span>
+    </nav>
+    <div class="hero-download">
+      <a class="btn-download-pdf"
+         href="Report%20Name.pdf"
+         download="Report Name.pdf"
+         target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download report (PDF)
+      </a>
+      <span class="download-meta">1 MB · full report</span>
+    </div>
+  </div>
+
+  <div class="hero-published">Published Month DD, 2026</div>
+  <h1>Report headline goes here</h1>
+</main>
+
+<!-- ========================= FOOTER ========================= -->
+<footer class="mp-footer">
+  <div class="mp-footer-inner">
+    <div class="mp-footer-row">
+      <div class="mp-footer-copyright">&copy; 2026 Million Podcasts. All Rights Reserved.</div>
+      <nav class="mp-footer-links" aria-label="Footer">
+        <a href="https://www.millionpodcasts.com/podcasts-directory">Podcast Directory</a>
+        <a href="https://www.millionpodcasts.com/shows-directory">Shows Directory</a>
+        <a href="https://www.millionpodcasts.com/charts">Podcast Charts</a>
+        <a href="https://www.millionpodcasts.com/about">About</a>
+        <a href="https://www.millionpodcasts.com/blog/">Blog</a>
+        <a href="https://www.millionpodcasts.com/privacy">Privacy</a>
+        <a href="https://www.millionpodcasts.com/terms">Terms</a>
+      </nav>
+    </div>
+    <div class="mp-footer-social" aria-label="Social media">
+      <a href="https://x.com/millionpodcasts" aria-label="X (Twitter)" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/millionpodcasts/" aria-label="LinkedIn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/millionpodcasts/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@million-podcasts" aria-label="YouTube" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
