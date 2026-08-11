@@ -1131,9 +1131,18 @@ body.dense .ex-glance-row{padding:11px 16px}
   color:var(--mp-paragraph);font-weight:400}
 .au-hero-scale{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;
   padding-top:0;border-top:none}
-.au-hero-stat{background:var(--mp-white);border:1px solid var(--mp-border);border-radius:14px;
-  padding:15px 16px 14px;box-shadow:var(--card-shadow);transition:box-shadow .18s ease,transform .18s ease}
-.au-hero-stat:hover{box-shadow:var(--card-shadow-hover);transform:translateY(-1px)}
+/* No wash behind the row. The card carries a touch of translucency and blur
+   on its own, so it reads as glass without tinting the hero around it. */
+.au-hero-stat{position:relative;
+  background:linear-gradient(165deg, rgba(255,255,255,.97), rgba(255,255,255,.90));
+  backdrop-filter:blur(8px) saturate(120%);-webkit-backdrop-filter:blur(8px) saturate(120%);
+  border:1px solid var(--mp-border);border-radius:15px;padding:15px 16px 14px;
+  box-shadow:0 1px 2px rgba(40,46,82,.05), 0 12px 26px -16px rgba(40,46,82,.26),
+             0 1px 0 rgba(255,255,255,.9) inset;
+  transition:box-shadow .2s ease,transform .2s ease}
+.au-hero-stat:hover{transform:translateY(-2px);
+  box-shadow:0 2px 5px rgba(40,46,82,.07), 0 20px 38px -18px rgba(94,119,251,.32),
+             0 1px 0 rgba(255,255,255,.95) inset}
 .au-hero-stat b{display:block;font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:500;
   color:var(--mp-heading);line-height:1;font-variant-numeric:lining-nums;letter-spacing:-.015em}
 .au-hero-stat span{display:block;font-size:11px;font-weight:400;color:var(--mp-secondary);
@@ -1215,11 +1224,15 @@ body.dense .ex-glance-row{padding:11px 16px}
 .ex-card-b.pad>.ex-insight{margin-left:0;margin-right:0}
 
 /* ---------- tables: quieter rules, tabular figures, calmer bars ---------- */
-.ex-tbl th{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.11em;
+.ex-tbl th{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.09em;
   text-transform:uppercase;color:var(--mp-secondary);font-weight:500;
-  padding:9px 14px;border-bottom:1px solid var(--mp-border);white-space:nowrap;background:transparent}
+  padding:9px 14px;border-bottom:1px solid var(--mp-border);background:transparent;
+  white-space:normal;line-height:1.3;vertical-align:bottom}
 .ex-tbl td{padding:10px 14px;border-bottom:1px solid rgba(223,228,254,.55);
   font-size:13px;color:var(--mp-subheading);vertical-align:middle}
+/* the content column is narrower now that the nav stands beside it, so the
+   first and last cells hug the card edge a little less */
+
 .ex-tbl tbody tr:last-child td{border-bottom:none}
 .ex-tbl tbody tr:hover td{background:rgba(239,241,255,.5)}
 .ex-tbl td.n,.ex-tbl th.n{text-align:right;font-variant-numeric:tabular-nums}
@@ -1262,7 +1275,10 @@ body.dense .ex-glance-row{padding:11px 16px}
 
 
 /* ---------- header block: breadcrumb / stamp / eyebrow share one rhythm ---------- */
-.ex-crumb{margin:0;padding:20px 0 0;font-size:12.5px;line-height:1.4}
+/* The site header is position:fixed at 64px. That clearance used to sit on
+   .ex-tools; with the control strip gone, the breadcrumb is the first thing
+   in flow, so it carries it instead. */
+.ex-crumb{margin:64px 0 0;padding:20px 0 0;font-size:12.5px;line-height:1.4}
 .au-stamp{display:flex;align-items:center;flex-wrap:wrap;gap:0 10px;
   margin:0;padding:13px 0 0;line-height:1.4}
 .au-stamp .seg{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
@@ -1379,6 +1395,76 @@ body.dense .ex-glance-row{padding:11px 16px}
 .ex-card-b.pad{padding-bottom:0}
 .ex-card-b.pad > *:last-child{margin-bottom:18px}
 .ex-card-b.pad > .ex-insight:last-child{margin-bottom:16px}
+
+
+/* ---------- vertical section nav, content to its right ----------
+   Header, hero and footer keep the full width. Everything from section 01
+   down sits in a two-column grid so the nav can stand alongside it. */
+.au-layout{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px;align-items:start}
+/* The cards keep the proportions they were designed at; the whole column is
+   just rendered at 75%. That is why nothing here re-tunes padding or type
+   size: a 918px column at 0.75 lays out as 1224 CSS px, which is what the
+   design assumed before the nav took its slice. The hero stays at 100%. */
+.au-main{min-width:0;zoom:.75}
+.au-side{position:sticky;top:88px;align-self:start}
+/* no panel, no fill: a hairline rail with the links hanging off it, so the nav
+   reads as page furniture rather than another card competing with the content */
+.au-side-in{padding:2px 0 0}
+.au-side-h{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--mp-icons);padding:0 0 20px 22px}
+.au-side nav{display:flex;flex-direction:column;gap:13px;position:relative;
+  border-left:1.5px solid var(--mp-border);max-height:calc(100vh - 150px);
+  overflow-y:auto;scrollbar-width:none}
+.au-side nav::-webkit-scrollbar{display:none}
+.au-side nav a{display:block;position:relative;padding:12px 4px 12px 22px;margin-left:-1.5px;
+  border-left:1.5px solid transparent;
+  font-size:12.5px;line-height:1.45;color:var(--mp-secondary);text-decoration:none;
+  transition:color .16s ease,border-color .16s ease}
+/* a marker per item, so the rail reads as a progress track rather than a
+   bare line, and the list fills the viewport instead of stopping halfway */
+.au-side nav a::before{content:"";position:absolute;left:-4.5px;top:18px;width:7px;height:7px;
+  border-radius:50%;background:var(--mp-white);border:1.5px solid var(--mp-border);
+  transition:background .16s ease,border-color .16s ease,transform .16s ease}
+.au-side nav a:hover{color:var(--mp-subheading)}
+.au-side nav a:hover::before{border-color:var(--mp-primary-disable)}
+.au-side nav a.on{color:var(--mp-primary);font-weight:600;border-left-color:var(--mp-primary)}
+.au-side nav a.on::before{background:var(--mp-primary);border-color:var(--mp-primary);
+  transform:scale(1.15)}
+
+/* the sticky chrome is just the site header now, so sections need less clearance */
+.ex-sec{scroll-margin-top:96px}
+#method{scroll-margin-top:96px}
+
+@media (max-width:1080px){
+  /* below this the nav lies flat above the content and scrolls sideways */
+  /* minmax(0,1fr), not 1fr: a plain 1fr resolves to min-content, and the
+     horizontal nav's own width then blows the grid past the viewport */
+  .au-layout{grid-template-columns:minmax(0,1fr);gap:18px}
+  .au-side{position:static}
+  .au-side-in{padding:10px 12px}
+  .au-side-h{display:none}
+    .au-side-in{min-width:0}
+  .au-side nav{flex-direction:row;gap:6px;max-height:none;overflow-x:auto;overflow-y:hidden;
+    scrollbar-width:none}
+  .au-side nav::-webkit-scrollbar{display:none}
+  .au-side nav a{white-space:nowrap;padding:7px 12px}
+  .au-side nav a.on::before{display:none}
+}
+
+/* ---------- chart / table toggle ---------- */
+.ex-chart.hide,.ex-legendwrap.hide{display:none}
+.ex-seg button{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;
+  padding:6px 13px;border:none;background:none;color:var(--mp-paragraph);cursor:pointer;
+  line-height:1.5;transition:background .14s ease,color .14s ease}
+.ex-seg button:hover:not(.on){background:var(--mp-section-sel)}
+.ex-seg button.on{background:var(--mp-primary);color:#fff}
+.ex-seg button:focus-visible{outline:2px solid var(--mp-primary);outline-offset:-2px}
+/* the table view sits where the chart was, so it needs the same breathing room */
+.ex-datatable{margin:16px 18px 4px}
+.ex-datatable th{padding:8px 12px;text-align:left;font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--mp-secondary);
+  background:var(--mp-section-sel)}
+.ex-datatable tbody tr:nth-child(even) td{background:rgba(94,119,251,.03)}
 
 /* ---------- sorted column highlight ---------- */
 .ex-tbl th.hl{color:var(--mp-primary);position:relative;background:#EDF0FF}
@@ -1529,11 +1615,6 @@ body.dense .ex-glance-row{padding:11px 16px}
   </div>
 </header>
 
-<div class="ex-tools">
-  <div class="ex-subnav-wrap">
-    <nav class="sp-wrap ex-subnav" id="exSubnav" aria-label="Statistics sections"></nav>
-  </div>
-</div>
 
 <div class="sp-wrap">
   <nav class="ex-crumb" aria-label="Breadcrumb">
@@ -1588,6 +1669,14 @@ body.dense .ex-glance-row{padding:11px 16px}
   </div>
 
   <div id="app" hidden>
+    <div class="au-layout">
+      <aside class="au-side">
+        <div class="au-side-in">
+          <div class="au-side-h">On this page</div>
+          <nav id="exSubnav" aria-label="Statistics sections"></nav>
+        </div>
+      </aside>
+      <div class="au-main">
 
     <section class="ex-sec" id="overview">
       <div class="ex-sec-h">
@@ -1828,6 +1917,8 @@ body.dense .ex-glance-row{padding:11px 16px}
       </div>
     </section>
 
+      </div>
+    </div>
   </div>
 </main>
 
@@ -2102,6 +2193,26 @@ var FIG={
   gender:"9.1", income:"9.2", gen:"9.3",
   lead:"10.1"
 };
+/* Section a block belongs to, used only for naming downloads. */
+var SECNAME={
+  states:"Geography", cities:"Geography",
+  tiers:"Reach", conc:"Reach",
+  cadence:"Activity", depth:"Activity", cohorts:"Activity", tenure:"Activity",
+  len:"Format", guests:"Format", lang:"Format", video:"Format",
+  signals:"Signals",
+  rating:"Ratings", reviews:"Ratings",
+  spon:"Monetization", brands:"Monetization",
+  gender:"Audience", income:"Audience", gen:"Audience",
+  lead:"Leaderboard"
+};
+/* Geography-2.1-Australia-MillionPodcasts.csv reads on its own in a downloads
+   folder; au-2.1-states.csv does not. */
+function fileName(id, ext){
+  var country=String(S.meta.country||"").replace(/[^A-Za-z0-9]/g,"");
+  return [SECNAME[id]||"Stats", FIG[id]||id, country, "MillionPodcasts"]
+    .join("-") + "." + ext;
+}
+
 var FIGREG={};
 
 /* Shared card header. Every block gets its number, an optional control strip
@@ -2122,18 +2233,31 @@ function reg(id,headers,rows,title){
 }
 function chartCard(o){
   FIGREG[o.id]={csv:o.csv||"", title:o.title};
+  var isTable = VIEW[o.id]==="table";
+  /* no "View" label: two buttons reading Chart and Table say what they do,
+     and the label was costing a line in a card that no longer has one spare */
+  var seg = o.table ?
+    '<div class="ex-seg">'+
+      '<button type="button" data-view="'+o.id+'" data-mode="chart"'+
+        (isTable?"":' class="on"')+'>Chart</button>'+
+      '<button type="button" data-view="'+o.id+'" data-mode="table"'+
+        (isTable?' class="on"':"")+'>Table</button>'+
+    "</div>" : "";
   var exp='<div class="ex-chart-export">'+
     (o.csv?'<button type="button" data-fig-csv="'+o.id+'">CSV</button>':"")+
     '<button type="button" data-fig-png="'+o.id+'">PNG</button></div>';
-  var table = o.table ? '<div class="ex-datatable" id="dt-'+o.id+'">'+o.table+"</div>" : "";
+  var table = o.table ?
+    '<div class="ex-datatable'+(isTable?" show":"")+'" id="dt-'+o.id+'">'+o.table+"</div>" : "";
   var citePill = o.claim ? ' <button class="ex-mini" type="button" data-cite="'+esc(citeClaim(o.claim))+'">cite</button>' : "";
   var insight = o.insight ? '<p class="ex-insight">'+o.insight+citePill+"</p>" : "";
   var num=FIG[o.id]?'<div class="ex-fig">'+FIG[o.id]+"</div>":"";
   return '<div class="ex-card" data-figid="'+o.id+'"><div class="ex-card-h"><div>'+num+
     "<h3>"+esc(o.title)+(o.modeled?'<span class="ex-badge">Modeled</span>':"")+"</h3>"+
     (o.sub?'<div class="s">'+esc(o.sub)+"</div>":"")+"</div>"+
-    '<div class="ex-headtools">'+exp+"</div></div>"+
-    '<div class="ex-chart" id="chsvg-'+o.id+'">'+o.svg+"</div>"+(o.legend||"")+table+insight+"</div>";
+    '<div class="ex-headtools">'+seg+exp+"</div></div>"+
+    '<div class="ex-chart'+(isTable?" hide":"")+'" id="chsvg-'+o.id+'">'+o.svg+"</div>"+
+    (o.legend?'<div class="ex-legendwrap'+(isTable?" hide":"")+'">'+o.legend+"</div>":"")+
+    table+insight+"</div>";
 }
 function dataTableAndCsv(headers,rows){
   var th='<table><thead><tr>'+headers.map(function(h,i){
@@ -2276,6 +2400,11 @@ var LOCAL={
   stateSort:"n", cityRows:"10", citySort:"n",
   brandRows:"12", leadSort:"reach", leadRows:"10", tierMode:"n"
 };
+
+/* Chart or table, per chart card. Every chart already carries the numbers
+   behind it (that is what the CSV button exports), so this just swaps which
+   one is on screen. Default is the chart. */
+var VIEW={};
 function ctl(id,label,opts,cur){
   return '<div class="ex-lf"><label for="'+id+'">'+esc(label)+"</label><select id=\""+id+"\">"+
     opts.map(function(o){
@@ -2918,6 +3047,18 @@ function renderRefFacts(){
    would otherwise squash its cities table down to two rows. */
 var MIN_ROWS = 5;
 
+/* The content column is rendered with zoom, so the two measurement families
+   disagree: offsetHeight and computed styles are CSS px in the zoomed
+   coordinate space, getBoundingClientRect is device px. Mixing them silently
+   scales every correction by 0.75. Anything read from a rect and then written
+   back to a style has to be divided by this. */
+function contentZoom(){
+  var m=document.querySelector(".au-main");
+  if(!m || !m.offsetWidth){ return 1; }
+  var z=m.getBoundingClientRect().width / m.offsetWidth;
+  return (z>0.05 && z<20) ? z : 1;
+}
+
 function outerH(e){
   var cs=getComputedStyle(e);
   /* .ex-insight carries margin-top:auto so it sits on the card floor.
@@ -2992,8 +3133,9 @@ function syncPair(refCardId, scrollCardId, wrapId){
     var refIns=refCard.querySelector(".ex-insight"),
         scIns=scCard.querySelector(".ex-insight");
     if(refIns && scIns){
+      var z=contentZoom();
       for(var pass=0; pass<3; pass++){
-        var delta=scIns.getBoundingClientRect().top - refIns.getBoundingClientRect().top;
+        var delta=(scIns.getBoundingClientRect().top - refIns.getBoundingClientRect().top)/z;
         if(Math.abs(delta) <= 1){ break; }
         var cur=parseFloat(wrap.style.maxHeight);
         /* the floor wins if correcting would squash the table below MIN_ROWS,
@@ -3015,15 +3157,31 @@ function equalizeInsights(idA, idB){
   var ia=a.querySelector(".ex-insight"), ib=b.querySelector(".ex-insight");
   if(!ia || !ib){ return; }
   ia.style.paddingTop=""; ib.style.paddingTop="";
-  var ha=ia.offsetHeight, hb=ib.offsetHeight;
-  if(ha===hb){ return; }
+  var z=contentZoom();
+  var ha=ia.getBoundingClientRect().height/z, hb=ib.getBoundingClientRect().height/z;
+  if(Math.abs(ha-hb)<0.5){ return; }
   /* Pad the SHORTER one at the top rather than setting a min-height. Both
      end up the same height either way, but padding pushes the short text
      down so the two cite buttons land on the same baseline; a min-height
      would leave the short one floating above its partner. */
   var shorter = ha<hb ? ia : ib;
   var base = parseFloat(getComputedStyle(shorter).paddingTop)||0;
-  shorter.style.paddingTop = (base + Math.abs(ha-hb)) + "px";
+  var pad = base + Math.abs(ha-hb);
+  shorter.style.paddingTop = pad + "px";
+
+  /* Correct against where the cite buttons actually landed. Fractional line
+     heights mean the padding sum alone lands a couple of pixels out, and at
+     this size a 3px step is visible between two cards side by side. */
+  var pa=a.querySelector(".ex-mini"), pb=b.querySelector(".ex-mini");
+  if(!pa || !pb){ return; }
+  for(var i=0;i<3;i++){
+    var d=(pa.getBoundingClientRect().bottom - pb.getBoundingClientRect().bottom)/z;
+    if(Math.abs(d)<0.5){ break; }
+    var target = (shorter===ia) ? pad - d : pad + d;
+    if(target<0 || Math.abs(target-pad)<0.5){ break; }
+    pad=target;
+    shorter.style.paddingTop = pad + "px";
+  }
 }
 
 var PAIRS=[
@@ -3038,9 +3196,15 @@ var PAIRS=[
 ];
 
 function syncAllPairs(){
-  /* equalise the cite blocks first: their height feeds the table cap below */
-  PAIRS.forEach(function(p){ equalizeInsights(p[0], p[1]); });
-  PAIRS.forEach(function(p){ if(p[2]){ syncPair(p[0], p[1], p[2]); } });
+  /* Two rounds, and the cap goes first. Capping a table changes the card
+     height, which changes how much slack the cite block has; padding the
+     cite block can nudge the card height back. One pass leaves the two
+     chasing each other by a couple of pixels, which is visible side by side.
+     A second round settles it. */
+  for(var round=0; round<2; round++){
+    PAIRS.forEach(function(p){ if(p[2]){ syncPair(p[0], p[1], p[2]); } });
+    PAIRS.forEach(function(p){ equalizeInsights(p[0], p[1]); });
+  }
 }
 
 /* ---------- chrome: tooltips, subnav, copy, export ---------- */
@@ -3117,6 +3281,11 @@ function svgText(x,y,txt,size,weight,fill,anchor){
 function exportPNG(id){
   var host=el("chsvg-"+id);
   if(!host || !host.firstElementChild){ return; }
+  /* the chart may be hidden behind the table view; un-hide it just long
+     enough to measure and rasterise, otherwise every computed style is
+     display:none and the export comes out empty */
+  var wasHidden=host.classList.contains("hide");
+  if(wasHidden){ host.classList.remove("hide"); }
   var live=host.firstElementChild;
   var clone=live.cloneNode(true);
   inlineStyles(live, clone);
@@ -3148,6 +3317,8 @@ function exportPNG(id){
             CITE.url, 10.5, 400, "#95959D")+
     "</svg>";
 
+  if(wasHidden){ host.classList.add("hide"); }
+
   var img=new Image();
   img.onload=function(){
     var scale=2, cv=document.createElement("canvas");
@@ -3158,7 +3329,7 @@ function exportPNG(id){
     cv.toBlob(function(blob){
       if(!blob){ toast("Export failed"); return; }
       var u=URL.createObjectURL(blob), a=document.createElement("a");
-      a.href=u; a.download=S.meta.iso.toLowerCase()+"-"+(FIG[id]||id)+"-"+id+".png";
+      a.href=u; a.download=fileName(id,"png");
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function(){ URL.revokeObjectURL(u); },400);
       toast("PNG downloaded");
@@ -3179,8 +3350,25 @@ function initActions(){
     }
     if(t.hasAttribute && t.hasAttribute("data-fig-csv")){
       var id=t.getAttribute("data-fig-csv");
-      download(S.meta.iso.toLowerCase()+"-"+(FIG[id]||id)+"-"+id+".csv",
-               FIGREG[id].csv,"text/csv;charset=utf-8"); return;
+      download(fileName(id,"csv"), FIGREG[id].csv, "text/csv;charset=utf-8"); return;
+    }
+    if(t.hasAttribute && t.hasAttribute("data-view")){
+      var vid=t.getAttribute("data-view"), mode=t.getAttribute("data-mode");
+      if(VIEW[vid]===mode || (mode==="chart" && !VIEW[vid])){ return; }
+      VIEW[vid]=mode;
+      var card=t.closest(".ex-card");
+      var wantTable=(mode==="table");
+      card.querySelectorAll('[data-view="'+vid+'"]').forEach(function(btn){
+        btn.classList.toggle("on", btn.getAttribute("data-mode")===mode);
+      });
+      var ch=el("chsvg-"+vid), dt=el("dt-"+vid),
+          lg=card.querySelector(".ex-legendwrap");
+      if(ch){ ch.classList.toggle("hide", wantTable); }
+      if(lg){ lg.classList.toggle("hide", wantTable); }
+      if(dt){ dt.classList.toggle("show", wantTable); }
+      /* the card just changed height, so the row it sits in has to re-settle */
+      requestAnimationFrame(syncAllPairs);
+      return;
     }
     if(t.hasAttribute && t.hasAttribute("data-fig-png")){
       exportPNG(t.getAttribute("data-fig-png")); return;
@@ -3207,7 +3395,9 @@ function initSubnav(){
        chrome: clicking a tab leaves that section's top sitting exactly that
        far down. So the activation line IS the scroll-margin, not the header
        height -- measure it, or the rail reads one section behind forever. */
-    var LINE=(parseFloat(getComputedStyle(secs[0]).scrollMarginTop)||120)+10;
+    /* scroll-margin lives in the section's own (zoomed) space, the rect we
+       compare it against is in device px, so bring it across */
+    var LINE=((parseFloat(getComputedStyle(secs[0]).scrollMarginTop)||120)*contentZoom())+10;
     /* getBoundingClientRect, not offsetTop: these sections sit inside a
        centred wrapper, so offsetTop is measured from that wrapper and the
        comparison against scrollY lands a section early. */
@@ -3220,14 +3410,19 @@ function initSubnav(){
     last=cur;
     var a=links[cur];
     if(!a){ return; }
-    /* scroll the rail itself, never the page: scrollIntoView would yank the
-       document vertically while the user is already scrolling. Rect deltas
-       again, because the rail is not the links' offset parent. */
-    var nr=nav.getBoundingClientRect(), ar=a.getBoundingClientRect();
-    var left=ar.left-nr.left+nav.scrollLeft, right=left+ar.width;
-    var view=nav.scrollLeft, w=nav.clientWidth, pad=24;
-    if(right+pad>view+w){ nav.scrollLeft=right+pad-w; }
-    else if(left-pad<view){ nav.scrollLeft=Math.max(0,left-pad); }
+    /* Keep the active item in view inside the rail itself, never by scrolling
+       the page. The rail is vertical on desktop and horizontal on narrow
+       screens, so pick the axis that actually overflows. */
+    var nr=nav.getBoundingClientRect(), ar=a.getBoundingClientRect(), pad=16;
+    if(nav.scrollHeight > nav.clientHeight+2){
+      var top=ar.top-nr.top+nav.scrollTop, bot=top+ar.height;
+      if(bot+pad>nav.scrollTop+nav.clientHeight){ nav.scrollTop=bot+pad-nav.clientHeight; }
+      else if(top-pad<nav.scrollTop){ nav.scrollTop=Math.max(0,top-pad); }
+    }else if(nav.scrollWidth > nav.clientWidth+2){
+      var left=ar.left-nr.left+nav.scrollLeft, right=left+ar.width;
+      if(right+pad>nav.scrollLeft+nav.clientWidth){ nav.scrollLeft=right+pad-nav.clientWidth; }
+      else if(left-pad<nav.scrollLeft){ nav.scrollLeft=Math.max(0,left-pad); }
+    }
   }
   window.addEventListener("scroll",spy,{passive:true}); spy();
 }
