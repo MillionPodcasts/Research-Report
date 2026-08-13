@@ -1131,18 +1131,36 @@ body.dense .ex-glance-row{padding:11px 16px}
   color:var(--mp-paragraph);font-weight:400}
 .au-hero-scale{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;
   padding-top:0;border-top:none}
-/* No wash behind the row. The card carries a touch of translucency and blur
-   on its own, so it reads as glass without tinting the hero around it. */
-.au-hero-stat{position:relative;
-  background:linear-gradient(165deg, rgba(255,255,255,.97), rgba(255,255,255,.90));
+/* These four are the first numbers anyone reads, so they get more presence
+   than a plain card: an accent rule down the left, a larger serif figure, and
+   a caption that sits quietly under it. The accent grows on hover rather than
+   the whole card jumping. */
+.au-hero-stat{position:relative;overflow:hidden;
+  background:linear-gradient(165deg, rgba(255,255,255,.98), rgba(248,250,255,.94));
   backdrop-filter:blur(8px) saturate(120%);-webkit-backdrop-filter:blur(8px) saturate(120%);
-  border:1px solid var(--mp-border);border-radius:15px;padding:15px 16px 14px;
+  border:1px solid var(--mp-border);border-radius:15px;padding:16px 16px 15px 19px;
   box-shadow:0 1px 2px rgba(40,46,82,.05), 0 12px 26px -16px rgba(40,46,82,.26),
              0 1px 0 rgba(255,255,255,.9) inset;
-  transition:box-shadow .2s ease,transform .2s ease}
-.au-hero-stat:hover{transform:translateY(-2px);
-  box-shadow:0 2px 5px rgba(40,46,82,.07), 0 20px 38px -18px rgba(94,119,251,.32),
+  transition:box-shadow .22s ease,transform .22s ease,border-color .22s ease}
+.au-hero-stat::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;
+  border-radius:0 3px 3px 0;background:linear-gradient(180deg,var(--mp-primary),#8FA0F9);
+  transition:top .22s ease,bottom .22s ease}
+.au-hero-stat::after{content:"";position:absolute;right:-30px;top:-30px;width:96px;height:96px;
+  border-radius:50%;background:radial-gradient(circle,rgba(94,119,251,.10),transparent 70%);
+  pointer-events:none}
+.au-hero-stat b{display:block;font-family:'Fraunces',Georgia,serif;font-weight:500;
+  font-size:30px;line-height:1.05;letter-spacing:-.01em;color:var(--mp-heading);
+  font-variant-numeric:lining-nums tabular-nums}
+.au-hero-stat span{display:block;margin-top:7px;font-size:11.5px;line-height:1.4;
+  color:var(--mp-secondary)}
+.au-hero-stat:hover{transform:translateY(-3px);border-color:rgba(94,119,251,.45);
+  box-shadow:0 2px 6px rgba(40,46,82,.08), 0 24px 44px -18px rgba(94,119,251,.40),
              0 1px 0 rgba(255,255,255,.95) inset}
+.au-hero-stat:hover::before{top:8px;bottom:8px}
+@media (max-width:520px){
+  .au-hero-stat b{font-size:25px}
+  .au-hero-stat{padding:13px 13px 12px 16px}
+}
 .au-hero-stat b{display:block;font-family:'Fraunces',Georgia,serif;font-size:30px;font-weight:500;
   color:var(--mp-heading);line-height:1;font-variant-numeric:lining-nums;letter-spacing:-.015em}
 .au-hero-stat span{display:block;font-size:11px;font-weight:400;color:var(--mp-secondary);
@@ -1246,6 +1264,13 @@ body.dense .ex-glance-row{padding:11px 16px}
 
 /* ---------- leaderboard ---------- */
 .ex-tbl td.rk{width:44px}
+/* The theme defines a bare `.rk` for an inline rank SPAN: display:inline-block.
+   The leaderboard uses "rk" as a CELL class, so that rule took the <td> out of
+   the table layout entirely - it stopped stretching to the row height and the
+   column visibly stepped out of line with the rest. Put the cell back. */
+.ex-tbl td.rk,.ex-tbl th.rk{display:table-cell;min-width:0;
+  font-family:'Inter',sans-serif;font-size:13px}
+
 .ex-rank{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;
   border-radius:7px;background:var(--mp-section-sel);color:var(--mp-secondary);
   font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums}
@@ -1457,7 +1482,7 @@ body.dense .ex-glance-row{padding:11px 16px}
 
 
 /* ---------- hover popup on the map and charts ---------- */
-.ex-charttip{position:absolute;z-index:400;pointer-events:none;max-width:250px;
+.ex-charttip{position:fixed;z-index:400;pointer-events:none;max-width:250px;
   background:#20243A;color:#fff;border-radius:9px;padding:8px 11px;
   box-shadow:0 6px 22px rgba(20,24,45,.30);font-size:12px;line-height:1.4}
 .ex-charttip b{display:block;font-weight:600;font-size:12.5px}
@@ -1501,6 +1526,155 @@ body.dense .ex-glance-row{padding:11px 16px}
 .ex-tbl th.ctr,.ex-tbl td.ctr{text-align:center;font-variant-numeric:tabular-nums}
 .ex-tbl th.rt{text-align:right}
 
+/* ---------- wide tables scroll sideways rather than squeeze ----------
+   Once a table carries video, guest and sponsor rates alongside counts and
+   medians, forcing it into the column width makes every cell unreadable.
+   A horizontal scroll keeps the type at full size. */
+.ex-tblscroll.wide{overflow-x:auto}
+.ex-tblscroll.wide table{min-width:660px}
+.ex-tblscroll.wide::-webkit-scrollbar{height:8px}
+.ex-listen{display:inline-block;padding:2.5px 9px;border-radius:999px;font-size:10.5px;
+  font-weight:600;text-decoration:none;border:1px solid transparent;white-space:nowrap;
+  transition:background .15s ease,border-color .15s ease}
+.ex-listen.apple{background:rgba(94,119,251,.10);color:var(--mp-primary);
+  border-color:rgba(94,119,251,.28)}
+.ex-listen.apple:hover{background:rgba(94,119,251,.20)}
+.ex-listen.spotify{background:rgba(29,185,84,.10);color:#128A3E;border-color:rgba(29,185,84,.30)}
+.ex-listen.spotify:hover{background:rgba(29,185,84,.20)}
+
+/* the sponsor cell is the hover target, so signal that it is interactive */
+.ex-tbl td.sponcell{cursor:help}
+.ex-tbl td.sponcell:hover .ex-yes{transform:scale(1.18)}
+.ex-tbl td.sponcell .ex-yes{display:inline-block;transition:transform .14s ease}
+.ex-yes{color:var(--mp-success);font-weight:700}
+.ex-no{color:var(--mp-icons)}
+
+
+/* ---------- one page width for header, content and footer ----------
+   The theme ships three containers at 1280 / 1400 / 1200 with different
+   padding, so their content edges land in three different places. Same cap
+   and same padding for all three puts the logo, the first card and the
+   footer link on one vertical line. */
+:root{--mp-page-max:1200px}
+@media (min-width:1360px){ :root{--mp-page-max:1300px} }
+@media (min-width:1500px){ :root{--mp-page-max:1400px} }
+@media (min-width:1700px){ :root{--mp-page-max:1500px} }
+.mp-header-inner,.mp-footer-inner,.sp-wrap{
+  max-width:var(--mp-page-max);padding-left:32px;padding-right:32px}
+@media (max-width:600px){
+  .mp-header-inner,.mp-footer-inner,.sp-wrap{padding-left:18px;padding-right:18px}
+}
+
+/* ---------- wide tables ----------
+   table-layout:fixed is what makes the width attributes binding. Without it
+   the browser auto-sizes from content and the metered column swells to twice
+   its share, which reads as a gap between columns. */
+.ex-tblscroll.wide table{min-width:1120px;table-layout:fixed}
+.ex-tblscroll.wide.capped table{min-width:1180px}
+.ex-tblscroll.wide td{overflow:hidden;text-overflow:ellipsis}
+.ex-tblscroll.wide th{white-space:normal;overflow:visible;line-height:1.25}
+.ex-tblscroll.wide td b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Everything centres; the sorted column right-aligns so the eye has one place
+   to land. The name column stays left, because centred proper nouns are hard
+   to scan down a list. */
+/* Applies to EVERY table on the page, not only the wide ones: 5.5 and 6.1 sit
+   outside .wide and were still left-aligned, which is what made the page look
+   inconsistent from card to card. */
+.ex-tbl th,.ex-tbl td{text-align:center}
+/* The label column is left-aligned, and that is the SECOND column whenever a
+   rank column sits in front of it. Keying off :first-child alone centred the
+   names in every ranked table. */
+.ex-tbl th:first-child,.ex-tbl td:first-child{text-align:left}
+.ex-tbl th.rk,.ex-tbl td.rk,.ex-tbl th.dim:first-child,.ex-tbl td.dim:first-child{text-align:center}
+.ex-tbl tr > td.dim:first-child + td,
+.ex-tbl tr > th:first-child + th{text-align:left}
+.ex-tbl th.hl,.ex-tbl td.hl{text-align:right}
+.ex-tbl td.mt{text-align:left}
+.ex-tblscroll.wide .ex-tbl th,
+.ex-tblscroll.wide .ex-tbl td{text-align:center}
+.ex-tblscroll.wide .ex-tbl th:first-child,
+.ex-tblscroll.wide .ex-tbl td:first-child{text-align:left}
+.ex-tblscroll.wide .ex-tbl th.hl,
+.ex-tblscroll.wide .ex-tbl td.hl{text-align:right}
+.ex-tblscroll.wide .ex-tbl td.mt{text-align:left}
+#sc-lead .ex-tbl th:first-child,#sc-lead .ex-tbl td:first-child{text-align:center}
+#sc-lead .ex-tbl th:nth-child(2),#sc-lead .ex-tbl td:nth-child(2){text-align:left}
+
+/* Ten rows is the floor: a table that shows six then scrolls reads as broken. */
+.ex-tblscroll.capped{max-height:452px;overflow-y:auto}
+#sc-cities.capped{max-height:452px}
+#sc-brands.capped{max-height:452px}
+#sc-lead.capped{max-height:672px}
+.ex-tblscroll.capped thead th{position:sticky;top:0;z-index:3;
+  background:#FFFFFF;box-shadow:inset 0 -1px 0 var(--mp-border)}
+.ex-tblscroll.capped thead th.hl{background:#EDF0FF}
+
+
+/* ---------- row rules must be ONE line, not one per cell ----------
+   .ex-tbl is border-collapse:separate, so every cell draws its own bottom
+   border. The content column is rendered at zoom .75, which makes a 1px
+   border 0.75 device px; each cell then rounds that independently and the
+   row rule lands on a different pixel column to column. At browser zoom the
+   drift is a visible stagger - the table looks like it is coming apart.
+   Collapsing merges the adjacent borders into a single line, so there is only
+   one value to round. The sticky header keeps its rule because that is drawn
+   with an inset box-shadow, not a border. */
+.ex-tblscroll.wide .ex-tbl{border-collapse:collapse}
+.ex-tblscroll.wide .ex-tbl th,
+.ex-tblscroll.wide .ex-tbl td{background-clip:padding-box}
+
+
+/* The theme pins #t-lead column two with position:sticky but never sets a
+   left offset, so it pins nothing - and in a collapsed table a sticky cell
+   paints its background over the merged border, leaving a stray fragment
+   beside the rank badge. Unset it. */
+#t-lead th:nth-child(2),#t-lead td:nth-child(2){position:static}
+
+
+/* The rank badge is 23px wide and the cell carries 14px of padding each side,
+   which needs 51px. At 3.5% of a 1180px table the cell is 41px, so the badge
+   overflowed - and because wide cells use text-overflow:ellipsis, the browser
+   drew an ellipsis that clipped down to a single stray dot beside every rank.
+   Give the column room and trim its padding. */
+.ex-tblscroll.wide .ex-tbl th:first-child,
+.ex-tblscroll.wide .ex-tbl td:first-child{padding-left:8px;padding-right:8px;
+  text-overflow:clip}
+.ex-tbl td.rk{width:auto}
+
+/* ---------- sorted column highlight, softened ----------
+   The old version was a flat block with a 2px bar hanging 1px BELOW the
+   header, so the bar overlapped row one and the column edge read as
+   misaligned. The bar now sits inside the header, the tint fades down the
+   column instead of stopping dead, and the whole thing gets rounded top
+   corners so it reads as one continuous band rather than stacked cells. */
+.ex-tbl th.hl .ex-sorted{bottom:0;height:2.5px;border-radius:2px 2px 0 0}
+.ex-tbl th.hl{background:linear-gradient(180deg,#E7EBFF,#EDF0FF)}
+.ex-tbl td.hl{background:linear-gradient(180deg,rgba(237,240,255,.92),rgba(237,240,255,.72))}
+
+.ex-tbl tbody tr:hover td.hl{background:rgba(224,230,255,.95)}
+
+/* the bar fills whatever the number leaves, so it grows with its column */
+.ex-meter.mini{gap:8px}
+.ex-meter.mini .t{flex:1 1 auto;min-width:14px;max-width:none}
+.ex-meter.mini .v{flex:0 0 auto;min-width:0;white-space:nowrap;text-align:right}
+.ex-tbl td.hl .ex-meter .t{background:rgba(58,75,160,.16)}
+.ex-listen{display:inline-block;padding:2.5px 9px;border-radius:999px;font-size:10.5px;
+  font-weight:600;text-decoration:none;border:1px solid transparent;white-space:nowrap;
+  transition:background .15s ease,border-color .15s ease}
+.ex-listen.apple{background:rgba(94,119,251,.10);color:var(--mp-primary);
+  border-color:rgba(94,119,251,.28)}
+.ex-listen.apple:hover{background:rgba(94,119,251,.20)}
+.ex-listen.spotify{background:rgba(29,185,84,.10);color:#128A3E;border-color:rgba(29,185,84,.30)}
+.ex-listen.spotify:hover{background:rgba(29,185,84,.20)}
+
+/* the sponsor cell is the hover target, so signal that it is interactive */
+.ex-tbl td.sponcell{cursor:help}
+.ex-tbl td.sponcell:hover .ex-yes{transform:scale(1.18)}
+.ex-tbl td.sponcell .ex-yes{display:inline-block;transition:transform .14s ease}
+.ex-yes{color:var(--mp-success);font-weight:700}
+.ex-no{color:var(--mp-icons)}
+
 /* ---------- chart / table toggle ---------- */
 .ex-chart.hide,.ex-legendwrap.hide{display:none}
 .ex-seg button{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;
@@ -1518,7 +1692,7 @@ body.dense .ex-glance-row{padding:11px 16px}
 
 /* ---------- sorted column highlight ---------- */
 .ex-tbl th.hl{color:var(--mp-primary);position:relative;background:#EDF0FF}
-.ex-tbl th.hl .ex-sorted{display:block;position:absolute;left:0;right:0;bottom:-1px;
+.ex-tbl th.hl .ex-sorted{display:block;position:absolute;left:0;right:0;bottom:0;
   height:2px;background:var(--mp-primary)}
 /* the sticky header keeps its own background, so re-apply the tint there too */
 .ex-tblscroll thead th.hl{background:#EDF0FF}
@@ -1861,10 +2035,23 @@ body.dense .ex-glance-row{padding:11px 16px}
       </div>
     </section>
 
+    <section class="ex-sec" id="networks">
+      <div class="ex-sec-h">
+        <div class="t">
+          <div class="ex-kicker">10 Networks</div>
+          <h2>Podcast networks and producers</h2>
+          <p>Networks ranked by roster size and combined reach. Sorting by each tells a syndication feed from a commercial network.</p>
+        </div>
+      </div>
+      <div class="ex-grid">
+        <div id="c-networks"></div>
+      </div>
+    </section>
+
     <section class="ex-sec" id="leaderboard">
       <div class="ex-sec-h">
         <div class="t">
-          <div class="ex-kicker">10 Leaderboard</div>
+          <div class="ex-kicker">11 Leaderboard</div>
           <h2>The largest Australian podcasts</h2>
           <p>Ranked by modeled monthly listeners.</p>
         </div>
@@ -1878,7 +2065,7 @@ body.dense .ex-glance-row{padding:11px 16px}
     <section class="ex-sec" id="method">
       <div class="ex-sec-h">
         <div class="t">
-          <div class="ex-kicker">11 Reference</div>
+          <div class="ex-kicker">12 Reference</div>
           <h2>Definitions, method and citation</h2>
           <p>Read before citing any figure.</p>
         </div>
@@ -2020,7 +2207,7 @@ body.dense .ex-glance-row{padding:11px 16px}
      STATS - the numbers, and the only thing a query has to return.
      Delete this tag once loadStats() fetches from an endpoint.
      ============================================================ -->
-<script id="countryData">window.COUNTRY_STATS = {"meta":{"countryDefinition":"storefront-weighted","dominanceMin":0.7,"basis":{"storefront-strong":1320,"storefront-weak":376,"both-agree":224,"storefront-diluted":144,"host-only":47},"coverage":76.6,"updated":"2026-08-07","nextUpdate":"2026-08-22","cadenceDays":15,"snapshot":"2026-06-29","placeholder":true},"headline":{"shows":{"v":2111,"raw":true,"label":"Australian podcasts","note":"Shows whose primary country is Australia"},"active90":{"v":959,"raw":true,"label":"Active in last 90 days","note":"45% of the catalog","ratio":45.4},"hosts":{"v":3232,"raw":true,"label":"Named hosts","note":"1.5 hosts per show on average"},"episodes":{"v":427772,"label":"Episodes published","note":"Median catalog 87 episodes"},"reach":{"v":7130596,"label":"Combined monthly listeners","note":"Listener-show pairs, not unique people","modeled":true},"medianReach":{"v":584,"label":"Median monthly listeners","note":"Mean is around 3,300, pulled up by the top tail","modeled":true},"rating":{"v":4.76,"label":"Average Apple rating","note":"Across 1,296 rated shows","dp":2},"sponsored":{"v":254,"raw":true,"label":"Shows with sponsors","note":"12.0% of the catalog","ratio":12.0},"reviews":{"v":364870,"label":"Apple reviews","note":"Median 9 per rated show"}},"states":[{"name":"New South Wales","n":270,"share":12.8,"med":1903,"reach":1730108,"spon":18.1},{"name":"Victoria","n":193,"share":9.1,"med":1934,"reach":1183569,"spon":18.1},{"name":"Queensland","n":107,"share":5.1,"med":1051,"reach":479831,"spon":19.6},{"name":"South Australia","n":32,"share":1.5,"med":1442,"reach":119996,"spon":9.4},{"name":"Western Australia","n":31,"share":1.5,"med":1476,"reach":81101,"spon":22.6},{"name":"Australian Capital Territory","n":16,"share":0.8,"med":1522,"reach":41362,"spon":25.0},{"name":"Tasmania","n":3,"share":0.1,"med":1244,"reach":3709,"spon":0.0},{"name":"Northern Territory","n":3,"share":0.1,"med":7227,"reach":14454,"spon":0.0}],"statesKnown":655,"cities":[{"name":"Sydney","n":189,"share":9.0,"med":2006,"spon":20.6},{"name":"Melbourne","n":164,"share":7.8,"med":2046,"spon":17.1},{"name":"Brisbane","n":56,"share":2.7,"med":962,"spon":17.9},{"name":"Perth","n":27,"share":1.3,"med":1430,"spon":25.9},{"name":"Adelaide","n":25,"share":1.2,"med":1441,"spon":12.0},{"name":"Canberra","n":15,"share":0.7,"med":1600,"spon":26.7},{"name":"Gold Coast","n":10,"share":0.5,"med":3018,"spon":10.0},{"name":"Sunshine Coast","n":7,"share":0.3,"med":1179,"spon":14.3},{"name":"Newcastle","n":6,"share":0.3,"med":1730,"spon":33.3},{"name":"Toowoomba","n":3,"share":0.1,"med":326,"spon":100.0},{"name":"Hobart","n":3,"share":0.1,"med":1244,"spon":0.0},{"name":"Cairns","n":3,"share":0.1,"med":3076,"spon":33.3},{"name":"Geelong","n":3,"share":0.1,"med":2000,"spon":33.3},{"name":"Byron Bay","n":3,"share":0.1,"med":14782,"spon":33.3},{"name":"Southbank","n":3,"share":0.1,"med":4382,"spon":0.0},{"name":"Bendigo","n":2,"share":0.1,"med":462,"spon":100.0},{"name":"Mosman","n":2,"share":0.1,"med":598,"spon":0.0},{"name":"Hornsby","n":2,"share":0.1,"med":1298,"spon":0.0},{"name":"Frankston","n":2,"share":0.1,"med":162,"spon":0.0},{"name":"Ipswich","n":2,"share":0.1,"med":2684,"spon":0.0},{"name":"Darwin","n":2,"share":0.1,"med":6579,"spon":0.0},{"name":"Springwood","n":2,"share":0.1,"med":356,"spon":0.0},{"name":"Alexandria","n":2,"share":0.1,"med":2920,"spon":0.0},{"name":"Castlemaine","n":2,"share":0.1,"med":704,"spon":0.0},{"name":"Collingwood","n":1,"share":0.0,"med":11064,"spon":0.0},{"name":"Fremantle","n":1,"share":0.0,"med":9551,"spon":0.0},{"name":"Summer Hill","n":1,"share":0.0,"med":192,"spon":0.0},{"name":"Bentley","n":1,"share":0.0,"med":1800,"spon":0.0},{"name":"Neutral Bay","n":1,"share":0.0,"med":2217,"spon":0.0},{"name":"Atwell","n":1,"share":0.0,"med":305,"spon":0.0},{"name":"Penrith","n":1,"share":0.0,"med":2601,"spon":100.0},{"name":"Erina","n":1,"share":0.0,"med":5594,"spon":0.0},{"name":"Redfern","n":1,"share":0.0,"med":32,"spon":0.0},{"name":"Babinda","n":1,"share":0.0,"med":463,"spon":100.0},{"name":"Albury","n":1,"share":0.0,"med":44,"spon":0.0},{"name":"Ultimo","n":1,"share":0.0,"med":4692,"spon":0.0},{"name":"Elimbah","n":1,"share":0.0,"med":5432,"spon":0.0},{"name":"Katherine","n":1,"share":0.0,"med":7875,"spon":0.0},{"name":"Surfers Paradise","n":1,"share":0.0,"med":3020,"spon":0.0},{"name":"Tuross Head","n":1,"share":0.0,"med":2678,"spon":0.0},{"name":"Chirnside Park","n":1,"share":0.0,"med":168,"spon":0.0},{"name":"Coorparoo","n":1,"share":0.0,"med":476,"spon":0.0},{"name":"Bangalow","n":1,"share":0.0,"med":84,"spon":0.0},{"name":"Kent Town","n":1,"share":0.0,"med":3626,"spon":0.0},{"name":"Moss Vale","n":1,"share":0.0,"med":382,"spon":0.0},{"name":"Beaconsfield","n":1,"share":0.0,"med":185,"spon":0.0},{"name":"Annandale","n":1,"share":0.0,"med":1590,"spon":100.0},{"name":"Fyshwick","n":1,"share":0.0,"med":305,"spon":0.0},{"name":"Glengowrie","n":1,"share":0.0,"med":1214,"spon":0.0},{"name":"St Leonards","n":1,"share":0.0,"med":2604,"spon":0.0}],"citiesKnown":597,"tiers":[{"label":"Under 1K","n":1308,"share":62.0,"reach":438438,"reachShare":6.1},{"label":"1K - 5K","n":553,"share":26.2,"reach":1253394,"reachShare":17.6},{"label":"5K - 20K","n":185,"share":8.8,"reach":1766707,"reachShare":24.8},{"label":"20K - 100K","n":54,"share":2.6,"reach":2178870,"reachShare":30.6},{"label":"100K+","n":8,"share":0.4,"reach":1493187,"reachShare":20.9}],"conc":{"top1":33.2,"top5":61.0,"top10":73.5,"top25":88.6},"lorenz":[[0,0.0],[4,56.9],[8,69.4],[12,76.6],[16,81.6],[20,85.2],[24,88.0],[28,90.1],[32,91.8],[36,93.2],[40,94.4],[44,95.4],[48,96.2],[52,96.9],[56,97.4],[60,97.9],[64,98.3],[68,98.7],[72,98.9],[76,99.2],[80,99.4],[84,99.6],[88,99.7],[92,99.8],[96,99.9],[100,100.0]],"cadence":[{"label":"Last 30 days","n":701,"share":33.2},{"label":"Last 90 days","n":959,"share":45.4},{"label":"Last 6 months","n":1094,"share":51.8},{"label":"Last 12 months","n":1337,"share":63.3}],"depth":[{"label":"1 - 24","n":380,"share":18.0,"med":138},{"label":"25 - 99","n":734,"share":34.8,"med":374},{"label":"100 - 499","n":859,"share":40.7,"med":1400},{"label":"500+","n":135,"share":6.4,"med":4507}],"cohorts":[{"label":"2013","n":15},{"label":"2014","n":16},{"label":"2015","n":44},{"label":"2016","n":48},{"label":"2017","n":98},{"label":"2018","n":137},{"label":"2019","n":189},{"label":"2020","n":351},{"label":"2021","n":246},{"label":"2022","n":187},{"label":"2023","n":277},{"label":"2024","n":197}],"tenure":[{"label":"Under 2 yrs","n":331,"share":17.9,"med":216},{"label":"2 - 3 yrs","n":538,"share":29.0,"med":382},{"label":"4 - 6 yrs","n":644,"share":34.8,"med":1098},{"label":"7 - 10 yrs","n":266,"share":14.4,"med":3093},{"label":"10+ yrs","n":74,"share":4.0,"med":3248}],"tenureKnown":1853,"tenureMed":4,"format":{"lengths":[{"label":"Under 15m","n":227,"share":11.2,"med":372},{"label":"15 - 29m","n":594,"share":29.3,"med":503},{"label":"30 - 59m","n":974,"share":48.1,"med":682},{"label":"60 - 89m","n":184,"share":9.1,"med":766},{"label":"90m+","n":47,"share":2.3,"med":554}],"medianLen":34,"lenKnown":2026,"guestYes":1282,"guestNo":829,"guestMed":858,"soloMed":326,"hostMix":[{"label":"Solo host","n":1527},{"label":"Two hosts","n":252},{"label":"Three or more","n":332}]},"quality":{"bands":[{"label":"4.5 - 5.0","n":1131,"share":87.3},{"label":"4.0 - 4.4","n":112,"share":8.6},{"label":"3.0 - 3.9","n":37,"share":2.9},{"label":"Below 3.0","n":16,"share":1.2}],"rated":1296,"ratedShare":61.4,"mean":4.76,"median":5.0,"reviewsTotal":364870,"reviewsMed":9},"money":{"sponsored":254,"sponsoredShare":12.0,"medSponsored":1293,"medUnsponsored":521,"medBrands":6,"meanBrands":11.8,"brandsTotal":2860,"brands":[{"name":"NordVPN","n":11},{"name":"Audio-Technica","n":6},{"name":"TAB","n":5},{"name":"Amazon","n":4},{"name":"Bon Charge","n":4},{"name":"Buzzsprout","n":3},{"name":"Vanta","n":3},{"name":"Harvey Norman","n":3},{"name":"Pearler","n":3},{"name":"Apple Arcade","n":3},{"name":"LMNT","n":3},{"name":"Toyota","n":3},{"name":"Rocket Money","n":3},{"name":"Saily","n":3},{"name":"Microsoft","n":3},{"name":"ChatGPT","n":3},{"name":"MEN\u2019s Bior\u00e9","n":2},{"name":"Sweetwater","n":2},{"name":"CommBank","n":2},{"name":"Westpac","n":2},{"name":"The Volte","n":2},{"name":"CoinSpot","n":2},{"name":"None","n":2},{"name":"Squarespace","n":2},{"name":"Matthias Media","n":2},{"name":"Alcove mortgage broking","n":2},{"name":"Amy Lunardi Buyers Agency","n":2},{"name":"Pete's Buyers Agency","n":2},{"name":"Amy Lunardi Buyers Agency Melbourne","n":2},{"name":"PocketSmith","n":2},{"name":"Betashares","n":2},{"name":"Cotality","n":2},{"name":"TermPlus","n":2},{"name":"Navexa","n":2},{"name":"GoodWe","n":2},{"name":"High Level","n":2},{"name":"STAX","n":2},{"name":"Finder","n":2},{"name":"Hero Packaging","n":2},{"name":"Brighton Trophy Centre","n":2},{"name":"WHOOP","n":2},{"name":"Shopify","n":2},{"name":"Airbnb","n":2},{"name":"SKIMS","n":2},{"name":"BetterHelp","n":2},{"name":"Cozy Earth","n":2},{"name":"iFLYflat","n":2},{"name":"Red Bull","n":2},{"name":"Frank Body","n":2},{"name":"Bondi Sands","n":2}]},"comp":{"gender":[{"label":"Female","v":50.0},{"label":"Male","v":49.6},{"label":"Other","v":0.4}],"genderN":2059,"income":[{"label":"Lower","v":21.0},{"label":"Middle","v":59.6},{"label":"Higher","v":19.4}],"incomeN":2019,"gen":[{"label":"Gen Alpha","v":0.6},{"label":"Gen Z","v":15.5},{"label":"Millennial","v":43.1},{"label":"Gen X","v":30.9},{"label":"Boomer","v":9.6},{"label":"Silent","v":0.4}],"genN":409},"lead":[{"title":"Casefile True Crime","reach":382536,"eps":328,"rating":4.7,"reviews":70774,"region":"","city":""},{"title":"Hamish & Andy","reach":247129,"eps":641,"rating":4.9,"reviews":20746,"region":"","city":""},{"title":"Conversations","reach":188561,"eps":701,"rating":4.5,"reviews":13072,"region":"","city":""},{"title":"What's That Rash?","reach":158605,"eps":914,"rating":4.7,"reviews":9865,"region":"","city":""},{"title":"The James Smith Podcast","reach":146080,"eps":223,"rating":5.0,"reviews":12664,"region":"New South Wales","city":"Sydney"},{"title":"Mamamia Out Loud","reach":141712,"eps":597,"rating":4.6,"reviews":8943,"region":"","city":""},{"title":"No Filter","reach":126652,"eps":268,"rating":3.8,"reviews":7596,"region":"New South Wales","city":""},{"title":"If You're Listening","reach":101912,"eps":328,"rating":4.6,"reviews":5493,"region":"","city":""},{"title":"I Catch Killers with Gary Jubelin","reach":95300,"eps":578,"rating":4.7,"reviews":4857,"region":"New South Wales","city":""},{"title":"It's A Lot with Abbie Chatfield","reach":88295,"eps":597,"rating":4.3,"reviews":4440,"region":"Queensland","city":"Brisbane"},{"title":"The Imperfects","reach":79603,"eps":153,"rating":4.7,"reviews":4042,"region":"Victoria","city":"Melbourne"},{"title":"The Teacher's Pet","reach":70427,"eps":36,"rating":4.5,"reviews":13773,"region":"Queensland","city":"Brisbane"},{"title":"Life and Crimes with Andrew Rule","reach":70262,"eps":364,"rating":4.7,"reviews":3281,"region":"Victoria","city":"Melbourne"},{"title":"True Crime Conversations","reach":65272,"eps":357,"rating":4.5,"reviews":3135,"region":"New South Wales","city":""},{"title":"Naked City","reach":61727,"eps":103,"rating":4.6,"reviews":2769,"region":"Victoria","city":"Melbourne"},{"title":"You Beauty","reach":59763,"eps":1469,"rating":4.5,"reviews":2576,"region":"","city":""},{"title":"The Property Couch","reach":58958,"eps":388,"rating":4.4,"reviews":2483,"region":"Victoria","city":"Melbourne"},{"title":"The Proof with Simon Hill","reach":58923,"eps":305,"rating":4.9,"reviews":5735,"region":"","city":""},{"title":"The Melissa Ambrosini Show","reach":56943,"eps":459,"rating":4.8,"reviews":3785,"region":"","city":""},{"title":"Outspoken the Podcast","reach":53266,"eps":331,"rating":3.5,"reviews":2180,"region":"South Australia","city":"Adelaide"},{"title":"Darling, Shine!","reach":53047,"eps":244,"rating":4.5,"reviews":3352,"region":"","city":""},{"title":"7am","reach":51613,"eps":1203,"rating":4.7,"reviews":2543,"region":"","city":""},{"title":"The Quicky","reach":51242,"eps":2272,"rating":3.8,"reviews":2069,"region":"","city":""},{"title":"ABC News Daily","reach":49751,"eps":965,"rating":4.5,"reviews":2025,"region":"New South Wales","city":"Sydney"},{"title":"Matty & Cronk","reach":48355,"eps":417,"rating":4.8,"reviews":1965,"region":"New South Wales","city":"Sydney"},{"title":"Full Story","reach":48032,"eps":1774,"rating":4.4,"reviews":1956,"region":"","city":""},{"title":"CANCELLED","reach":45900,"eps":201,"rating":4.7,"reviews":2701,"region":"New South Wales","city":"Sydney"},{"title":"Bloke In A Bar","reach":41987,"eps":1323,"rating":4.8,"reviews":1628,"region":"","city":""},{"title":"Squiz Kids","reach":41806,"eps":1610,"rating":4.6,"reviews":1557,"region":"New South Wales","city":"Sydney"},{"title":"money money money","reach":41364,"eps":409,"rating":4.3,"reviews":1511,"region":"New South Wales","city":"Newcastle"},{"title":"Bizarre with Mick Molloy and Titus O\u2019Reily","reach":39719,"eps":249,"rating":4.9,"reviews":1459,"region":"Victoria","city":"Melbourne"},{"title":"Somehow Related with Dave O'Neil & Glenn Robbins","reach":39555,"eps":161,"rating":4.8,"reviews":1443,"region":"","city":""},{"title":"But Are You Happy?","reach":37293,"eps":128,"rating":4.8,"reviews":1421,"region":"New South Wales","city":""},{"title":"Hack","reach":34850,"eps":861,"rating":4.7,"reviews":1284,"region":"","city":""},{"title":"The Nutrition Couch","reach":34850,"eps":237,"rating":4.8,"reviews":1284,"region":"New South Wales","city":"Sydney"},{"title":"Aunty Donna Podcast","reach":34028,"eps":311,"rating":4.9,"reviews":2326,"region":"Victoria","city":"Melbourne"},{"title":"Betoota Talks","reach":32227,"eps":322,"rating":4.8,"reviews":1095,"region":"Queensland","city":""},{"title":"SLEEP MEDITATION with Lauren Ostrowski Fenton","reach":32004,"eps":427,"rating":4.5,"reviews":1521,"region":"","city":""},{"title":"The Grade Cricketer","reach":31244,"eps":620,"rating":4.7,"reviews":1547,"region":"Victoria","city":"Melbourne"},{"title":"We Don't Have Time For This","reach":31243,"eps":323,"rating":4.7,"reviews":1466,"region":"","city":""},{"title":"The Money Puzzle","reach":30476,"eps":741,"rating":4.5,"reviews":992,"region":"Victoria","city":"Melbourne"},{"title":"Complete Drivel","reach":30425,"eps":141,"rating":4.8,"reviews":1860,"region":"","city":""},{"title":"On Attachment","reach":29815,"eps":371,"rating":4.9,"reviews":1646,"region":"New South Wales","city":"Sydney"},{"title":"Rusty's Garage","reach":28662,"eps":646,"rating":5.0,"reviews":952,"region":"","city":""},{"title":"Biz","reach":27774,"eps":210,"rating":4.4,"reviews":887,"region":"New South Wales","city":""},{"title":"Crappy to Happy","reach":26280,"eps":197,"rating":4.9,"reviews":1309,"region":"","city":""},{"title":"Property Investment Podcast Network","reach":26204,"eps":983,"rating":4.8,"reviews":799,"region":"New South Wales","city":""},{"title":"Quillette Podcast","reach":25866,"eps":411,"rating":4.4,"reviews":1309,"region":"New South Wales","city":"Sydney"},{"title":"Law Report","reach":25405,"eps":207,"rating":4.3,"reviews":787,"region":"Victoria","city":"Melbourne"},{"title":"Australian Finance Podcast","reach":24274,"eps":753,"rating":5.0,"reviews":714,"region":"Victoria","city":"Melbourne"}],"lang":[{"code":"en","name":"English","n":1981,"share":94.0,"med":617},{"code":"zh","name":"Chinese","n":25,"share":1.2,"med":168},{"code":"es","name":"Spanish","n":10,"share":0.5,"med":129},{"code":"si","name":"Sinhala","n":7,"share":0.3,"med":374},{"code":"in","name":"Indonesian","n":6,"share":0.3,"med":138},{"code":"th","name":"Thai","n":6,"share":0.3,"med":162},{"code":"pt","name":"Portuguese","n":5,"share":0.2,"med":210},{"code":"fa","name":"Persian","n":5,"share":0.2,"med":138},{"code":"it","name":"Italian","n":5,"share":0.2,"med":216},{"code":"ru","name":"Russian","n":4,"share":0.2,"med":168},{"code":"","name":"All other languages","n":53,"share":2.5,"med":210,"rest":true}],"langMeta":{"known":2107,"distinct":44,"topName":"English","topShare":94.0,"otherShare":6.0,"otherN":126},"pubrate":{"known":1851,"median":23.4,"bands":[{"label":"Less than monthly","sub":"under 12 a year","n":449,"share":24.3,"med":304},{"label":"About monthly","sub":"12 to 25 a year","n":559,"share":30.2,"med":521},{"label":"About fortnightly","sub":"26 to 51 a year","n":532,"share":28.7,"med":1022},{"label":"Weekly or more","sub":"52+ a year","n":311,"share":16.8,"med":1800}]},"hostgender":{"known":1118,"knownShare":53.0,"rows":[{"label":"All-male line-up","n":646,"share":57.8,"med":1278},{"label":"All-female line-up","n":366,"share":32.7,"med":858},{"label":"Mixed line-up","n":106,"share":9.5,"med":2379}],"hostRows":3232,"genderedRows":1599,"male":1041,"female":555},"video":{"video":2049,"audio":62,"videoShare":97.1,"medVideo":585,"medAudio":430},"signals":[{"label":"More than one host","yesLabel":"Two or more hosts","noLabel":"Solo host","yes":584,"no":1527,"share":27.7,"medYes":1598,"medNo":378,"lift":4.22},{"label":"Features guests","yesLabel":"With guests","noLabel":"No guests","yes":1282,"no":829,"share":60.7,"medYes":858,"medNo":326,"lift":2.63},{"label":"Has detected sponsors","yesLabel":"Sponsored","noLabel":"Unsponsored","yes":254,"no":1857,"share":12.0,"medYes":1293,"medNo":521,"lift":2.48},{"label":"Publishes on YouTube","yesLabel":"On YouTube","noLabel":"Not on YouTube","yes":2049,"no":62,"share":97.1,"medYes":585,"medNo":430,"lift":1.36}]};</script>
+<script id="countryData">window.COUNTRY_STATS = {"meta":{"countryDefinition":"storefront-weighted","dominanceMin":0.7,"basis":{"storefront-strong":1320,"storefront-weak":376,"both-agree":224,"storefront-diluted":144,"host-only":47},"coverage":76.6,"updated":"2026-08-07","nextUpdate":"2026-08-22","cadenceDays":15,"snapshot":"2026-06-29","placeholder":true},"headline":{"shows":{"v":2111,"raw":true,"label":"Australian podcasts","note":"Shows whose primary country is Australia"},"active90":{"v":959,"raw":true,"label":"Active in last 90 days","note":"45% of the catalog","ratio":45.4},"hosts":{"v":3232,"raw":true,"label":"Named hosts","note":"1.5 hosts per show on average"},"episodes":{"v":427772,"label":"Episodes published","note":"Median catalog 87 episodes"},"reach":{"v":7130596,"label":"Combined monthly listeners","note":"Listener-show pairs, not unique people","modeled":true},"medianReach":{"v":584,"label":"Median monthly listeners","note":"Mean is around 3,300, pulled up by the top tail","modeled":true},"rating":{"v":4.76,"label":"Average Apple rating","note":"Across 1,296 rated shows","dp":2},"sponsored":{"v":254,"raw":true,"label":"Shows with sponsors","note":"12.0% of the catalog","ratio":12.0},"reviews":{"v":364870,"label":"Apple reviews","note":"Median 9 per rated show"}},"states":[{"n":270,"share":41.2,"med":1903,"eps":150,"reach":1730108,"video":96.3,"guest":78.5,"spon":18.1,"contact":97.8,"langs":2,"name":"New South Wales"},{"n":193,"share":29.5,"med":1934,"eps":203,"reach":1183569,"video":98.4,"guest":79.3,"spon":18.1,"contact":100.0,"langs":2,"name":"Victoria"},{"n":107,"share":16.3,"med":1051,"eps":137,"reach":479831,"video":95.3,"guest":61.7,"spon":19.6,"contact":98.1,"langs":1,"name":"Queensland"},{"n":32,"share":4.9,"med":1442,"eps":208,"reach":119996,"video":100.0,"guest":75.0,"spon":9.4,"contact":100.0,"langs":1,"name":"South Australia"},{"n":31,"share":4.7,"med":1476,"eps":224,"reach":81101,"video":96.8,"guest":71.0,"spon":22.6,"contact":96.8,"langs":1,"name":"Western Australia"},{"n":16,"share":2.4,"med":1522,"eps":144,"reach":41362,"video":100.0,"guest":75.0,"spon":25.0,"contact":100.0,"langs":1,"name":"Australian Capital Territory"},{"n":3,"share":0.5,"med":1244,"eps":227,"reach":3709,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Tasmania"},{"n":3,"share":0.5,"med":7227,"eps":104,"reach":14454,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Northern Territory"}],"statesKnown":655,"cities":[{"n":189,"share":31.7,"med":2006,"eps":157,"reach":1097713,"video":96.3,"guest":77.2,"spon":20.6,"contact":97.4,"langs":2,"name":"Sydney"},{"n":164,"share":27.5,"med":2046,"eps":210,"reach":1042682,"video":99.4,"guest":77.4,"spon":17.1,"contact":100.0,"langs":2,"name":"Melbourne"},{"n":56,"share":9.4,"med":962,"eps":132,"reach":318054,"video":96.4,"guest":66.1,"spon":17.9,"contact":96.4,"langs":1,"name":"Brisbane"},{"n":27,"share":4.5,"med":1430,"eps":224,"reach":67552,"video":96.3,"guest":74.1,"spon":25.9,"contact":96.3,"langs":1,"name":"Perth"},{"n":25,"share":4.2,"med":1441,"eps":206,"reach":102605,"video":100.0,"guest":76.0,"spon":12.0,"contact":100.0,"langs":1,"name":"Adelaide"},{"n":15,"share":2.5,"med":1600,"eps":153,"reach":41057,"video":100.0,"guest":80.0,"spon":26.7,"contact":100.0,"langs":1,"name":"Canberra"},{"n":10,"share":1.7,"med":3018,"eps":115,"reach":31548,"video":70.0,"guest":40.0,"spon":10.0,"contact":100.0,"langs":1,"name":"Gold Coast"},{"n":7,"share":1.2,"med":1179,"eps":200,"reach":14115,"video":100.0,"guest":42.9,"spon":14.3,"contact":100.0,"langs":1,"name":"Sunshine Coast"},{"n":6,"share":1.0,"med":1730,"eps":203,"reach":54098,"video":83.3,"guest":66.7,"spon":33.3,"contact":100.0,"langs":1,"name":"Newcastle"},{"n":3,"share":0.5,"med":326,"eps":385,"reach":6617,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Toowoomba"},{"n":3,"share":0.5,"med":1244,"eps":227,"reach":3709,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Hobart"},{"n":3,"share":0.5,"med":3076,"eps":309,"reach":16235,"video":100.0,"guest":66.7,"spon":33.3,"contact":100.0,"langs":1,"name":"Cairns"},{"n":3,"share":0.5,"med":2000,"eps":278,"reach":9777,"video":100.0,"guest":100.0,"spon":33.3,"contact":100.0,"langs":1,"name":"Geelong"},{"n":3,"share":0.5,"med":14782,"eps":393,"reach":41572,"video":100.0,"guest":100.0,"spon":33.3,"contact":100.0,"langs":1,"name":"Byron Bay"},{"n":3,"share":0.5,"med":4382,"eps":172,"reach":15431,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Southbank"},{"n":2,"share":0.3,"med":462,"eps":370,"reach":923,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Bendigo"},{"n":2,"share":0.3,"med":598,"eps":103,"reach":1196,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Mosman"},{"n":2,"share":0.3,"med":1298,"eps":304,"reach":2597,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Hornsby"},{"n":2,"share":0.3,"med":162,"eps":98,"reach":324,"video":100.0,"guest":50.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Frankston"},{"n":2,"share":0.3,"med":2684,"eps":160,"reach":5367,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Ipswich"},{"n":2,"share":0.3,"med":6579,"eps":153,"reach":6579,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Darwin"},{"n":2,"share":0.3,"med":356,"eps":312,"reach":712,"video":100.0,"guest":50.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Springwood"},{"n":2,"share":0.3,"med":2920,"eps":176,"reach":5839,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Alexandria"},{"n":2,"share":0.3,"med":704,"eps":88,"reach":1407,"video":50.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Castlemaine"},{"n":1,"share":0.2,"med":11064,"eps":169,"reach":11064,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Collingwood"},{"n":1,"share":0.2,"med":9551,"eps":595,"reach":9551,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Fremantle"},{"n":1,"share":0.2,"med":192,"eps":122,"reach":192,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Summer Hill"},{"n":1,"share":0.2,"med":1800,"eps":253,"reach":1800,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Bentley"},{"n":1,"share":0.2,"med":2217,"eps":73,"reach":2217,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Neutral Bay"},{"n":1,"share":0.2,"med":305,"eps":15,"reach":305,"video":100.0,"guest":0.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Atwell"},{"n":1,"share":0.2,"med":2601,"eps":569,"reach":2601,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Penrith"},{"n":1,"share":0.2,"med":5594,"eps":110,"reach":5594,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Erina"},{"n":1,"share":0.2,"med":32,"eps":114,"reach":32,"video":100.0,"guest":0.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Redfern"},{"n":1,"share":0.2,"med":463,"eps":173,"reach":463,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Babinda"},{"n":1,"share":0.2,"med":44,"eps":188,"reach":44,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Albury"},{"n":1,"share":0.2,"med":4692,"eps":67,"reach":4692,"video":100.0,"guest":0.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Ultimo"},{"n":1,"share":0.2,"med":5432,"eps":65,"reach":5432,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Elimbah"},{"n":1,"share":0.2,"med":7875,"eps":104,"reach":7875,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Katherine"},{"n":1,"share":0.2,"med":3020,"eps":270,"reach":3020,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Surfers Paradise"},{"n":1,"share":0.2,"med":2678,"eps":342,"reach":2678,"video":0.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Tuross Head"},{"n":1,"share":0.2,"med":168,"eps":92,"reach":168,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Chirnside Park"},{"n":1,"share":0.2,"med":476,"eps":334,"reach":476,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Coorparoo"},{"n":1,"share":0.2,"med":84,"eps":23,"reach":84,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Bangalow"},{"n":1,"share":0.2,"med":3626,"eps":139,"reach":3626,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Kent Town"},{"n":1,"share":0.2,"med":382,"eps":44,"reach":382,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Moss Vale"},{"n":1,"share":0.2,"med":185,"eps":19,"reach":185,"video":100.0,"guest":0.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Beaconsfield"},{"n":1,"share":0.2,"med":1590,"eps":997,"reach":1590,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Annandale"},{"n":1,"share":0.2,"med":305,"eps":19,"reach":305,"video":100.0,"guest":0.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Fyshwick"},{"n":1,"share":0.2,"med":1214,"eps":276,"reach":1214,"video":100.0,"guest":0.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Glengowrie"},{"n":1,"share":0.2,"med":2604,"eps":70,"reach":2604,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"St Leonards"}],"citiesKnown":597,"tiers":[{"label":"Under 1K","n":1308,"share":62.0,"reach":438438,"reachShare":6.1},{"label":"1K - 5K","n":553,"share":26.2,"reach":1253394,"reachShare":17.6},{"label":"5K - 20K","n":185,"share":8.8,"reach":1766707,"reachShare":24.8},{"label":"20K - 100K","n":54,"share":2.6,"reach":2178870,"reachShare":30.6},{"label":"100K+","n":8,"share":0.4,"reach":1493187,"reachShare":20.9}],"conc":{"top1":33.2,"top5":61.0,"top10":73.5,"top25":88.6},"lorenz":[[0,0.0],[4,56.9],[8,69.4],[12,76.6],[16,81.6],[20,85.2],[24,88.0],[28,90.1],[32,91.8],[36,93.2],[40,94.4],[44,95.4],[48,96.2],[52,96.9],[56,97.4],[60,97.9],[64,98.3],[68,98.7],[72,98.9],[76,99.2],[80,99.4],[84,99.6],[88,99.7],[92,99.8],[96,99.9],[100,100.0]],"cadence":[{"label":"Last 30 days","n":701,"share":33.2},{"label":"Last 90 days","n":959,"share":45.4},{"label":"Last 6 months","n":1094,"share":51.8},{"label":"Last 12 months","n":1337,"share":63.3}],"depth":[{"label":"1 - 24","n":380,"share":18.0,"med":138},{"label":"25 - 99","n":734,"share":34.8,"med":374},{"label":"100 - 499","n":859,"share":40.7,"med":1400},{"label":"500+","n":135,"share":6.4,"med":4507}],"cohorts":[{"label":"2013","n":15},{"label":"2014","n":16},{"label":"2015","n":44},{"label":"2016","n":48},{"label":"2017","n":98},{"label":"2018","n":137},{"label":"2019","n":189},{"label":"2020","n":351},{"label":"2021","n":246},{"label":"2022","n":187},{"label":"2023","n":277},{"label":"2024","n":197}],"tenure":[{"label":"Under 2 yrs","n":331,"share":17.9,"med":216},{"label":"2 - 3 yrs","n":538,"share":29.0,"med":382},{"label":"4 - 6 yrs","n":644,"share":34.8,"med":1098},{"label":"7 - 10 yrs","n":266,"share":14.4,"med":3093},{"label":"10+ yrs","n":74,"share":4.0,"med":3248}],"tenureKnown":1853,"tenureMed":4,"format":{"lengths":[{"n":227,"share":11.2,"med":372,"eps":99,"reach":441295,"video":96.9,"guest":34.4,"spon":7.0,"contact":84.6,"langs":27,"label":"Under 15m"},{"n":594,"share":29.3,"med":503,"eps":79,"reach":1806899,"video":97.0,"guest":59.6,"spon":11.3,"contact":81.6,"langs":21,"label":"15 - 29m"},{"n":974,"share":48.1,"med":682,"eps":95,"reach":3744039,"video":97.2,"guest":69.8,"spon":12.9,"contact":80.6,"langs":21,"label":"30 - 59m"},{"n":184,"share":9.1,"med":766,"eps":87,"reach":923795,"video":96.2,"guest":67.9,"spon":18.5,"contact":84.8,"langs":8,"label":"60 - 89m"},{"n":47,"share":2.3,"med":554,"eps":114,"reach":168249,"video":100.0,"guest":51.1,"spon":19.1,"contact":78.7,"langs":3,"label":"90m+"}],"medianLen":34,"lenKnown":2026,"guestYes":1282,"guestNo":829,"guestMed":858,"soloMed":326,"hostMix":[{"label":"Solo host","n":1527},{"label":"Two hosts","n":252},{"label":"Three or more","n":332}]},"quality":{"bands":[{"label":"4.5 - 5.0","n":1131,"share":87.3},{"label":"4.0 - 4.4","n":112,"share":8.6},{"label":"3.0 - 3.9","n":37,"share":2.9},{"label":"Below 3.0","n":16,"share":1.2}],"rated":1296,"ratedShare":61.4,"mean":4.76,"median":5.0,"reviewsTotal":364870,"reviewsMed":9},"money":{"sponsored":254,"sponsoredShare":12.0,"medSponsored":1293,"medUnsponsored":521,"medBrands":6,"meanBrands":11.8,"brandsTotal":2860,"brands":[{"n":11,"share":4.3,"med":16170,"eps":348,"reach":173304,"video":90.9,"guest":90.9,"spon":100.0,"contact":100.0,"langs":2,"name":"NordVPN"},{"n":6,"share":2.4,"med":1200,"eps":172,"reach":8163,"video":100.0,"guest":66.7,"spon":100.0,"contact":83.3,"langs":1,"name":"Audio-Technica"},{"n":5,"share":2.0,"med":3664,"eps":148,"reach":31256,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"TAB"},{"n":4,"share":1.6,"med":3408,"eps":513,"reach":12602,"video":100.0,"guest":100.0,"spon":100.0,"contact":75.0,"langs":1,"name":"Amazon"},{"n":4,"share":1.6,"med":3509,"eps":162,"reach":12760,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Bon Charge"},{"n":3,"share":1.2,"med":755,"eps":215,"reach":2317,"video":100.0,"guest":66.7,"spon":100.0,"contact":100.0,"langs":1,"name":"Buzzsprout"},{"n":3,"share":1.2,"med":1293,"eps":187,"reach":10647,"video":100.0,"guest":100.0,"spon":100.0,"contact":66.7,"langs":1,"name":"Vanta"},{"n":3,"share":1.2,"med":802,"eps":148,"reach":4511,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Harvey Norman"},{"n":3,"share":1.2,"med":6077,"eps":308,"reach":34905,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Pearler"},{"n":3,"share":1.2,"med":1349,"eps":207,"reach":5019,"video":100.0,"guest":66.7,"spon":100.0,"contact":100.0,"langs":1,"name":"Apple Arcade"},{"n":3,"share":1.2,"med":8420,"eps":305,"reach":68220,"video":66.7,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"LMNT"},{"n":3,"share":1.2,"med":586,"eps":188,"reach":1565,"video":100.0,"guest":33.3,"spon":100.0,"contact":100.0,"langs":1,"name":"Toyota"},{"n":3,"share":1.2,"med":356,"eps":280,"reach":5594,"video":100.0,"guest":66.7,"spon":100.0,"contact":66.7,"langs":1,"name":"Rocket Money"},{"n":3,"share":1.2,"med":19362,"eps":319,"reach":48105,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Saily"},{"n":3,"share":1.2,"med":1934,"eps":317,"reach":4792,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Microsoft"},{"n":3,"share":1.2,"med":316,"eps":158,"reach":1505,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"ChatGPT"},{"n":2,"share":0.8,"med":377,"eps":137,"reach":754,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"MEN\u2019s Bior\u00e9"},{"n":2,"share":0.8,"med":331,"eps":116,"reach":662,"video":100.0,"guest":100.0,"spon":100.0,"contact":50.0,"langs":1,"name":"Sweetwater"},{"n":2,"share":0.8,"med":7740,"eps":410,"reach":15481,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"CommBank"},{"n":2,"share":0.8,"med":4732,"eps":234,"reach":9465,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Westpac"},{"n":2,"share":0.8,"med":6207,"eps":670,"reach":12414,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"The Volte"},{"n":2,"share":0.8,"med":23077,"eps":278,"reach":46154,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"CoinSpot"},{"n":2,"share":0.8,"med":19901,"eps":101,"reach":39802,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"None"},{"n":2,"share":0.8,"med":29078,"eps":1162,"reach":58157,"video":100.0,"guest":50.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Squarespace"},{"n":2,"share":0.8,"med":1570,"eps":626,"reach":3140,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Matthias Media"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Alcove mortgage broking"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Amy Lunardi Buyers Agency"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Pete's Buyers Agency"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Amy Lunardi Buyers Agency Melbourne"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"PocketSmith"},{"n":2,"share":0.8,"med":23720,"eps":358,"reach":47441,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Betashares"},{"n":2,"share":0.8,"med":5147,"eps":342,"reach":10294,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Cotality"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"TermPlus"},{"n":2,"share":0.8,"med":15176,"eps":530,"reach":30351,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Navexa"},{"n":2,"share":0.8,"med":752,"eps":124,"reach":1505,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"GoodWe"},{"n":2,"share":0.8,"med":274,"eps":100,"reach":548,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"High Level"},{"n":2,"share":0.8,"med":4590,"eps":212,"reach":9181,"video":50.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"STAX"},{"n":2,"share":0.8,"med":4590,"eps":212,"reach":9181,"video":50.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Finder"},{"n":2,"share":0.8,"med":4590,"eps":212,"reach":9181,"video":50.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Hero Packaging"},{"n":2,"share":0.8,"med":1032,"eps":108,"reach":2064,"video":100.0,"guest":50.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Brighton Trophy Centre"},{"n":2,"share":0.8,"med":45084,"eps":462,"reach":90167,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"WHOOP"},{"n":2,"share":0.8,"med":31421,"eps":619,"reach":62842,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Shopify"},{"n":2,"share":0.8,"med":50455,"eps":814,"reach":100910,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Airbnb"},{"n":2,"share":0.8,"med":31902,"eps":786,"reach":63805,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"SKIMS"},{"n":2,"share":0.8,"med":33672,"eps":267,"reach":67343,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"BetterHelp"},{"n":2,"share":0.8,"med":32894,"eps":334,"reach":65788,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Cozy Earth"},{"n":2,"share":0.8,"med":1234,"eps":124,"reach":2468,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"iFLYflat"},{"n":2,"share":0.8,"med":612,"eps":152,"reach":1223,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Red Bull"},{"n":2,"share":0.8,"med":10828,"eps":428,"reach":21656,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Frank Body"},{"n":2,"share":0.8,"med":10828,"eps":428,"reach":21656,"video":100.0,"guest":100.0,"spon":100.0,"contact":100.0,"langs":1,"name":"Bondi Sands"}]},"comp":{"gender":[{"label":"Female","v":50.0},{"label":"Male","v":49.6},{"label":"Other","v":0.4}],"genderN":2059,"income":[{"label":"Lower","v":21.0},{"label":"Middle","v":59.6},{"label":"Higher","v":19.4}],"incomeN":2019,"gen":[{"label":"Gen Alpha","v":0.6},{"label":"Gen Z","v":15.5},{"label":"Millennial","v":43.1},{"label":"Gen X","v":30.9},{"label":"Boomer","v":9.6},{"label":"Silent","v":0.4}],"genN":409},"lead":[{"title":"Casefile True Crime","reach":382536,"eps":328,"rating":4.7,"reviews":70774,"video":true,"guest":true,"spon":false,"lang":"English","network":"","url":"https://podcasts.apple.com/us/podcast/casefile-true-crime/id998568017","urlAlt":"https://open.spotify.com/show/4V3K3zyD0k789eaSWFXzhc","sponsors":"","region":"","city":""},{"title":"Hamish & Andy","reach":247129,"eps":641,"rating":4.9,"reviews":20746,"video":true,"guest":true,"spon":false,"lang":"English","network":"LiSTNR Support, Hamish & Andy","url":"https://podcasts.apple.com/us/podcast/hamish-andy/id213334232","urlAlt":"https://open.spotify.com/show/3MY0GQPtstOkhHszg2lHY7","sponsors":"","region":"","city":""},{"title":"Conversations","reach":188561,"eps":701,"rating":4.5,"reviews":13072,"video":true,"guest":true,"spon":false,"lang":"English","network":"ABC listen","url":"https://podcasts.apple.com/au/podcast/conversations/id94688506","urlAlt":"https://open.spotify.com/show/362DwZBa01YuXx5LeK8Psp","sponsors":"","region":"","city":""},{"title":"What's That Rash?","reach":158605,"eps":914,"rating":4.7,"reviews":9865,"video":true,"guest":true,"spon":false,"lang":"English","network":"ABC listen","url":"https://podcasts.apple.com/us/podcast/coronacast/id1501500390","urlAlt":"https://open.spotify.com/show/4Xm4p6XFLIAhasMfLSYOOr","sponsors":"","region":"","city":""},{"title":"The James Smith Podcast","reach":146080,"eps":223,"rating":5.0,"reviews":12664,"video":true,"guest":true,"spon":false,"lang":"English","network":"James Smith","url":"https://podcasts.apple.com/us/podcast/the-james-smith-podcast/id1444720680","urlAlt":"https://open.spotify.com/show/5iEtvU8Fhzkgn7M22GmnaF","sponsors":"","region":"New South Wales","city":"Sydney"},{"title":"Mamamia Out Loud","reach":141712,"eps":597,"rating":4.6,"reviews":8943,"video":true,"guest":true,"spon":false,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/us/podcast/mamamia-out-loud/id928350893","urlAlt":"https://open.spotify.com/show/7dPYxszTS36t2he9P9Jmcj","sponsors":"","region":"","city":""},{"title":"No Filter","reach":126652,"eps":268,"rating":3.8,"reviews":7596,"video":true,"guest":true,"spon":false,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/us/podcast/no-filter/id995159486","urlAlt":"https://open.spotify.com/show/6N445ZpBx2fDe5ecA1ztzn","sponsors":"","region":"New South Wales","city":""},{"title":"If You're Listening","reach":101912,"eps":328,"rating":4.6,"reviews":5493,"video":true,"guest":true,"spon":false,"lang":"English","network":"ABC News","url":"https://podcasts.apple.com/us/podcast/if-youre-listening/id1381291342","urlAlt":"https://open.spotify.com/show/06bz0CgppKdIUlZ7HcckZI","sponsors":"","region":"","city":""},{"title":"I Catch Killers with Gary Jubelin","reach":95300,"eps":578,"rating":4.7,"reviews":4857,"video":true,"guest":true,"spon":false,"lang":"English","network":"Crime X","url":"https://podcasts.apple.com/au/podcast/i-catch-killers-with-gary-jubelin/id1506667049","urlAlt":"https://open.spotify.com/show/7ieI0ppiXJ02t9klXF5TNE","sponsors":"","region":"New South Wales","city":""},{"title":"It's A Lot with Abbie Chatfield","reach":88295,"eps":597,"rating":4.3,"reviews":4440,"video":true,"guest":true,"spon":false,"lang":"English","network":"LiSTNR","url":"https://podcasts.apple.com/us/podcast/its-a-lot-with-abbie-chatfield/id1500849438","urlAlt":"https://open.spotify.com/show/3OG5SmzCHgJZKLcammfJ1K","sponsors":"","region":"Queensland","city":"Brisbane"},{"title":"The Imperfects","reach":79603,"eps":153,"rating":4.7,"reviews":4042,"video":true,"guest":true,"spon":false,"lang":"English","network":"Hugh van Cuylenburg, Ryan Shelton & Josh van Cuylenburg","url":"https://podcasts.apple.com/my/podcast/the-imperfects/id1476501557","urlAlt":"https://open.spotify.com/show/6ZmSCzsv0W2ZZAPFCbqhOd","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"The Teacher's Pet","reach":70427,"eps":36,"rating":4.5,"reviews":13773,"video":true,"guest":true,"spon":false,"lang":"English","network":"Crime X","url":"https://podcasts.apple.com/us/podcast/the-teachers-pet/id1385379989","urlAlt":"https://open.spotify.com/show/19LCrHZaUuWvizzJRZi8YN","sponsors":"","region":"Queensland","city":"Brisbane"},{"title":"Life and Crimes with Andrew Rule","reach":70262,"eps":364,"rating":4.7,"reviews":3281,"video":true,"guest":true,"spon":true,"lang":"English","network":"","url":"https://podcasts.apple.com/au/podcast/life-and-crimes-with-andrew-rule/id1260800644","urlAlt":"https://open.spotify.com/show/0oAgdFJxevcENpQ33hiSxD","sponsors":"Safer Places Network","region":"Victoria","city":"Melbourne"},{"title":"True Crime Conversations","reach":65272,"eps":357,"rating":4.5,"reviews":3135,"video":true,"guest":true,"spon":false,"lang":"English","network":"","url":"https://podcasts.apple.com/us/podcast/true-crime-conversations/id1469153910","urlAlt":"https://open.spotify.com/show/31jNJsdwsa2GHrjiPFcfq2","sponsors":"","region":"New South Wales","city":""},{"title":"Naked City","reach":61727,"eps":103,"rating":4.6,"reviews":2769,"video":true,"guest":true,"spon":false,"lang":"English","network":"","url":"https://podcasts.apple.com/gb/podcast/naked-city/id1501054880","urlAlt":"https://open.spotify.com/show/73Sf8djgoUEYugTMHcGAas","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"You Beauty","reach":59763,"eps":1469,"rating":4.5,"reviews":2576,"video":true,"guest":true,"spon":false,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/us/podcast/you-beauty/id1427018681","urlAlt":"https://open.spotify.com/show/5GjVxzplq73olPIdvk0Cvh","sponsors":"","region":"","city":""},{"title":"The Property Couch","reach":58958,"eps":388,"rating":4.4,"reviews":2483,"video":true,"guest":true,"spon":false,"lang":"English","network":"Bryce Holdaway & Ben Kingsley","url":"https://podcasts.apple.com/au/podcast/the-property-couch/id969904333","urlAlt":"https://open.spotify.com/show/09ofZB3Y6309Q88HZSzlop","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"The Proof with Simon Hill","reach":58923,"eps":305,"rating":4.9,"reviews":5735,"video":true,"guest":true,"spon":true,"lang":"","network":"Live better for longer","url":"https://podcasts.apple.com/us/podcast/plant-proof-evidence-based-nutrition/id1367773989","urlAlt":"https://open.spotify.com/show/7bAIJCVgnquxXZuQCdZyTi","sponsors":"38TERA, Function Health, Eight Sleep, Eimele, WHOOP, Birch, Pique Life, Momentous and more","region":"","city":""},{"title":"The Melissa Ambrosini Show","reach":56943,"eps":459,"rating":4.8,"reviews":3785,"video":true,"guest":true,"spon":false,"lang":"English","network":"Melissa Ambrosini","url":"https://podcasts.apple.com/us/podcast/the-melissa-ambrosini-show/id1196106699","urlAlt":"https://open.spotify.com/show/4cBKCrx06MkdcinQNTbXI7","sponsors":"","region":"","city":""},{"title":"Outspoken the Podcast","reach":53266,"eps":331,"rating":3.5,"reviews":2180,"video":true,"guest":true,"spon":false,"lang":"English","network":"Outspoken the Podcast","url":"https://podcasts.apple.com/us/podcast/outspoken-the-podcast/id1473369253","urlAlt":"https://open.spotify.com/show/03t0cQyHS8OzAYigyksL9E","sponsors":"","region":"South Australia","city":"Adelaide"},{"title":"Darling, Shine!","reach":53047,"eps":244,"rating":4.5,"reviews":3352,"video":true,"guest":true,"spon":false,"lang":"English","network":"LiSTNR","url":"https://podcasts.apple.com/au/podcast/darling-shine/id1571006909","urlAlt":"https://open.spotify.com/show/5k3AZ3wgXpNIkbu2Vjt401","sponsors":"","region":"","city":""},{"title":"7am","reach":51613,"eps":1203,"rating":4.7,"reviews":2543,"video":true,"guest":true,"spon":false,"lang":"English","network":"Schwartz Media","url":"https://podcasts.apple.com/au/podcast/7am/id1461999702","urlAlt":"https://open.spotify.com/show/7A58JjoBja1ykDVvZPSEXC","sponsors":"","region":"","city":""},{"title":"The Quicky","reach":51242,"eps":2272,"rating":3.8,"reviews":2069,"video":true,"guest":true,"spon":false,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/es/podcast/the-quicky/id1451469361","urlAlt":"https://open.spotify.com/show/4omeoOVsGWXhhFObFWGTvT","sponsors":"","region":"","city":""},{"title":"ABC News Daily","reach":49751,"eps":965,"rating":4.5,"reviews":2025,"video":true,"guest":true,"spon":false,"lang":"English","network":"ABC News","url":"https://podcasts.apple.com/au/podcast/abc-news-daily/id1349523628","urlAlt":"https://open.spotify.com/show/1D4A4NKKF0axPvAS7h31Lu","sponsors":"","region":"New South Wales","city":"Sydney"},{"title":"Matty & Cronk","reach":48355,"eps":417,"rating":4.8,"reviews":1965,"video":true,"guest":true,"spon":false,"lang":"English","network":"FOX Sports","url":"https://podcasts.apple.com/au/podcast/the-matty-johns-podcast/id1117246594","urlAlt":"https://open.spotify.com/show/4Ge9qqdv1uSPl2OZj5Ta9G","sponsors":"","region":"New South Wales","city":"Sydney"},{"title":"Full Story","reach":48032,"eps":1774,"rating":4.4,"reviews":1956,"video":true,"guest":true,"spon":false,"lang":"English","network":"The Guardian","url":"https://podcasts.apple.com/us/podcast/full-story/id1482061243","urlAlt":"https://open.spotify.com/show/7GJod4EyoLywB1AW6zrSHh","sponsors":"","region":"","city":""},{"title":"CANCELLED","reach":45900,"eps":201,"rating":4.7,"reviews":2701,"video":true,"guest":true,"spon":true,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/us/podcast/cancelled/id1580836614","urlAlt":"https://open.spotify.com/show/6NDwcR2GDFv5Q3MiqkzVBc","sponsors":"Medibank","region":"New South Wales","city":"Sydney"},{"title":"Bloke In A Bar","reach":41987,"eps":1323,"rating":4.8,"reviews":1628,"video":true,"guest":true,"spon":true,"lang":"English","network":"Denan Kemp","url":"https://podcasts.apple.com/us/podcast/bloke-in-a-bar/id1010619816","urlAlt":"https://open.spotify.com/show/1GS73KTOx9EN6swLGxNqC2","sponsors":"Mazda, MENULOG, GOOD DAY, KAYO SPORTS, GRUMPY COFFEE, BLOKE UNDIES, Musashi, CODE SPORTS and more","region":"","city":""},{"title":"Squiz Kids","reach":41806,"eps":1610,"rating":4.6,"reviews":1557,"video":true,"guest":false,"spon":false,"lang":"English","network":"The Squiz","url":"https://podcasts.apple.com/us/podcast/squiz-kids/id1494238283","urlAlt":"https://open.spotify.com/show/05eBu9p8N5xxj5lB9Mz4DN","sponsors":"","region":"New South Wales","city":"Sydney"},{"title":"money money money","reach":41364,"eps":409,"rating":4.3,"reviews":1511,"video":true,"guest":true,"spon":true,"lang":"English","network":"money money money","url":"https://podcasts.apple.com/us/podcast/money-money-money/id1384819415","urlAlt":"https://open.spotify.com/show/1XflIryhmXHszEXC3M6Az1","sponsors":"Skye Wealth, Sphere Home Loans, SYMO Interactive Pty Ltd, MoneySherpa Pty Ltd, Sort Your Property Out, Australian Retirement Trust, Forever Projects, Everest Wealth and more","region":"New South Wales","city":"Newcastle"},{"title":"Bizarre with Mick Molloy and Titus O\u2019Reily","reach":39719,"eps":249,"rating":4.9,"reviews":1459,"video":true,"guest":true,"spon":false,"lang":"English","network":"Sport Bizarre","url":"https://podcasts.apple.com/ph/podcast/bizarre-with-mick-molloy-and-titus-oreily/id1633189616","urlAlt":"https://open.spotify.com/show/4sFTbWxW6cCYbH9XHB9RmM","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"Somehow Related with Dave O'Neil & Glenn Robbins","reach":39555,"eps":161,"rating":4.8,"reviews":1443,"video":true,"guest":true,"spon":true,"lang":"English","network":"Nearly Media","url":"https://podcasts.apple.com/us/podcast/somehow-related-with-dave-oneil-glenn-robbins/id1377628820","urlAlt":"https://open.spotify.com/show/3IvsWxtdfticRinoP3JKlY","sponsors":"Licorice International, Norseland Rock, Nestle, Cadbury, Allens, Natural Confectionary Company, None","region":"","city":""},{"title":"But Are You Happy?","reach":37293,"eps":128,"rating":4.8,"reviews":1421,"video":true,"guest":true,"spon":false,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/au/podcast/but-are-you-happy/id1679837320","urlAlt":"https://open.spotify.com/show/0MoatUonBXqaJ6NOsnpXpQ","sponsors":"","region":"New South Wales","city":""},{"title":"Hack","reach":34850,"eps":861,"rating":4.7,"reviews":1284,"video":true,"guest":true,"spon":false,"lang":"English","network":"ABC News","url":"https://podcasts.apple.com/us/podcast/hack/id78995043","urlAlt":"https://open.spotify.com/show/4jULwMxzuP6sipQL6ggMEo","sponsors":"","region":"","city":""},{"title":"The Nutrition Couch","reach":34850,"eps":237,"rating":4.8,"reviews":1284,"video":true,"guest":true,"spon":true,"lang":"English","network":"Susie Burrell & Leanne Ward","url":"https://podcasts.apple.com/au/podcast/the-nutrition-couch/id1565025982","urlAlt":"https://open.spotify.com/show/69pDrHgXIBOobmcFp10G7H","sponsors":"AG1, B-Fit Food, Woolworths, Designed by Dietitians, Riverina Dairy, Dairy Farmers, Elevate Saunas, Nice & Natural and more","region":"New South Wales","city":"Sydney"},{"title":"Aunty Donna Podcast","reach":34028,"eps":311,"rating":4.9,"reviews":2326,"video":true,"guest":true,"spon":false,"lang":"English","network":"LiSTNR","url":"https://podcasts.apple.com/us/podcast/aunty-donna-podcast/id1143557564","urlAlt":"https://open.spotify.com/show/6OBSec7On5LhYs0FQenK15","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"Betoota Talks","reach":32227,"eps":322,"rating":4.8,"reviews":1095,"video":true,"guest":true,"spon":false,"lang":"English","network":"DM Podcasts","url":"https://podcasts.apple.com/us/podcast/betoota-talks/id1350346878","urlAlt":"https://open.spotify.com/show/5BnrHKAw8iGdS40m7rmODj","sponsors":"","region":"Queensland","city":""},{"title":"SLEEP MEDITATION with Lauren Ostrowski Fenton","reach":32004,"eps":427,"rating":4.5,"reviews":1521,"video":true,"guest":true,"spon":false,"lang":"English","network":"Lauren Ostrowski Fenton","url":"https://podcasts.apple.com/us/podcast/sleep-meditation-with-lauren-ostrowski-fenton/id1030685050","urlAlt":"https://open.spotify.com/show/4YfDM1kGnepG5NG4poCwK0","sponsors":"","region":"","city":""},{"title":"The Grade Cricketer","reach":31244,"eps":620,"rating":4.7,"reviews":1547,"video":true,"guest":true,"spon":true,"lang":"English","network":"RARE","url":"https://podcasts.apple.com/in/podcast/the-grade-cricketer/id1164374262","urlAlt":"https://open.spotify.com/show/1ph1B4w2Q1Y3z1VQcAhQNU","sponsors":"NordVPN, Liquorland, Smith Optics, Prime Video, Swyftx, Six Points Pale, KPMG, WHOOP and more","region":"Victoria","city":"Melbourne"},{"title":"We Don't Have Time For This","reach":31243,"eps":323,"rating":4.7,"reviews":1466,"video":true,"guest":false,"spon":false,"lang":"English","network":"Gemma Peanut & Kate Reeves","url":"https://podcasts.apple.com/us/podcast/we-dont-have-time-for-this/id1544178687","urlAlt":"https://open.spotify.com/show/1kGC1I1xEJiom7tqRLUKnJ","sponsors":"","region":"","city":""},{"title":"The Money Puzzle","reach":30476,"eps":741,"rating":4.5,"reviews":992,"video":true,"guest":true,"spon":false,"lang":"English","network":"The Australian","url":"https://podcasts.apple.com/us/podcast/the-money-puzzle-with-james-kirby/id1201031401","urlAlt":"https://open.spotify.com/show/4hwfvVZmwQC9hckPABZtiG","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"Complete Drivel","reach":30425,"eps":141,"rating":4.8,"reviews":1860,"video":true,"guest":false,"spon":false,"lang":"English","network":"","url":"https://podcasts.apple.com/us/podcast/complete-drivel/id1158641518","urlAlt":"https://open.spotify.com/show/3loSjqQ136N5FbA4sA1RMj","sponsors":"","region":"","city":""},{"title":"On Attachment","reach":29815,"eps":371,"rating":4.9,"reviews":1646,"video":true,"guest":true,"spon":false,"lang":"English","network":"Stephanie Rigg","url":"https://podcasts.apple.com/us/podcast/on-attachment/id1620471393","urlAlt":"https://open.spotify.com/show/46MQbkuTSRMo4hzQWJzbmD","sponsors":"","region":"New South Wales","city":"Sydney"},{"title":"Rusty's Garage","reach":28662,"eps":646,"rating":5.0,"reviews":952,"video":true,"guest":true,"spon":false,"lang":"English","network":"LiSTNR","url":"https://podcasts.apple.com/us/podcast/rustys-garage/id1355538998","urlAlt":"https://open.spotify.com/show/1BuWwOowPe1nPTnYv0F07r","sponsors":"","region":"","city":""},{"title":"Biz","reach":27774,"eps":210,"rating":4.4,"reviews":887,"video":true,"guest":true,"spon":false,"lang":"English","network":"Mamamia","url":"https://podcasts.apple.com/us/podcast/lady-startup-stories/id1361401612","urlAlt":"https://open.spotify.com/show/7CBHMhhnOvYNaxgd8N6duR","sponsors":"","region":"New South Wales","city":""},{"title":"Crappy to Happy","reach":26280,"eps":197,"rating":4.9,"reviews":1309,"video":true,"guest":true,"spon":false,"lang":"English","network":"","url":"https://podcasts.apple.com/au/podcast/crappy-to-happy/id1274672540","urlAlt":"https://open.spotify.com/show/5XqsXZdczcUWcIXA4ftkqp","sponsors":"","region":"","city":""},{"title":"Property Investment Podcast Network","reach":26204,"eps":983,"rating":4.8,"reviews":799,"video":true,"guest":true,"spon":false,"lang":"English","network":"Momentum Media","url":"https://podcasts.apple.com/us/podcast/property-investment-podcast-network/id1062491621","urlAlt":"https://open.spotify.com/show/7DWmPXxXcMB1F4nJGxFzK6","sponsors":"","region":"New South Wales","city":""},{"title":"Quillette Podcast","reach":25866,"eps":411,"rating":4.4,"reviews":1309,"video":true,"guest":true,"spon":false,"lang":"English","network":"Quillette","url":"https://podcasts.apple.com/us/podcast/quillette-podcast/id1441708286","urlAlt":"https://open.spotify.com/show/5OexgXX1vghj0rizOSvVeR","sponsors":"","region":"New South Wales","city":"Sydney"},{"title":"Law Report","reach":25405,"eps":207,"rating":4.3,"reviews":787,"video":true,"guest":true,"spon":false,"lang":"English","network":"ABC listen","url":"https://podcasts.apple.com/us/podcast/law-report/id74849126","urlAlt":"","sponsors":"","region":"Victoria","city":"Melbourne"},{"title":"Australian Finance Podcast","reach":24274,"eps":753,"rating":5.0,"reviews":714,"video":true,"guest":true,"spon":true,"lang":"English","network":"Rask","url":"https://podcasts.apple.com/us/podcast/australian-finance-podcast/id1454193127","urlAlt":"https://open.spotify.com/show/0KEsqdQgVCL6BKomPoNVOz","sponsors":"Everlab, Pearler, PocketSmith, BetaShares, WedShed, Skye Wealth, Pete's Buyers Agency, Amy Lunardi Buyers Agency Melbourne and more","region":"Victoria","city":"Melbourne"}],"lang":[{"n":1981,"share":94.0,"med":617,"eps":88,"reach":6976760,"video":97.0,"guest":62.4,"spon":12.5,"contact":81.5,"langs":1,"code":"en","name":"English"},{"n":25,"share":1.2,"med":168,"eps":98,"reach":15686,"video":100.0,"guest":44.0,"spon":24.0,"contact":76.0,"langs":1,"code":"zh","name":"Chinese"},{"n":10,"share":0.5,"med":129,"eps":48,"reach":1861,"video":100.0,"guest":10.0,"spon":0.0,"contact":90.0,"langs":1,"code":"es","name":"Spanish"},{"n":7,"share":0.3,"med":374,"eps":49,"reach":4835,"video":100.0,"guest":0.0,"spon":0.0,"contact":57.1,"langs":1,"code":"si","name":"Sinhala"},{"n":6,"share":0.3,"med":138,"eps":62,"reach":954,"video":83.3,"guest":16.7,"spon":0.0,"contact":83.3,"langs":1,"code":"in","name":"Indonesian"},{"n":6,"share":0.3,"med":162,"eps":60,"reach":1318,"video":100.0,"guest":50.0,"spon":0.0,"contact":66.7,"langs":1,"code":"th","name":"Thai"},{"n":5,"share":0.2,"med":210,"eps":60,"reach":1394,"video":100.0,"guest":40.0,"spon":0.0,"contact":80.0,"langs":1,"code":"pt","name":"Portuguese"},{"n":5,"share":0.2,"med":138,"eps":58,"reach":2135,"video":100.0,"guest":40.0,"spon":0.0,"contact":60.0,"langs":1,"code":"fa","name":"Persian"},{"n":5,"share":0.2,"med":216,"eps":141,"reach":3552,"video":100.0,"guest":20.0,"spon":0.0,"contact":100.0,"langs":1,"code":"it","name":"Italian"},{"n":4,"share":0.2,"med":168,"eps":108,"reach":636,"video":100.0,"guest":0.0,"spon":0.0,"contact":75.0,"langs":1,"code":"ru","name":"Russian"},{"n":53,"share":2.5,"med":210,"eps":98,"reach":35295,"video":98.1,"guest":39.6,"spon":0.0,"contact":79.2,"langs":34,"code":"","name":"All other languages","rest":true}],"langMeta":{"known":2107,"distinct":44,"topName":"English","topShare":94.0,"otherShare":6.0,"otherN":126},"pubrate":{"known":1851,"median":23.4,"bands":[{"label":"Less than monthly","sub":"under 12 a year","n":449,"share":24.3,"med":304},{"label":"About monthly","sub":"12 to 25 a year","n":559,"share":30.2,"med":521},{"label":"About fortnightly","sub":"26 to 51 a year","n":532,"share":28.7,"med":1022},{"label":"Weekly or more","sub":"52+ a year","n":311,"share":16.8,"med":1800}]},"hostgender":{"known":1118,"knownShare":53.0,"rows":[{"label":"All-male line-up","n":646,"share":57.8,"med":1278},{"label":"All-female line-up","n":366,"share":32.7,"med":858},{"label":"Mixed line-up","n":106,"share":9.5,"med":2379}],"hostRows":3232,"genderedRows":1599,"male":1041,"female":555},"networks":[{"n":34,"share":1.7,"med":602,"eps":28,"reach":26520,"video":100.0,"guest":32.4,"spon":0.0,"contact":100.0,"langs":16,"name":"SBS Audio"},{"n":12,"share":0.6,"med":316,"eps":45,"reach":7132,"video":100.0,"guest":33.3,"spon":16.7,"contact":91.7,"langs":1,"name":"Auscast Network"},{"n":11,"share":0.5,"med":4411,"eps":2911,"reach":65083,"video":100.0,"guest":90.9,"spon":9.1,"contact":100.0,"langs":1,"name":"Sen"},{"n":10,"share":0.5,"med":9867,"eps":167,"reach":429139,"video":100.0,"guest":80.0,"spon":0.0,"contact":90.0,"langs":1,"name":"ABC listen"},{"n":8,"share":0.4,"med":17034,"eps":278,"reach":215190,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"LiSTNR"},{"n":7,"share":0.3,"med":1369,"eps":35,"reach":15635,"video":100.0,"guest":28.6,"spon":14.3,"contact":100.0,"langs":1,"name":"The West Australian"},{"n":7,"share":0.3,"med":306,"eps":274,"reach":17190,"video":100.0,"guest":71.4,"spon":0.0,"contact":100.0,"langs":1,"name":"7NEWS Podcasts"},{"n":7,"share":0.3,"med":10423,"eps":14,"reach":216518,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Crime X"},{"n":7,"share":0.3,"med":2440,"eps":148,"reach":35077,"video":100.0,"guest":85.7,"spon":42.9,"contact":100.0,"langs":1,"name":"9Podcasts"},{"n":7,"share":0.3,"med":51242,"eps":268,"reach":490336,"video":100.0,"guest":100.0,"spon":14.3,"contact":100.0,"langs":1,"name":"Mamamia"},{"n":7,"share":0.3,"med":590,"eps":19,"reach":17234,"video":100.0,"guest":57.1,"spon":0.0,"contact":100.0,"langs":1,"name":"SBS News"},{"n":6,"share":0.3,"med":708,"eps":21,"reach":4141,"video":66.7,"guest":16.7,"spon":0.0,"contact":100.0,"langs":1,"name":"RNZ Originals"},{"n":6,"share":0.3,"med":6196,"eps":211,"reach":65728,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"DM Podcasts"},{"n":5,"share":0.2,"med":2301,"eps":385,"reach":33754,"video":100.0,"guest":100.0,"spon":20.0,"contact":100.0,"langs":1,"name":"Triple M"},{"n":5,"share":0.2,"med":7106,"eps":359,"reach":56407,"video":100.0,"guest":100.0,"spon":40.0,"contact":100.0,"langs":1,"name":"Rask"},{"n":5,"share":0.2,"med":4363,"eps":526,"reach":38263,"video":100.0,"guest":60.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Sky News Australia / NZ"},{"n":4,"share":0.2,"med":3858,"eps":58,"reach":20312,"video":100.0,"guest":25.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Fox Sports Australia"},{"n":4,"share":0.2,"med":2198,"eps":700,"reach":9915,"video":100.0,"guest":25.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Hope 103.2"},{"n":4,"share":0.2,"med":522,"eps":312,"reach":2185,"video":100.0,"guest":25.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Vision Christian Media"},{"n":4,"share":0.2,"med":42300,"eps":594,"reach":206250,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"ABC News"},{"n":3,"share":0.1,"med":192,"eps":87,"reach":1967,"video":100.0,"guest":66.7,"spon":0.0,"contact":33.3,"langs":1,"name":"Newlife Church"},{"n":3,"share":0.1,"med":5949,"eps":383,"reach":32459,"video":66.7,"guest":66.7,"spon":0.0,"contact":100.0,"langs":1,"name":"Momentum Media"},{"n":3,"share":0.1,"med":1349,"eps":207,"reach":5019,"video":100.0,"guest":66.7,"spon":100.0,"contact":100.0,"langs":1,"name":"SIFTER"},{"n":3,"share":0.1,"med":6322,"eps":104,"reach":28300,"video":100.0,"guest":33.3,"spon":0.0,"contact":100.0,"langs":1,"name":"SMH & The Age"},{"n":3,"share":0.1,"med":6527,"eps":1096,"reach":25349,"video":100.0,"guest":100.0,"spon":0.0,"contact":100.0,"langs":1,"name":"Nova Podcasts"},{"n":3,"share":0.1,"med":1153,"eps":27,"reach":8772,"video":100.0,"guest":66.7,"spon":0.0,"contact":100.0,"langs":1,"name":"Lowy Institute"},{"n":3,"share":0.1,"med":326,"eps":64,"reach":1429,"video":100.0,"guest":0.0,"spon":0.0,"contact":0.0,"langs":1,"name":"Film & TV Podcast - EN"}],"netMeta":{"known":2023,"knownShare":95.8,"distinct":1825,"threePlus":27,"tenPlus":4},"videoByLang":[{"code":"","name":"All languages","video":2049,"audio":62,"medVideo":585,"medAudio":430},{"code":"en","name":"English","video":1921,"audio":60,"medVideo":618,"medAudio":450},{"code":"zh","name":"Chinese","video":25,"audio":0,"medVideo":168,"medAudio":null},{"code":"es","name":"Spanish","video":10,"audio":0,"medVideo":129,"medAudio":null},{"code":"si","name":"Sinhala","video":7,"audio":0,"medVideo":374,"medAudio":null},{"code":"in","name":"Indonesian","video":5,"audio":1,"medVideo":138,"medAudio":186},{"code":"th","name":"Thai","video":6,"audio":0,"medVideo":162,"medAudio":null},{"code":"pt","name":"Portuguese","video":5,"audio":0,"medVideo":210,"medAudio":null},{"code":"fa","name":"Persian","video":5,"audio":0,"medVideo":138,"medAudio":null},{"code":"it","name":"Italian","video":5,"audio":0,"medVideo":216,"medAudio":null}],"lenKnownN":2026,"video":{"video":2049,"audio":62,"videoShare":97.1,"medVideo":585,"medAudio":430},"signals":[{"label":"More than one host","yesLabel":"Two or more hosts","noLabel":"Solo host","yes":584,"no":1527,"share":27.7,"medYes":1598,"medNo":378,"lift":4.22},{"label":"Features guests","yesLabel":"With guests","noLabel":"No guests","yes":1282,"no":829,"share":60.7,"medYes":858,"medNo":326,"lift":2.63},{"label":"Has detected sponsors","yesLabel":"Sponsored","noLabel":"Unsponsored","yes":254,"no":1857,"share":12.0,"medYes":1293,"medNo":521,"lift":2.48},{"label":"Publishes on YouTube","yesLabel":"On YouTube","noLabel":"Not on YouTube","yes":2049,"no":62,"share":97.1,"medYes":585,"medNo":430,"lift":1.36}]};</script>
 
 <script>
 "use strict";
@@ -2257,7 +2444,8 @@ var FIG={
   rating:"7.1", reviews:"7.2",
   spon:"8.1",   brands:"8.2",
   gender:"9.1", income:"9.2", gen:"9.3",
-  lead:"10.1"
+  networks:"10.1",
+  lead:"11.1"
 };
 /* Section a block belongs to, used only for naming downloads. */
 var SECNAME={
@@ -2269,7 +2457,7 @@ var SECNAME={
   rating:"Ratings", reviews:"Ratings",
   spon:"Monetization", brands:"Monetization",
   gender:"Audience", income:"Audience", gen:"Audience",
-  lead:"Leaderboard"
+  networks:"Networks", lead:"Leaderboard"
 };
 /* Geography-2.1-Australia-MillionPodcasts.csv reads on its own in a downloads
    folder; au-2.1-states.csv does not. */
@@ -2471,7 +2659,7 @@ var S=null;
    other. Keys match the card they drive. */
 var LOCAL={
   stateSort:"n", cityRows:"10", citySort:"n",
-  brandRows:"12", leadSort:"reach", leadRows:"10", tierMode:"n"
+  langSort:"n", brandSort:"n", brandRows:"12", netSort:"n", netRows:"12", leadSort:"reach", leadRows:"10", tierMode:"n", videoLang:""
 };
 
 /* Chart or table, per chart card. Every chart already carries the numbers
@@ -2538,35 +2726,59 @@ function renderGeography(){
 }
 
 function renderStates(){
-  var SORTS=[["n","Show count"],["med","Median listeners"],["spon","Sponsored share"]];
+  reg("states",[cap(S.meta.regionWord),"Shows","Share of located shows %",
+                "Combined monthly listeners","Median monthly listeners","Median episodes",
+                "Contacts %","Video %","Guests %","Sponsored %"],
+      S.states.map(function(d){
+        return [d.name,d.n,d.share,d.reach,d.med,d.eps,d.contact,d.video,d.guest,d.spon]; }),
+      S.meta.regionWordPlural);
+
+  var SORTS=[["n","Show count"],["reach","Combined reach"],["med","Median listeners"],
+             ["contact","Contact coverage"],["video","Video share"],["guest","Guest share"],
+             ["spon","Sponsored share"]];
   var rows=sortRows(S.states,LOCAL.stateSort);
   var K=LOCAL.stateSort;
+  var maxK=Math.max.apply(null,rows.map(function(d){ return nz(d[K]); }).concat([1]));
+  /* A bar earns its place on an unbounded count; on a 0-100 percentage the
+     number is already self-comparing, so those columns take the highlight
+     alone and every column keeps the same width whichever one is sorted. */
+  var BARABLE={n:1, med:1, reach:1};
+  function cell(d,key,txt){
+    if(key!==K){ return td(txt,"ctr"); }
+    return BARABLE[key] ? td(miniMeter(d[K],maxK,txt),"mt hl") : td(txt,"ctr hl");
+  }
   var body=rows.map(function(d){
-    return [td(esc(d.name)),
-            td(fmtInt(d.n),"n"+(K==="n"?" hl":"")),
-            td(pct1(d.n/S.statesKnown*100),"n"),
-            td(fmtRange(d.med),"n"+(K==="med"?" hl":"")),
-            td(pct1(d.spon),"n"+(K==="spon"?" hl":""))];
+    return [td("<b>"+esc(d.name)+"</b>"),
+            cell(d,"n",fmtInt(d.n)),
+            td(pct1(d.share),"ctr"),
+            cell(d,"reach",fmtRange(d.reach)),
+            cell(d,"med",fmtRange(d.med)),
+            td(fmtInt(d.eps),"ctr"),
+            cell(d,"contact",pct1(d.contact)),
+            cell(d,"video",pct1(d.video)),
+            cell(d,"guest",pct1(d.guest)),
+            cell(d,"spon",pct1(d.spon))];
   });
   var lead=S.states.slice(0,2);
-  reg("states",[cap(S.meta.regionWord),"Shows","Share of located shows %",
-                "Median monthly listeners","Sponsored %"],
-      S.states.map(function(d){
-        return [d.name,d.n,(d.n/S.statesKnown*100).toFixed(1),d.med,d.spon]; }),
-      S.meta.regionWordPlural);
   el("c-states").innerHTML =
     '<div class="ex-card" data-figid="states">'+
     panelHead("states", esc(S.meta.regionWordPlural),
       "Shares are of the "+fmtInt(S.statesKnown)+" shows with a known "+esc(S.meta.regionWord)+".",
       localTools(ctl("l-statesort","Rank by",SORTS,LOCAL.stateSort)))+
-    '<div class="ex-card-b">'+
-    '<div class="ex-tblscroll" id="sc-states">'+
-    tbl([{t:cap(S.meta.regionWord)},{t:"Shows",n:1,hl:K==="n"},{t:"Share",n:1},
-         {t:"Median listeners",n:1,hl:K==="med"},{t:"Sponsored",n:1,hl:K==="spon"}],
-        body, "t-states")+"</div>"+
+    '<div class="ex-card-b"><div class="ex-tblscroll wide capped" id="sc-states">'+
+    tbl([{t:cap(S.meta.regionWord),w:"17%"},
+         {t:"Shows",w:"12%",cls:"ctr",hl:K==="n"},
+         {t:"Share",w:"8%",cls:"ctr"},
+         {t:"Combined listeners",w:"13%",cls:"ctr",hl:K==="reach"},
+         {t:"Median listeners",w:"12.5%",cls:"ctr",hl:K==="med"},
+         {t:"Median episodes",w:"9.5%",cls:"ctr"},
+         {t:"Contacts %",w:"8%",cls:"ctr",hl:K==="contact"},
+         {t:"Video %",w:"6.5%",cls:"ctr",hl:K==="video"},
+         {t:"Guests %",w:"6.5%",cls:"ctr",hl:K==="guest"},
+         {t:"Sponsored %",w:"7%",cls:"ctr",hl:K==="spon"}], body, "t-states")+"</div>"+
     (lead.length>1 ?
       '<p class="ex-insight">'+esc(lead[0].name)+" and "+esc(lead[1].name)+
-      " together hold <b>"+pct1((lead[0].n+lead[1].n)/S.statesKnown*100)+
+      " together hold <b>"+pct1((nz(lead[0].n)+nz(lead[1].n))/S.statesKnown*100)+
       '</b> of the shows with a known '+esc(S.meta.regionWord)+
       '. <button class="ex-mini" type="button" data-cite="'+
       esc(citeClaim(lead[0].name+" and "+lead[1].name+" account for most "+
@@ -2576,30 +2788,68 @@ function renderStates(){
   requestAnimationFrame(syncAllPairs);
 }
 
+/* The bar fills whatever the number leaves rather than sitting at a fixed
+   width, so it grows and shrinks with the column it is in. */
+function miniMeter(val,max,txt){
+  return '<div class="ex-meter mini"><span class="t"><i style="width:'+
+    Math.max(3,nz(val)/max*100).toFixed(1)+'%"></i></span><span class="v">'+txt+"</span></div>";
+}
+
+/* bar + value on one baseline, used wherever a count deserves a scale */
+function meterCell(val,max,txt){
+  return '<div class="ex-meter"><span class="t"><i style="width:'+
+    Math.max(3,nz(val)/max*100).toFixed(1)+'%"></i></span><span class="v">'+txt+"</span></div>";
+}
+
 function renderCities(){
-  var SORTS=[["n","Show count"],["med","Median listeners"]];
+  var SORTS=[["n","Show count"],["reach","Combined reach"],["med","Median listeners"],
+             ["contact","Contact coverage"],["video","Video share"],["guest","Guest share"],
+             ["spon","Sponsored share"]];
   var ROWS=[["10","Top 10"],["25","Top 25"],["50","Top 50"]];
-  var rows=sortRows(S.cities,LOCAL.citySort).slice(0,parseInt(LOCAL.cityRows,10));
   var K=LOCAL.citySort;
+  var rows=sortRows(S.cities,K).slice(0,parseInt(LOCAL.cityRows,10));
+  var maxC=Math.max.apply(null,rows.map(function(d){ return nz(d.n); }).concat([1]));
+  var maxCK=Math.max.apply(null,rows.map(function(d){ return nz(d[K]); }).concat([1]));
+  var CBAR={n:1, reach:1, med:1};
+  function ccell(d,key,txt){
+    if(key!==K){ return td(txt,"ctr"); }
+    return CBAR[key] ? td(miniMeter(d[K],maxCK,txt),"mt hl") : td(txt,"ctr hl");
+  }
   var body=rows.map(function(d,i){
-    return [td(String(i+1),"dim"), td(esc(d.name)),
-            td(fmtInt(d.n),"n"+(K==="n"?" hl":"")),
-            td(pct1(d.n/S.citiesKnown*100),"n"),
-            td(fmtRange(d.med),"n"+(K==="med"?" hl":""))];
+    return [td(String(i+1),"dim"), td("<b>"+esc(d.name)+"</b>"),
+            ccell(d,"n",fmtInt(d.n)),
+            td(pct1(d.share),"ctr"),
+            ccell(d,"reach",fmtRange(d.reach)),
+            ccell(d,"med",fmtRange(d.med)),
+            td(fmtInt(d.eps),"ctr"),
+            ccell(d,"contact",pct1(d.contact)),
+            ccell(d,"video",pct1(d.video)),
+            ccell(d,"guest",pct1(d.guest)),
+            ccell(d,"spon",pct1(d.spon))];
   });
-  reg("cities",["City","Shows","Share of located shows %","Median monthly listeners"],
-      S.cities.map(function(d){
-        return [d.name,d.n,(d.n/S.citiesKnown*100).toFixed(1),d.med]; }), "Cities");
+  reg("cities",["Rank","City","Shows","Share of located shows %","Combined monthly listeners",
+                "Median monthly listeners","Median episodes","Contacts %","Video %",
+                "Guests %","Sponsored %"],
+      sortRows(S.cities,K).map(function(d,i){
+        return [i+1,d.name,d.n,d.share,d.reach,d.med,d.eps,d.contact,d.video,d.guest,d.spon]; }),
+      "Cities");
   el("c-cities").innerHTML =
     '<div class="ex-card" data-figid="cities">'+
     panelHead("cities","Cities",
       "Shares are of the "+fmtInt(S.citiesKnown)+" shows with a known city.",
       localTools(ctl("l-citysort","Rank by",SORTS,LOCAL.citySort)+
                  ctl("l-cityrows","Rows",ROWS,LOCAL.cityRows)))+
-    '<div class="ex-card-b">'+
-    '<div class="ex-tblscroll" id="sc-cities">'+
-    tbl([{t:"#"},{t:"City"},{t:"Shows",n:1,hl:K==="n"},{t:"Share",n:1},
-         {t:"Median listeners",n:1,hl:K==="med"}], body, "t-cities")+"</div>"+
+    '<div class="ex-card-b"><div class="ex-tblscroll wide capped" id="sc-cities">'+
+    tbl([{t:"#",w:"3.5%"},{t:"City",w:"15%"},
+         {t:"Shows",w:"11.5%",cls:"ctr",hl:K==="n"},
+         {t:"Share",w:"8%",cls:"ctr"},
+         {t:"Combined listeners",w:"13%",cls:"ctr",hl:K==="reach"},
+         {t:"Median listeners",w:"12.5%",cls:"ctr",hl:K==="med"},
+         {t:"Median episodes",w:"9.5%",cls:"ctr"},
+         {t:"Contacts %",w:"8%",cls:"ctr",hl:K==="contact"},
+         {t:"Video %",w:"6.5%",cls:"ctr",hl:K==="video"},
+         {t:"Guests %",w:"6.5%",cls:"ctr",hl:K==="guest"},
+         {t:"Sponsored %",w:"7%",cls:"ctr",hl:K==="spon"}], body, "t-cities")+"</div>"+
     (S.cities.length>1 ?
       '<p class="ex-insight">'+esc(S.cities[0].name)+" and "+esc(S.cities[1].name)+
       " account for <b>"+pct1((nz(S.cities[0].n)+nz(S.cities[1].n))/S.citiesKnown*100)+
@@ -2717,8 +2967,10 @@ function lengthQuick(){
 }
 
 function renderFormat(){
-  var dt=dataTableAndCsv(["Average episode length","Shows","Share","Median listeners"],
-    S.format.lengths.map(function(d){ return [d.label,d.n,pct1(d.share),d.med]; }));
+  var dt=dataTableAndCsv(["Average episode length","Shows","Share %","Median monthly listeners",
+                          "Video %","Guests %","Sponsored %"],
+    S.format.lengths.map(function(d){
+      return [d.label,d.n,d.share,d.med,d.video,d.guest,d.spon]; }));
   el("c-len").innerHTML = chartCard({
     id:"len", title:"Average episode length",
     sub:"Length is known for "+fmtInt(S.format.lenKnown)+" shows. Median is "+S.format.medianLen+" minutes.",
@@ -2728,7 +2980,9 @@ function renderFormat(){
     claim:"the median "+S.meta.adjective+" podcast episode runs "+S.format.medianLen+" minutes",
     legend:lengthQuick(),
     insight:"The median "+S.meta.adjective+" episode runs <b>"+S.format.medianLen+
-      " minutes</b>, and <b>"+pct1(S.format.lengths[2].share)+"</b> of shows sit in the 30 to 59 minute band."
+      " minutes</b>, and <b>"+pct1(S.format.lengths[2].share)+
+      "</b> of shows sit in the 30 to 59 minute band. Open the table to see how guest usage and "+
+      "sponsorship change with length."
   });
 
   var g=S.format.guestYes, ng=S.format.guestNo, tot=g+ng;
@@ -2818,40 +3072,76 @@ function renderHostGender(){
 }
 
 function renderLang(){
-  var LM=S.langMeta, rows=S.lang;
+  var SORTS=[["n","Show count"],["med","Median listeners"],["video","Video share"],
+             ["guest","Guest share"],["spon","Sponsored share"]];
+  var LK=LOCAL.langSort;
+  var LM=S.langMeta;
+  /* "All other languages" is a bucket, not a language, so it stays pinned to
+     the bottom whatever the sort. */
+  var real=S.lang.filter(function(d){ return !d.rest; });
+  var rest=S.lang.filter(function(d){ return d.rest; });
+  var rows=sortRows(real,LK).concat(rest);
   var maxN=rows.length?rows[0].n:1;
-  reg("lang",["Language","Code","Shows","Share of shows with a language %","Median monthly listeners"],
-      rows.map(function(d){ return [d.name,d.code,d.n,d.share,d.med]; }), "Publishing language");
+  reg("lang",["Language","Code","Shows","Share of shows with a language %",
+              "Median monthly listeners","Video %","Guests %","Sponsored %"],
+      rows.map(function(d){
+        return [d.name,d.code,d.n,d.share,d.med,d.video,d.guest,d.spon]; }), "Publishing language");
+  var maxLK=Math.max.apply(null,real.map(function(d){ return nz(d[LK]); }).concat([1]));
   var body=rows.map(function(d){
     return [td(esc(d.name)+(d.code?' <span class="ex-code">'+esc(d.code)+"</span>":"")),
-            td(fmtInt(d.n)+barHtml(d.n,maxN),"n b"),
-            td(pct1(d.share),"n"), td(fmtRange(d.med),"n")];
+            (LK==="n"?td(miniMeter(d.n,maxLK,fmtInt(d.n)),"mt hl"):td(fmtInt(d.n),"ctr")),
+            td(pct1(d.share),"ctr"),
+            (LK==="med"?td(miniMeter(d.med,maxLK,fmtRange(d.med)),"mt hl"):td(fmtRange(d.med),"ctr")),
+            td(pct1(d.video),"ctr"+(LK==="video"?" hl":"")),
+            td(pct1(d.guest),"ctr"+(LK==="guest"?" hl":"")),
+            td(pct1(d.spon),"ctr"+(LK==="spon"?" hl":""))];
   });
   el("c-lang").innerHTML =
     '<div class="ex-card" data-figid="lang">'+
     panelHead("lang","Publishing language",
-      "Feed-declared language for the "+fmtInt(LM.known)+" shows that declare one. Top 10, rest grouped.","")+
+      "Feed-declared language for the "+fmtInt(LM.known)+
+      " shows that declare one. Top 10, rest grouped.",
+      localTools(ctl("l-langsort","Rank by",SORTS,LOCAL.langSort)))+
     '<div class="ex-card-b">'+
-    '<div class="ex-tblscroll" id="sc-lang">'+
-    tbl([{t:"Language"},{t:"Shows",n:1},{t:"Share",n:1},{t:"Median listeners",n:1}], body, "t-lang")+
-    "</div>"+
+    '<div class="ex-tblscroll wide" id="sc-lang">'+
+    tbl([{t:"Language",w:"20%"},{t:"Shows",w:"17%",cls:"ctr",hl:LK==="n"},
+         {t:"Share",w:"10%",cls:"ctr"},
+         {t:"Median listeners",w:"17%",cls:"ctr",hl:LK==="med"},
+         {t:"Video %",w:"12%",cls:"ctr",hl:LK==="video"},
+         {t:"Guests %",w:"12%",cls:"ctr",hl:LK==="guest"},
+         {t:"Sponsored %",w:"12%",cls:"ctr",hl:LK==="spon"}], body, "t-lang")+"</div>"+
     '<p class="ex-insight"><b>'+pct1(LM.topShare)+"</b> of shows publish in "+esc(LM.topName)+
     ", leaving <b>"+fmtInt(LM.otherN)+"</b> shows across <b>"+(LM.distinct-1)+
     "</b> other languages. Feed language understates this: a bilingual show usually declares only one."+
     ' <button class="ex-mini" type="button" data-cite="'+
     esc(citeClaim(S.meta.adjective+" podcasts publish in "+LM.distinct+" declared languages"))+
     '">cite</button></p></div></div>';
+  bindLocal("l-langsort","langSort",renderLang);
+  requestAnimationFrame(syncAllPairs);
 }
 
 function renderVideo(){
-  var v=S.video, tot=v.video+v.audio;
+  /* The country-wide split hides the interesting part: an English catalog and
+     a Chinese one do not adopt video at the same rate. The dropdown reslices
+     this card only - it never touches the rest of the page. */
+  var opts=S.videoByLang||[];
+  var pick=opts.filter(function(o){ return (o.code||"")===(LOCAL.videoLang||""); })[0]||opts[0];
+  var v = pick ? {video:pick.video, audio:pick.audio,
+                  videoShare: (pick.video+pick.audio) ? Math.round(pick.video/(pick.video+pick.audio)*1000)/10 : 0,
+                  medVideo:pick.medVideo, medAudio:pick.medAudio} : S.video;
+  var tot=nz(v.video)+nz(v.audio);
   var lift=v.medAudio?(v.medVideo/v.medAudio):null;
   reg("video",["Group","Shows","Share %","Median monthly listeners"],[
       ["Publishes on YouTube",v.video,v.videoShare,v.medVideo],
       ["No YouTube presence",v.audio,Math.round((100-v.videoShare)*10)/10,v.medAudio]
   ],"Video and audio-only");
-  el("c-video").innerHTML = cardHtml("Video and audio-only",
-    "A YouTube channel is the closest thing the data has to a video flag. Presence means the show publishes there, not that every episode is filmed.",
+  var LOPTS=opts.map(function(o){ return [o.code||"", o.name]; });
+  el("c-video").innerHTML =
+    '<div class="ex-card" data-figid="video">'+
+    panelHead("video","Video and audio-only",
+      "A YouTube channel is the closest thing the data has to a video flag. Presence means the show publishes there, not that every episode is filmed.",
+      (LOPTS.length>1?localTools(ctl("l-videolang","Language",LOPTS,LOCAL.videoLang||"")):""))+
+    '<div class="ex-card-b pad">'+
     '<div class="ex-splitk">'+
       donut(v.videoShare,"On YouTube")+
       '<div class="ex-splitk-r">'+
@@ -2876,7 +3166,9 @@ function renderVideo(){
       "can be found, though the bigger shows were also the ones able to afford filming in the first place."+
       ' <button class="ex-mini" type="button" data-cite="'+
       esc(citeClaim(pct1(v.videoShare)+" of "+S.meta.adjective+" podcasts publish on YouTube"))+
-      '">cite</button></p>', "video", 1);
+      '">cite</button></p></div></div>';
+  bindLocal("l-videolang","videoLang",renderVideo);
+  requestAnimationFrame(syncAllPairs);
 }
 
 function renderSignals(){
@@ -3030,26 +3322,48 @@ function renderMoney(){
 }
 
 function renderBrands(){
+  var SORTS=[["n","Show count"],["reach","Combined reach"],["med","Median listeners"],
+             ["guest","Guest share"],["video","Video share"]];
   var ROWS=[["12","Top 12"],["25","Top 25"],["50","Top 50"]];
-  var rows=S.money.brands.slice(0,parseInt(LOCAL.brandRows,10));
-  var maxB=rows.length?rows[0].n:1;
+  var BK=LOCAL.brandSort;
+  var all=sortRows(S.money.brands,BK);
+  var rows=all.slice(0,parseInt(LOCAL.brandRows,10));
+  var maxBK=Math.max.apply(null,rows.map(function(d){ return nz(d[BK]); }).concat([1]));
+  var BBAR={n:1, reach:1, med:1};
+  function bcell(d,key,txt){
+    if(key!==BK){ return td(txt,"ctr"); }
+    return BBAR[key] ? td(miniMeter(d[BK],maxBK,txt),"mt hl") : td(txt,"ctr hl");
+  }
   var body=rows.map(function(d,i){
-    return [td(String(i+1),"dim"), td(esc(d.name)),
-            td(fmtInt(d.n)+barHtml(d.n,maxB),"n b"),
-            td(pct1(d.n/S.money.sponsored*100),"n")];
+    return [td(String(i+1),"dim"), td("<b>"+esc(d.name)+"</b>"),
+            bcell(d,"n",fmtInt(d.n)),
+            td(pct1(d.share),"ctr"),
+            bcell(d,"reach",fmtRange(d.reach)),
+            bcell(d,"med",fmtRange(d.med)),
+            td(fmtInt(d.eps),"ctr"),
+            bcell(d,"video",pct1(d.video)),
+            bcell(d,"guest",pct1(d.guest))];
   });
-  reg("brands",["Rank","Brand","Shows","Share of sponsored shows %"],
-      S.money.brands.map(function(d,i){
-        return [i+1,d.name,d.n,(d.n/S.money.sponsored*100).toFixed(1)]; }),
-      "Brands most often detected");
+  reg("brands",["Rank","Sponsor","Shows","Share of sponsored shows %","Combined monthly listeners",
+                "Median monthly listeners","Median episodes","Video %","Guests %"],
+      all.map(function(d,i){
+        return [i+1,d.name,d.n,d.share,d.reach,d.med,d.eps,d.video,d.guest]; }),
+      "Popular sponsors");
   el("c-brands").innerHTML =
     '<div class="ex-card" data-figid="brands">'+
-    panelHead("brands","Brands most often detected",
+    panelHead("brands","Popular sponsors",
       "Share is of the "+fmtInt(S.money.sponsored)+" shows with detected sponsors.",
-      localTools(ctl("l-brandrows","Rows",ROWS,LOCAL.brandRows)))+
+      localTools(ctl("l-brandsort","Rank by",SORTS,LOCAL.brandSort)+
+                 ctl("l-brandrows","Rows",ROWS,LOCAL.brandRows)))+
     '<div class="ex-card-b">'+
-    '<div class="ex-tblscroll" id="sc-brands">'+
-    tbl([{t:"#"},{t:"Brand"},{t:"Shows",n:1},{t:"Share of sponsored",n:1}], body, "t-brands")+
+    '<div class="ex-tblscroll wide capped" id="sc-brands">'+
+    tbl([{t:"#",w:"3.5%"},{t:"Sponsor",w:"18%"},{t:"Shows",w:"12.5%",cls:"ctr",hl:BK==="n"},
+         {t:"Share",w:"9%",cls:"ctr"},
+         {t:"Combined listeners",w:"15%",cls:"ctr",hl:BK==="reach"},
+         {t:"Median listeners",w:"14%",cls:"ctr",hl:BK==="med"},
+         {t:"Median episodes",w:"10%",cls:"ctr"},
+         {t:"Video %",w:"9.5%",cls:"ctr",hl:BK==="video"},
+         {t:"Guests %",w:"9.5%",cls:"ctr",hl:BK==="guest"}], body, "t-brands")+
     "</div>"+
     (S.money.brands.length ?
       '<p class="ex-insight">'+esc(S.money.brands[0].name)+" appears on <b>"+
@@ -3059,6 +3373,7 @@ function renderBrands(){
       esc(citeClaim(S.money.brands[0].name+" is the most frequently detected sponsor on "+
           S.meta.adjective+" podcasts"))+
       '">cite</button></p>' : "")+"</div></div>";
+  bindLocal("l-brandsort","brandSort",renderBrands);
   bindLocal("l-brandrows","brandRows",renderBrands);
   requestAnimationFrame(syncAllPairs);
 }
@@ -3098,6 +3413,80 @@ function renderComp(){
   block("c-gen","Generation",base(S.comp.genN),S.comp.gen,PAL.gen);
 }
 
+
+/* Apple first, Spotify when there is no Apple link. A row with neither shows a
+   dash rather than a dead control. */
+function listenLink(d){
+  var u = d.url || d.urlAlt || "";
+  if(!u){ return '<span class="ex-no">&ndash;</span>'; }
+  var apple = !!d.url;
+  return '<a class="ex-listen'+(apple?" apple":" spotify")+'" href="'+esc(u)+
+    '" target="_blank" rel="noopener nofollow" title="'+
+    (apple?"Listen on Apple Podcasts":"Listen on Spotify")+'">'+
+    (apple?"Apple":"Spotify")+"</a>";
+}
+
+function renderNetworks(){
+  var SORTS=[["n","Show count"],["reach","Combined reach"],["med","Median listeners"],
+             ["spon","Sponsored share"],["guest","Guest share"]];
+  var ROWS=[["12","Top 12"],["25","Top 25"],["50","Top 50"]];
+  var K=LOCAL.netSort;
+  var all=sortRows(S.networks,K);
+  var rows=all.slice(0,parseInt(LOCAL.netRows,10));
+  var maxNK=Math.max.apply(null,rows.map(function(d){ return nz(d[K]); }).concat([1]));
+  var NBAR={n:1, reach:1, med:1};
+  function ncell(d,key,txt){
+    if(key!==K){ return td(txt,"ctr"); }
+    return NBAR[key] ? td(miniMeter(d[K],maxNK,txt),"mt hl") : td(txt,"ctr hl");
+  }
+  reg("networks",["Rank","Network","Shows","Share of shows with a network %","Combined monthly listeners",
+                  "Median monthly listeners","Median episodes","Contacts %","Video %",
+                  "Sponsored %","Guests %"],
+      all.map(function(d,i){
+        return [i+1,d.name,d.n,d.share,d.reach,d.med,d.eps,d.contact,d.video,d.spon,d.guest]; }),
+      "Popular networks");
+  var body=rows.map(function(d,i){
+    return [td(String(i+1),"dim"), td("<b>"+esc(d.name)+"</b>"),
+            ncell(d,"n",fmtInt(d.n)),
+            ncell(d,"reach",fmtRange(d.reach)),
+            ncell(d,"med",fmtRange(d.med)),
+            td(fmtInt(d.eps),"ctr"),
+            td(pct1(d.contact),"ctr"),
+            td(pct1(d.video),"ctr"),
+            ncell(d,"spon",pct1(d.spon)),
+            ncell(d,"guest",pct1(d.guest))];
+  });
+  var byReach=all.slice().sort(function(a,b){ return nz(b.reach)-nz(a.reach); })[0];
+  var byCount=all.slice().sort(function(a,b){ return nz(b.n)-nz(a.n); })[0];
+  el("c-networks").innerHTML =
+    '<div class="ex-card" data-figid="networks">'+
+    panelHead("networks","Podcast networks and producers",
+      "Network is on record for "+pct1(S.netMeta.knownShare)+" of the catalog, across "+
+      fmtInt(S.netMeta.distinct)+" named networks. Only those with three shows or more are "+
+      "listed, which is "+fmtInt(S.netMeta.threePlus)+" of them.",
+      localTools(ctl("l-netsort","Rank by",SORTS,LOCAL.netSort)+
+                 ctl("l-netrows","Rows",ROWS,LOCAL.netRows)))+
+    '<div class="ex-card-b"><div class="ex-tblscroll wide capped" id="sc-networks">'+
+    tbl([{t:"#",w:"3.5%"},{t:"Network",w:"18%"},{t:"Shows",w:"11.5%",cls:"ctr",hl:K==="n"},
+         {t:"Combined listeners",w:"14%",cls:"ctr",hl:K==="reach"},
+         {t:"Median listeners",w:"13%",cls:"ctr",hl:K==="med"},
+         {t:"Median episodes",w:"10%",cls:"ctr"},
+         {t:"Contacts %",w:"9%",cls:"ctr"},{t:"Video %",w:"8%",cls:"ctr"},
+         {t:"Sponsored %",w:"7%",cls:"ctr",hl:K==="spon"},
+         {t:"Guests %",w:"7%",cls:"ctr",hl:K==="guest"}], body, "t-networks")+"</div>"+
+    (all.length ?
+      '<p class="ex-insight">Show count and combined reach rank differently: <b>'+
+      esc(byCount.name)+"</b> carries the largest roster at <b>"+fmtInt(byCount.n)+
+      "</b> shows, while <b>"+esc(byReach.name)+"</b> reaches the most listeners at <b>"+
+      fmtRange(byReach.reach)+"</b>. A long roster of small shows is a syndication feed; a short "+
+      "roster with high combined reach is a commercial network."+
+      ' <button class="ex-mini" type="button" data-cite="'+
+      esc(citeClaim(byReach.name+" is the highest-reaching "+S.meta.adjective+" podcast network"))+
+      '">cite</button></p>' : "")+"</div></div>";
+  bindLocal("l-netsort","netSort",renderNetworks);
+  bindLocal("l-netrows","netRows",renderNetworks);
+}
+
 function renderLead(){
   var SORTS=[["reach","Monthly listeners"],["eps","Episode count"],
              ["rating","Apple rating"],["reviews","Apple reviews"]];
@@ -3105,27 +3494,48 @@ function renderLead(){
   var key=LOCAL.leadSort;
   var rows=sortRows(S.lead,key).slice(0,parseInt(LOCAL.leadRows,10));
   var maxV=Math.max.apply(null,rows.map(function(d){ return d[key]||0; }).concat([1]));
-  var maxR=Math.max.apply(null,rows.map(function(d){ return d.reach||0; }).concat([1]));
+  var maxK=Math.max.apply(null,rows.map(function(d){ return nz(d[key]); }).concat([1]));
   var body=rows.map(function(d,i){
     var place=(d.city||d.region||"");
     /* the reach column is the point of this table, so it gets a track and the
        value on the same baseline instead of a number with a bar tucked under */
-    var meter='<div class="ex-meter"><span class="t"><i style="width:'+
-      Math.max(2,(d.reach||0)/maxR*100).toFixed(1)+'%"></i></span>'+
-      '<span class="v">'+fmtRange(d.reach)+"</span></div>";
+    function lcell(k2,txt){
+      return (k2===key) ? td(miniMeter(d[k2],maxK,txt),"mt hl") : td(txt,"ctr");
+    }
+    /* a tick beats a word here: three flag columns stay scannable */
+    function flag(on){ return on?'<span class="ex-yes">&#10003;</span>'
+                               :'<span class="ex-no">&ndash;</span>'; }
     return [td('<span class="ex-rank'+(i<3?" top":"")+'">'+(i+1)+"</span>","rk"),
             td("<b>"+esc(d.title)+"</b>"+(place?'<span class="ex-place">'+esc(place)+"</span>":"")),
-            td(meter,"mt"+(key==="reach"?" hl":"")),
-            td(fmtInt(d.eps),"n"+(key==="eps"?" hl":"")),
-            td(d.rating===null||d.rating===undefined?"-":'<span class="ex-star">'+nz(d.rating).toFixed(1)+"</span>",
-               "n"+(key==="rating"?" hl":"")),
-            td(fmtRange(d.reviews),"n"+(key==="reviews"?" hl":""))];
+            lcell("reach",fmtRange(d.reach)),
+            lcell("eps",fmtInt(d.eps)),
+            (key==="rating"
+              ? td(miniMeter(d.rating,maxK,(d.rating==null?"-":nz(d.rating).toFixed(1))),"mt hl")
+              : td(d.rating==null?"-":'<span class="ex-star">'+nz(d.rating).toFixed(1)+"</span>","ctr")),
+            lcell("reviews",fmtRange(d.reviews)),
+            td(esc(d.lang||"-"),"ctr dim"),
+            td(d.network?esc(d.network):'<span class="ex-no">Independent</span>',"ctr dim"),
+            td(flag(d.video),"ctr"),
+            td(flag(d.guest),"ctr"),
+            /* The tip goes on the CELL, not the tick. The glyph is about ten
+               pixels across, so hovering it means hitting a target most people
+               miss, and they conclude nothing happens. The unsponsored side
+               answers too, otherwise hovering there also looks broken. */
+            '<td class="ctr sponcell" data-tip="'+
+              (d.spon
+                ? esc("Sponsors detected\n"+(d.sponsors||"Brand names not recorded"))
+                : esc("No sponsors detected\nNo brand activity found in this show's episodes"))+
+              '">'+(d.spon?'<span class="ex-yes">&#10003;</span>'
+                          :'<span class="ex-no">&ndash;</span>')+"</td>",
+            td(listenLink(d),"ctr")];
   });
   var label=SORTS.filter(function(o){ return o[0]===key; })[0][1];
   reg("lead",["Rank","Podcast","Monthly listeners (modeled)","Episodes","Apple rating",
-              "Apple reviews",cap(S.meta.regionWord),"City"],
+              "Apple reviews","Language","Network","On YouTube","Features guests","Has sponsors","Sponsor names","Listen URL",cap(S.meta.regionWord),"City"],
       sortRows(S.lead,key).map(function(d,i){
-        return [i+1,d.title,d.reach,d.eps,d.rating,d.reviews,d.region,d.city]; }),
+        return [i+1,d.title,d.reach,d.eps,d.rating,d.reviews,d.lang,d.network,
+                d.video?"Yes":"No",d.guest?"Yes":"No",d.spon?"Yes":"No",
+                (d.sponsors||""),(d.url||d.urlAlt||""),d.region,d.city]; }),
       "Largest podcasts");
   el("c-lead").innerHTML =
     '<div class="ex-card" data-figid="lead">'+
@@ -3135,9 +3545,16 @@ function renderLead(){
       localTools(ctl("l-leadsort","Rank by",SORTS,LOCAL.leadSort)+
                  ctl("l-leadrows","Rows",ROWS,LOCAL.leadRows)))+
     '<div class="ex-card-b">'+
-    tbl([{t:"#"},{t:"Podcast"},{t:"Monthly listeners",hl:key==="reach"},
-         {t:"Episodes",n:1,hl:key==="eps"},{t:"Rating",n:1,hl:key==="rating"},
-         {t:"Reviews",n:1,hl:key==="reviews"}], body, "t-lead")+"</div></div>";
+    '<div class="ex-tblscroll wide capped" id="sc-lead">'+
+    tbl([{t:"#",w:"5%"},{t:"Podcast",w:"16%"},
+         {t:"Monthly listeners",w:"13%",cls:"ctr",hl:key==="reach"},
+         {t:"Episodes",w:"8%",cls:"ctr",hl:key==="eps"},
+         {t:"Rating",w:"7.5%",cls:"ctr",hl:key==="rating"},
+         {t:"Reviews",w:"10%",cls:"ctr",hl:key==="reviews"},
+         {t:"Language",w:"8%",cls:"ctr"},{t:"Network",w:"11%",cls:"ctr"},
+         {t:"Video",w:"6%",cls:"ctr"},{t:"Guests",w:"6%",cls:"ctr"},
+         {t:"Sponsor",w:"6.5%",cls:"ctr"},{t:"Listen",w:"7%",cls:"ctr"}],
+        body, "t-lead")+"</div></div></div>";
   bindLocal("l-leadsort","leadSort",renderLead);
   bindLocal("l-leadrows","leadRows",renderLead);
 }
@@ -3373,18 +3790,28 @@ function initTooltips(){
     tip.innerHTML='<b>'+esc(parts[0])+"</b>"+
       (parts.length>1?'<span>'+esc(parts.slice(1).join(" "))+"</span>":"");
     tip.hidden=false;
+    /* The theme styles .ex-charttip at opacity:0 and only reveals it via an
+       .on class. Setting hidden=false alone left it in the DOM, correctly
+       positioned, with the right text - and completely transparent. */
+    tip.classList.add("on");
   });
   document.addEventListener("mousemove",function(e){
     if(tip.hidden){ return; }
-    /* clamp so a popup near the right edge does not push the page wider */
-    var w=tip.offsetWidth||160;
+    /* position:fixed and raw client coordinates. The tooltip lives on <body>,
+       which the theme positions, so absolute + scrollY resolved against the
+       wrong origin and the popup landed at the top of the page instead of by
+       the cursor - which reads as "hovering does nothing". Fixed needs no
+       ancestor or scroll maths at all. Clamped on both axes so it never
+       widens the page or falls off the bottom. */
+    var w=tip.offsetWidth||180, h=tip.offsetHeight||44;
     var x=Math.min(e.clientX+16, window.innerWidth-w-12);
+    var y=Math.min(e.clientY-12, window.innerHeight-h-12);
     tip.style.left=Math.max(8,x)+"px";
-    tip.style.top=(e.clientY-12+window.scrollY)+"px";
+    tip.style.top=Math.max(8,y)+"px";
   });
   document.addEventListener("mouseout",function(e){
     var t=e.target.closest?e.target.closest("[data-tip]"):null;
-    if(t){ tip.hidden=true; }
+    if(t){ tip.hidden=true; tip.classList.remove("on"); }
   });
 }
 function toast(msg){
@@ -3631,7 +4058,7 @@ function boot(){
 
     renderHeadline(); renderGeography(); renderReach(); renderActivity();
     renderFormat(); renderSignals(); renderQuality(); renderMoney();
-    renderComp(); renderLead(); renderRefFacts(); renderCitations();
+    renderComp(); renderNetworks(); renderLead(); renderRefFacts(); renderCitations();
 
     el("loadState").hidden=true; el("app").hidden=false;
     initSubnav();
