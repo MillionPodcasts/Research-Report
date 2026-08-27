@@ -7,53 +7,129 @@
 <!-- ============================================================
      HOW TO MAINTAIN THIS PAGE
      ------------------------------------------------------------
-     Everything you normally need to change lives in the CONFIG
-     block below (search for "CONFIG STARTS HERE"). You should not
-     need to touch the HTML markup or the CSS to publish a report.
+     Everything you normally change lives in the CONFIG block below
+     (search for "CONFIG STARTS HERE"). You never need to touch the
+     HTML markup or the CSS to publish or edit a report.
 
+     ------------------------------------------------------------
      ADD A REPORT
-       Copy any object inside the REPORTS array, paste it as a new
-       entry, and change the values. Nothing else to do. The card,
-       the sort order, the date label and the structured data all
-       update on their own.
+       1. Scroll to the REPORTS array.
+       2. Copy any whole { ... } block, including the comma.
+       3. Paste it as a new entry and change the values.
+       4. Save. The card, the sort position, the date line, the
+          report count and the structured data all update on
+          their own.
 
-     EDIT A TITLE / DESCRIPTION / THUMBNAIL / DATE / TAG
-       Change that one field on that one object.
+     ------------------------------------------------------------
+     EDIT ONE REPORT
+       Find its { ... } block and change the one field:
 
-     REMOVE A REPORT
-       Delete its object from the REPORTS array.
+         title        the card headline. Leave the year OFF.
+         fullTitle    the real full name with the year. Search
+                      engines only, never shown on screen.
+         description  the sentence under the title.
+         url          where the card links to.
+         thumbnail    the image path, see below.
+         published    when it went live.
+         updated      when it was last revised, if ever.
+         tag          the little coloured badge.
 
+     ------------------------------------------------------------
+     THUMBNAILS
+       1. Export the image at 1200 x 675 px (16:9). Any other
+          ratio gets cropped to fit, so start at 16:9.
+       2. Name it after the report id, exactly:
+            the-uk-podcast-landscape-2026.jpg
+       3. Upload it to  /images/research/
+       4. Put the path in that report's thumbnail field:
+            thumbnail: "/images/research/the-uk-podcast-landscape-2026.jpg"
+
+       Leave thumbnail as "" and the page draws a branded fallback
+       tile instead, coloured from the report's tag. That is why a
+       report with no artwork yet still looks finished, and why a
+       broken image path can never break the layout.
+
+       To swap an image later, replace the file or change the path.
+       Nothing else needs editing.
+
+     ------------------------------------------------------------
+     DATES
+       Both are ISO format, "YYYY-MM-DD". The page turns them into
+       "June 2026" for display, so never type a display date.
+
+         published only            card reads "Published June 2026"
+         published + updated       card reads "Updated August 2026"
+
+       Reports sort newest first on whichever date applies.
+
+     ------------------------------------------------------------
      REORDER
-       Default order is newest first, by lastUpdated.
-       To pin an arrangement, add "order": 1, "order": 2 and so on.
-       Any report with an order number is placed first, in that
-       order; everything without one follows in date order.
+       Default is newest first. To pin an arrangement, add
+       "order": 1, "order": 2 and so on. Anything with an order
+       number leads, in that order; everything else follows by date.
 
-     MARK A REPORT AS FEATURED
-       Set "featured": true. It renders as the large card in the
-       Featured Research band above the grid. If no report is
-       featured, that whole band is not rendered at all.
-       Featured reports are hidden from the All Research grid so
-       they do not appear twice. To show them in both places, set
+     ------------------------------------------------------------
+     REMOVE A REPORT
+       Delete its whole { ... } block.
+
+     ------------------------------------------------------------
+     ADD AN UPCOMING ("coming soon") REPORT
+       Same one-block copy as any other report, with two changes:
+
+         1. Add   status: "upcoming"
+         2. Omit url, published and thumbnail entirely (or leave
+            them blank). It has none of those yet.
+
+       Fill in title, fullTitle, description and tag as normal. It
+       renders as a quiet, non-clickable teaser card: title,
+       description, tag badge, and a "Coming soon" label where the
+       date would be. Upcoming reports always trail the published
+       ones, are never counted in the published-report totals, are
+       never given the featured slot, and are left out of the
+       structured data.
+
+     LAUNCH AN UPCOMING REPORT
+       When it goes live, change ONE field and fill in the rest:
+
+         status: "upcoming"   ->   status: "published"
+                                   (or delete the status line, the
+                                    default is "published")
+
+       then add its url, its published date, and its thumbnail. It
+       becomes a normal clickable card automatically. Nothing else
+       needs editing anywhere on the page.
+
+       Where the upcoming logic lives, if you need it: the
+       isUpcoming() and cardMarkup() functions in the RENDERER
+       script at the bottom of the file, the published/upcoming
+       split inside render() just below them, and the
+       ".r-card--upcoming" rules in the stylesheet.
+
+     WHERE UPCOMING CARDS SIT
+       SITE.groupUpcoming controls this. false (default) trails them
+       at the end of the All Research grid; true moves them into
+       their own "Coming soon" section underneath.
+
+     ------------------------------------------------------------
+     FEATURED
+       "featured": true pulls a report out of the grid and renders
+       it as the large card in the Featured Research band above.
+       No report featured, and that band is not rendered at all.
+       To show featured reports in the grid as well, set
        SITE.showFeaturedInGrid to true.
 
-     WHERE THUMBNAILS GO
-       Path pattern:  /images/research/<id>.jpg
-       Dimensions:    1200 x 675 px  (16:9)
-       If a thumbnail is missing, empty, or fails to load, the page
-       draws a branded fallback tile from the theme colour and the
-       report title. A missing image can never break the layout,
-       so it is safe to ship a report before its artwork is ready.
-
+     ------------------------------------------------------------
      STATS STRIP
-       SITE.stats, three entries. Use the token {{count}} as a
-       value to print the live number of published reports.
+       SITE.stats. Add or remove entries freely, the strip resizes
+       itself. "{{database}}" prints SITE.databaseSize, "{{count}}"
+       prints the live number of reports.
 
+     ------------------------------------------------------------
      JOURNALIST CTA
-       SITE.pressContactUrl. It currently holds the literal
-       placeholder PRESS_CONTACT_URL. Replace it with the real
-       press or media-contact URL before this page goes live.
+       SITE.pressContactUrl. Currently the literal placeholder
+       PRESS_CONTACT_URL. Replace it before this page goes live.
 
+     ------------------------------------------------------------
      THEME
        All colours are CSS variables in the DESIGN TOKENS block at
        the top of the stylesheet. Change them there, once.
@@ -137,79 +213,121 @@ var SITE = {
 
   /* Show featured reports in the All Research grid as well as in
      the Featured band? Default false, so nothing appears twice. */
-  showFeaturedInGrid: false
+  showFeaturedInGrid: false,
+
+  /* How to lay out reports with status: "upcoming".
+       false (default) they trail the published cards in the All
+                       Research grid, which fills the row out nicely
+                       while there are only one or two of them.
+       true            they move into their own "Coming soon"
+                       section under the grid. Better once there are
+                       several. Published always leads either way. */
+  groupUpcoming: false
 };
 
 /* ---- Standard tag vocabulary ---------------------------------
    Use these values only, spelled exactly like this. Filtering UI
    is not built yet, but standardising now means it can be added
    later without restructuring anything.
-   Each tag is bound to one accent hue from the report palette so
-   a given tag always looks the same wherever it appears.
+
+   Each tag is bound to one accent hue from the report palette, so
+   a given tag always looks the same wherever it appears, and that
+   hue also colours the report's fallback thumbnail tile.
+
+   To add a new tag: add one line here with an ink/tint pair. Reuse
+   an existing pair rather than inventing a colour, the inks are
+   chosen to clear WCAG AA on their tint.
    -------------------------------------------------------------- */
 var TAGS = {
-  Industry:    { ink: "#3A4BA0", tint: "#EFF1FF" },
-  Video:       { ink: "#4A3CA6", tint: "#F0EDFE" },
-  Regional:    { ink: "#12707D", tint: "#E6F7FA" },
-  Sponsorship: { ink: "#4536A8", tint: "#EDEBFB" },
-  Audience:    { ink: "#3A4BA0", tint: "#EFF1FF" },
-  Platform:    { ink: "#4A3CA6", tint: "#F0EDFE" },
-  Creator:     { ink: "#12707D", tint: "#E6F7FA" },
-  Advertising: { ink: "#4536A8", tint: "#EDEBFB" }
+  Industry:    { ink: "#3A4BA0", tint: "#EFF1FF" },   /* deep indigo */
+  Sports:      { ink: "#3A4BA0", tint: "#EFF1FF" },   /* deep indigo */
+  Video:       { ink: "#4A3CA6", tint: "#F0EDFE" },   /* violet */
+  Platform:    { ink: "#4A3CA6", tint: "#F0EDFE" },   /* violet */
+  Regional:    { ink: "#12707D", tint: "#E6F7FA" },   /* teal */
+  Creator:     { ink: "#12707D", tint: "#E6F7FA" },   /* teal */
+  Sponsorship: { ink: "#4536A8", tint: "#EDEBFB" },   /* periwinkle */
+  Advertising: { ink: "#4536A8", tint: "#EDEBFB" },   /* periwinkle */
+  Audience:    { ink: "#4536A8", tint: "#EDEBFB" }    /* periwinkle */
 };
 
 /* ==============================================================
    REPORTS
-   One object per published report. Copy an entry to add one.
+   One object per published report. To add one, copy an entry,
+   paste it, change the values. Nothing else needs touching.
 
-   id           stable slug. NEVER change it once set, the
-                thumbnail path and the fallback tile key off it.
-   title        the report title as it should read on the card.
-   description  one or two sentences.
-   url          the report's own page on this site.
-   thumbnail    /images/research/<id>.jpg  at 1200x675 (16:9).
-                Leave "" to draw the branded fallback tile.
-   lastUpdated  ISO date "YYYY-MM-DD". The page formats it for
-                display, so never type a display date here.
-   tag          optional. One value from TAGS above.
-   featured     optional. true renders the large featured card.
-   order        optional. A number pins the arrangement and
-                overrides the newest-first date sort.
+   FIELDS
+   id          Stable slug. NEVER change it once set, the thumbnail
+               filename is keyed off it.
+   title       What shows ON THE CARD. Leave the year OFF, the date
+               line underneath already carries it.
+   fullTitle   Optional. The report's real, full name including the
+               year. Used for search engines and structured data
+               only, never displayed. Falls back to title if absent.
+   description One or two sentences.
+   url         Full link to the report's own page.
+   thumbnail   "/images/research/<id>.jpg" at 1200x675 (16:9).
+               Leave "" to draw the branded fallback tile instead.
+   published   ISO date "YYYY-MM-DD". Shows as "Published June 2026".
+   updated     Optional ISO date. When set and different from
+               published, the card shows "Updated August 2026"
+               instead, and the report sorts by this date.
+   tag         Optional. One value from TAGS above.
+   status      Optional. "published" (the default when absent) or
+               "upcoming" for research not released yet. An upcoming
+               entry needs no url, published date or thumbnail.
+   featured    Optional. true renders the large featured card.
+               Ignored on upcoming entries.
+   order       Optional. A number pins the arrangement and overrides
+               the date sort.
    ============================================================== */
 var REPORTS = [
 
   {
     id: "the-uk-podcast-landscape-2026",
-    title: "The UK Podcast Landscape 2026",
+    title: "The UK Podcast Landscape",
+    fullTitle: "The UK Podcast Landscape 2026",
     description: "An analysis of 6,693 active UK podcasts covering market concentration, publishers, monetisation, and the video shift.",
     url: "https://www.millionpodcasts.com/research/the-uk-podcast-landscape-2026",
     thumbnail: "",                 // PLACEHOLDER -> /images/research/the-uk-podcast-landscape-2026.jpg
-    lastUpdated: "2026-08-01",     // CONFIRM. First covered by the trade press in June 2026 at the
-                                   // old 5,400 base; the page was revised in August to the 6,693
-                                   // base. August is right for "last updated", June for "published".
+    published: "2026-06-01",       // CONFIRM. Trade coverage dates first pickup to June 2026.
+    updated: "2026-08-01",         // Page revised in August to the 6,693 base. Card reads "Updated".
     tag: "Regional"
   },
 
   {
     id: "the-nba-podcast-ecosystem-2026",
-    title: "The NBA Podcast Ecosystem 2026",
+    title: "The NBA Podcast Ecosystem",
+    fullTitle: "The NBA Podcast Ecosystem 2026",
     description: "An analysis of 2,215 active NBA podcasts covering sponsorship, network effects, and team-level audiences.",
     url: "https://www.millionpodcasts.com/research/the-nba-podcast-ecosystem-2026",
     thumbnail: "",                 // PLACEHOLDER -> /images/research/the-nba-podcast-ecosystem-2026.jpg
-    lastUpdated: "2026-06-11",     // Matches the published date printed on the report page itself.
-    tag: "Sponsorship"
+    published: "2026-06-11",       // Matches the published date printed on the report page itself.
+    tag: "Sports"
   },
 
   {
     id: "the-state-of-video-podcasting-2026",
-    title: "The State of Video Podcasting 2026",
+    title: "The State of Video Podcasting",
+    fullTitle: "The State of Video Podcasting 2026",
     description: "An analysis of 34,208 active video podcasts covering platform distribution, monetisation, and audience concentration.",
     url: "https://www.millionpodcasts.com/research/the-state-of-video-podcasting-2026",
     thumbnail: "",                 // PLACEHOLDER -> /images/research/the-state-of-video-podcasting-2026.jpg
-    lastUpdated: "2026-05-12",     // CONFIRM. Trade coverage dates first pickup to May 2026, not
-                                   // July as previously guessed here.
+    published: "2026-05-12",       // CONFIRM. Trade coverage dates first pickup to May 2026.
     tag: "Video",
     featured: true                 // DEMONSTRATION ONLY, choose the real featured report
+  },
+
+  /* --- Not published yet. Renders as a quiet, non-clickable teaser
+         card. To launch it: change status to "published", add url,
+         published and thumbnail. Nothing else. --- */
+  {
+    id: "the-australia-podcast-landscape-2026",
+    title: "The Australia Podcast Landscape",
+    fullTitle: "The Australia Podcast Landscape 2026",
+    description: "An analysis of the Australian podcast market: concentration, publishers, monetisation, and the video shift.",  // PLACEHOLDER copy
+    tag: "Regional",
+    status: "upcoming"
+    // no url, no published date, no thumbnail yet
   }
 
 ];
@@ -247,6 +365,13 @@ var REPORTS = [
   --mp-periwinkle:      #7C6CF0;   /* secondary accent */
   --mp-violet:          #5B4BD1;   /* tertiary accent */
   --mp-teal:            #2DB6C9;   /* quaternary accent */
+
+  /* Amber, used only for the "Coming soon" status pill. Built on the
+     system's existing Upgrade Button BG so it stays in family. */
+  --mp-amber-bg:        #FFF3C4;   /* pill fill */
+  --mp-amber-line:      #F2DC94;   /* pill border */
+  --mp-amber-ink:       #7A5200;   /* pill text, 6.22:1 on the fill */
+  --mp-amber-dot:       #E0A008;   /* pill dot */
 
   /* Signature treatment from the report palette */
   --mp-grad: linear-gradient(90deg,#5E77FB 0%,#7C6CF0 50%,#22B8CF 100%);
@@ -292,6 +417,9 @@ var REPORTS = [
   .serif{font-family:'Fraunces', Georgia, serif}
   .mono{font-family:'JetBrains Mono', monospace}
   h1,h2,h3,h4{font-family:'Fraunces', Georgia, serif;font-weight:500;letter-spacing:-.01em}
+  /* Fraunces ships old-style figures by default, which makes digits sit
+     at different heights. Force lining figures on every heading. */
+  h1,h2,h3,h4,.serif{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1}
   h1{font-size: clamp(54px, 8vw, 128px); line-height:.92; letter-spacing:-.04em; font-weight:400}
   h2{font-size: clamp(34px, 4.2vw, 60px); line-height:1.02; letter-spacing:-.025em; font-weight:500}
   h3{font-size: clamp(22px, 2.4vw, 30px); line-height:1.15; letter-spacing:-.015em}
@@ -726,22 +854,32 @@ var REPORTS = [
   color: var(--mp-heading);
   max-width: 15ch;
   margin: 0 auto;
+  text-wrap: balance;
 }
 .rx-hero p{
   margin: 20px auto 0;
-  max-width: 600px;
+  max-width: 660px;
   font-size: 17px;
   line-height: 1.55;
   color: var(--mp-paragraph);
+  text-wrap: balance;
 }
 /* Homepage pattern: key figures bolded inside body copy */
-.rx-hero p strong{ color: var(--mp-heading); font-weight: 600; }
+.rx-hero p strong{
+  color: var(--mp-heading); font-weight: 600;
+  font-variant-numeric: lining-nums;
+}
 @media (max-width: 768px){ .rx-hero{ padding: 104px 0 4px; } }
 
 /* ---- Stats strip ----
+   Matches the homepage counts row: bold Inter numerals with the
+   unit letter in primary blue, sentence-case grey labels beneath.
    Column count is set from the config at render time, so the strip
    sizes itself to however many stats are listed. ---- */
-.rx-stats{ padding: 34px 0 38px; }
+.rx-stats{
+  padding: 32px 0 34px;
+  border-top: 1px solid var(--mp-border);
+}
 .rx-stats-inner{
   display: grid;
   grid-template-columns: repeat(var(--stat-cols, 3), minmax(0, 1fr));
@@ -749,22 +887,32 @@ var REPORTS = [
   text-align: center;
 }
 .rx-stat-value{
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: clamp(24px, 2.7vw, 33px); font-weight: 500;
-  letter-spacing: -.025em; line-height: 1.05;
+  /* Inter, not Fraunces. Fraunces renders old-style figures, so
+     digits sit at different heights and the number looks uneven.
+     lining-nums keeps every digit the same height either way. */
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(26px, 2.7vw, 34px);
+  font-weight: 700;
+  letter-spacing: -.02em; line-height: 1.15;
   color: var(--mp-heading);
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
+/* Unit suffix (M, K, +) picks up the brand blue, as on the homepage */
+.rx-stat-value .u{ color: var(--mp-primary); }
 .rx-stat-label{
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--mp-secondary); margin-top: 9px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px; font-weight: 400;
+  letter-spacing: 0; text-transform: none;
+  color: var(--mp-paragraph); margin-top: 5px;
 }
 @media (max-width: 860px){
-  .rx-stats{ padding: 28px 0 32px; }
+  .rx-stats{ padding: 26px 0 28px; }
   .rx-stats-inner{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 14px; }
 }
 @media (max-width: 520px){
   .rx-stats-inner{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rx-stat-label{ font-size: 12.5px; }
 }
 
 /* ---- Section heads ---- */
@@ -839,22 +987,16 @@ var REPORTS = [
 .r-tile{
   position: absolute; inset: 0; z-index: 1;
   display: flex; flex-direction: column; justify-content: space-between;
-  padding: 18px 20px;
+  padding: 20px 22px;
   background-color: var(--tile);
   background-image: radial-gradient(120% 100% at 100% 0%, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 60%);
 }
-.r-tile-motif{ display: flex; align-items: flex-end; gap: 5px; height: 34px; }
-.r-tile-motif i{ display: block; width: 7px; border-radius: 2px; background: rgba(255,255,255,.42); }
-.r-tile-title{
-  font-family: 'Fraunces', Georgia, serif;
-  font-weight: 500; color: #FFFFFF;
-  font-size: clamp(19px, 2vw, 24px); line-height: 1.14; letter-spacing: -.015em;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-}
+.r-tile-motif{ display: flex; align-items: flex-end; gap: 6px; height: 46px; }
+.r-tile-motif i{ display: block; width: 8px; border-radius: 2px; background: rgba(255,255,255,.40); }
 .r-tile-mark{
   font-family: 'JetBrains Mono', monospace;
   font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
-  color: rgba(255,255,255,.82); margin-top: 10px;
+  color: rgba(255,255,255,.85);
 }
 
 /* Card body */
@@ -893,6 +1035,59 @@ var REPORTS = [
 .r-cue i{ font-style: normal; transition: transform .18s ease; }
 .r-card:hover .r-cue i{ transform: translateX(4px); }
 
+/* ---- Upcoming (not yet published) card ----
+   Rendered as a <div>, not an <a>, so there is nothing to click and
+   nothing in the tab order.
+
+   Same white surface and same thumbnail treatment as a published
+   card. What marks it out is the amber "Coming soon" pill where the
+   date and read cue would be, plus a dashed outline in place of the
+   solid one. Everything that says LIVE is withheld: no gradient cap,
+   no shadow, no hover lift, no read cue. */
+.r-card--upcoming{
+  background: var(--mp-white);
+  border: 1px dashed rgba(94,119,251,.55);
+  box-shadow: none;
+  cursor: default;
+}
+.r-card--upcoming::before{ display: none; }        /* no gradient cap */
+.r-card--upcoming:hover{
+  transform: none; box-shadow: none;
+  border-color: rgba(94,119,251,.55);
+}
+.r-card--upcoming .r-thumb{
+  border-bottom: 1px dashed rgba(94,119,251,.55);
+}
+.r-card--upcoming .r-foot{
+  padding-top: 14px;
+  border-top: 1px dashed rgba(94,119,251,.55);
+}
+/* The one warm element on an otherwise all-blue page, which is what
+   makes it read as forthcoming at a glance. */
+.r-soon{
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mp-amber-ink);
+  background: var(--mp-amber-bg);
+  border: 1px solid var(--mp-amber-line);
+  border-radius: 999px;
+  padding: 6px 13px 6px 11px;
+}
+/* A slow pulse on the dot, so the card reads as work in progress
+   rather than something switched off. Stopped under
+   prefers-reduced-motion by the rule at the end of the sheet. */
+.r-soon::before{
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--mp-amber-dot); flex: 0 0 auto;
+  animation: rxSoonPulse 2.6s ease-in-out infinite;
+}
+@keyframes rxSoonPulse{
+  0%, 100%{ opacity: 1;   transform: scale(1); }
+  50%     { opacity: .35; transform: scale(.78); }
+}
+
 /* ---- Featured card ----
    On desktop this runs the full width of the grid, with the image
    column at roughly two card-widths and the copy at one. Under
@@ -904,10 +1099,10 @@ var REPORTS = [
 .r-card--featured .r-body{ padding: 34px 36px; justify-content: center; }
 .r-card--featured .r-title{ font-size: clamp(25px, 2.6vw, 34px); line-height: 1.12; }
 .r-card--featured .r-desc{ font-size: 15.5px; margin-top: 12px; -webkit-line-clamp: 4; }
-.r-card--featured .r-tile-title{ font-size: clamp(24px, 2.8vw, 36px); }
-.r-card--featured .r-tile{ padding: 26px 30px; }
-.r-card--featured .r-tile-motif{ height: 48px; }
-.r-card--featured .r-tile-motif i{ width: 9px; }
+.r-card--featured .r-tile{ padding: 30px 34px; }
+.r-card--featured .r-tile-motif{ height: 78px; gap: 9px; }
+.r-card--featured .r-tile-motif i{ width: 12px; }
+.r-card--featured .r-tile-mark{ font-size: 10.5px; }
 @media (max-width: 860px){
   .r-card--featured{ flex-direction: column; }
   .r-card--featured .r-thumb{
@@ -969,6 +1164,7 @@ var REPORTS = [
   html{ scroll-behavior: auto; }
   *, *::before, *::after{
     animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: .001ms !important;
   }
 }
@@ -1147,6 +1343,17 @@ var REPORTS = [
       <div class="r-grid" id="rxGrid"></div>
     </section>
 
+    <!-- Coming soon. Only rendered when SITE.groupUpcoming is true
+         AND at least one report has status: "upcoming". By default
+         upcoming cards trail the All Research grid instead. -->
+    <section class="rx-sec" id="rxUpcomingSection" hidden>
+      <div class="rx-sec-head">
+        <h2>Coming soon</h2>
+        <span class="rx-sec-rule" aria-hidden="true"></span>
+      </div>
+      <div class="r-grid" id="rxUpcomingGrid"></div>
+    </section>
+
     <!-- For journalists -->
     <section class="rx-press" aria-labelledby="rxPressHeading">
       <div>
@@ -1237,7 +1444,23 @@ var REPORTS = [
     return (tag && TAGS[tag]) ? TAGS[tag] : DEFAULT_TAG_THEME;
   }
 
-  /* Sort: pinned "order" values first, then newest lastUpdated first. */
+  /* The date a report sorts and displays by: its update date when it
+     has one, otherwise its publication date. */
+  function effectiveDate(report){
+    return report.updated || report.published || "";
+  }
+
+  /* The line under each card. "Updated August 2026" when the report
+     has been revised since publication, otherwise "Published June
+     2026". No wordmark here, the thumbnail already carries it. */
+  function dateLabel(report){
+    var wasUpdated = report.updated && report.updated !== report.published;
+    var display = formatDate(wasUpdated ? report.updated : report.published);
+    if(!display){ return ""; }
+    return (wasUpdated ? "Updated " : "Published ") + display;
+  }
+
+  /* Sort: pinned "order" values first, then newest first. */
   function sortReports(list){
     return list.slice().sort(function(a, b){
       var aPinned = typeof a.order === "number";
@@ -1245,32 +1468,47 @@ var REPORTS = [
       if(aPinned && bPinned){ return a.order - b.order; }
       if(aPinned){ return -1; }
       if(bPinned){ return 1; }
-      return String(b.lastUpdated || "").localeCompare(String(a.lastUpdated || ""));
+      return String(effectiveDate(b)).localeCompare(String(effectiveDate(a)));
     });
   }
 
   /* Branded fallback tile: theme colour keyed to the report's tag,
-     plus the report title and a small data motif. Always rendered,
-     and sits behind the <img> so a missing or broken image simply
-     reveals it instead of breaking the card. */
+     the wordmark, and a small data motif whose bar heights are
+     derived from the report id so no two tiles look identical.
+     The report title is deliberately NOT printed here, it would
+     repeat the card title sitting directly underneath it.
+     Always rendered, and sits behind the <img>, so a missing or
+     broken image simply reveals it instead of breaking the card. */
   function tileMarkup(report){
-    var heights = [40, 66, 52, 88, 72];   /* small bar motif */
-    var bars = heights.map(function(h){
-      return '<i style="height:' + h + '%"></i>';
-    }).join("");
+    var seed = 0, id = String(report.id || "");
+    for(var i = 0; i < id.length; i++){ seed = (seed * 31 + id.charCodeAt(i)) % 9973; }
+    var bars = "";
+    for(var b = 0; b < 6; b++){
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      bars += '<i style="height:' + (26 + (seed % 70)) + '%"></i>';
+    }
     return '' +
-      '<div class="r-tile" style="--tile:' + esc(tagTheme(report.tag).ink) + '">' +
+      '<div class="r-tile" style="--tile:' + esc(tagTheme(report.tag).ink) +
+        ';--tile-soft:' + esc(tagTheme(report.tag).tint) + '">' +
         '<div class="r-tile-motif" aria-hidden="true">' + bars + '</div>' +
-        '<div>' +
-          '<div class="r-tile-title">' + esc(report.title) + '</div>' +
-          '<div class="r-tile-mark">MillionPodcasts Research</div>' +
-        '</div>' +
+        '<div class="r-tile-mark">MillionPodcasts Research</div>' +
       '</div>';
+  }
+
+  /* ============================================================
+     UPCOMING LOGIC LIVES HERE (and in the .r-card--upcoming CSS,
+     and in render() below where the two groups are split).
+     A report with status: "upcoming" renders as a <div>, not an
+     <a>, so there is no href, no pointer cursor, nothing to click
+     and nothing in the tab order.
+     ============================================================ */
+  function isUpcoming(report){
+    return report.status === "upcoming";
   }
 
   function cardMarkup(report, isFeatured){
     var theme = tagTheme(report.tag);
-    var dateLabel = formatDate(report.lastUpdated);
+    var upcoming = isUpcoming(report);
     var image = report.thumbnail
       ? '<img src="' + esc(report.thumbnail) + '" alt="' + esc(IMAGE_ALT) + '"' +
         ' loading="lazy" decoding="async"' +
@@ -1282,24 +1520,39 @@ var REPORTS = [
         ';--tag-tint:' + esc(theme.tint) + '">' + esc(report.tag) + '</span>'
       : "";
 
-    var meta = dateLabel
-      ? '<div class="r-meta">' + esc(dateLabel) + ' &middot; MillionPodcasts Research</div>'
-      : '<div class="r-meta">MillionPodcasts Research</div>';
+    /* Published cards get a date line and a read cue. Upcoming cards
+       get a "Coming soon" label in place of both. */
+    var foot;
+    if(upcoming){
+      foot = '<div class="r-foot"><span class="r-soon">Coming soon</span></div>';
+    } else {
+      var dateLine = dateLabel(report);
+      foot = '<div class="r-foot">' +
+        (dateLine ? '<div class="r-meta">' + esc(dateLine) + '</div>' : "") +
+        '<span class="r-cue">Read research <i aria-hidden="true">&rarr;</i></span>' +
+      '</div>';
+    }
 
-    return '' +
-      '<a class="r-card' + (isFeatured ? " r-card--featured" : "") + '"' +
-        ' href="' + esc(report.url) + '" data-report-id="' + esc(report.id) + '">' +
-        '<div class="r-thumb">' + tileMarkup(report) + image + '</div>' +
-        '<div class="r-body">' +
-          tag +
-          '<h3 class="r-title">' + esc(report.title) + '</h3>' +
-          '<p class="r-desc">' + esc(report.description) + '</p>' +
-          '<div class="r-foot">' +
-            meta +
-            '<span class="r-cue">Read research <i aria-hidden="true">&rarr;</i></span>' +
-          '</div>' +
-        '</div>' +
-      '</a>';
+    var inner = '' +
+      '<div class="r-thumb">' + tileMarkup(report) + image + '</div>' +
+      '<div class="r-body">' +
+        tag +
+        '<h3 class="r-title">' + esc(report.title) + '</h3>' +
+        '<p class="r-desc">' + esc(report.description) + '</p>' +
+        foot +
+      '</div>';
+
+    var classes = "r-card" +
+      (isFeatured ? " r-card--featured" : "") +
+      (upcoming ? " r-card--upcoming" : "");
+
+    /* A div, not a link. Inert to clicks and to the keyboard. */
+    if(upcoming){
+      return '<div class="' + classes + '" aria-disabled="true"' +
+        ' data-report-id="' + esc(report.id) + '">' + inner + '</div>';
+    }
+    return '<a class="' + classes + '" href="' + esc(report.url) + '"' +
+      ' data-report-id="' + esc(report.id) + '">' + inner + '</a>';
   }
 
   /* ---- Stats strip ----
@@ -1314,9 +1567,17 @@ var REPORTS = [
       var value = String(stat.value)
         .replace("{{database}}", String(SITE.databaseSize))
         .replace("{{count}}", String(reportCount));
+
+      /* Split "2.7M" into "2.7" and "M" so the unit can take the
+         brand blue, the way the homepage counts row does. Values
+         with no suffix ("180") just render whole. */
+      var parts = value.match(/^([0-9][0-9.,]*)(.*)$/);
+      var figure = parts ? esc(parts[1]) : esc(value);
+      var unit = (parts && parts[2]) ? '<span class="u">' + esc(parts[2]) + '</span>' : "";
+
       return '' +
         '<div class="rx-stat">' +
-          '<div class="rx-stat-value">' + esc(value) + '</div>' +
+          '<div class="rx-stat-value">' + figure + unit + '</div>' +
           '<div class="rx-stat-label">' + esc(stat.label) + '</div>' +
         '</div>';
     }).join("");
@@ -1355,10 +1616,13 @@ var REPORTS = [
             "position": index + 1,
             "item": {
               "@type": "Report",
-              "name": report.title,
+              /* Search engines get the report's real full name, with
+                 the year, even though the card shows the short one. */
+              "name": report.fullTitle || report.title,
               "description": report.description,
               "url": absolute(report.url),
-              "datePublished": report.lastUpdated,
+              "datePublished": report.published,
+              "dateModified": report.updated || report.published,
               "publisher": { "@type": "Organization", "name": "MillionPodcasts" }
             }
           };
@@ -1384,16 +1648,26 @@ var REPORTS = [
     }
   }
 
-  /* ---- Boot ---- */
+  /* ---- Boot ----
+     Published and upcoming are split here. Published research always
+     leads; upcoming trails, either at the end of the grid or in its
+     own section, per SITE.groupUpcoming. */
   function render(){
     var all = sortReports(REPORTS || []);
-    var featured = all.filter(function(r){ return r.featured === true; });
-    var gridItems = SITE.showFeaturedInGrid
-      ? all
-      : all.filter(function(r){ return r.featured !== true; });
+    var published = all.filter(function(r){ return !isUpcoming(r); });
+    var upcoming  = all.filter(isUpcoming);
 
+    /* {{count}} and the section count reflect PUBLISHED research
+       only. Unreleased work never inflates that number. */
     renderDbSize();
-    renderStats(all.length);
+    renderStats(published.length);
+
+    /* Featured is drawn from published only, so an upcoming report
+       can never take the featured slot. */
+    var featured = published.filter(function(r){ return r.featured === true; });
+    var gridItems = SITE.showFeaturedInGrid
+      ? published.slice()
+      : published.filter(function(r){ return r.featured !== true; });
 
     var featuredSection = document.getElementById("rxFeaturedSection");
     var featuredHost = document.getElementById("rxFeatured");
@@ -1403,10 +1677,13 @@ var REPORTS = [
       featuredHost.innerHTML = cardMarkup(featured[0], true);
       featuredSection.hidden = false;
       if(featured.length > 1 && !SITE.showFeaturedInGrid){
-        gridItems = featured.slice(1).concat(gridItems);
-        gridItems = sortReports(gridItems);
+        gridItems = sortReports(featured.slice(1).concat(gridItems));
       }
     }
+
+    /* Upcoming cards either trail the grid or move to their own band. */
+    var upcomingInGrid = !SITE.groupUpcoming && upcoming.length > 0;
+    if(upcomingInGrid){ gridItems = gridItems.concat(upcoming); }
 
     var grid = document.getElementById("rxGrid");
     if(grid){
@@ -1415,15 +1692,29 @@ var REPORTS = [
         : '<div class="rx-empty">No research reports are published yet.</div>';
     }
 
+    var upSection = document.getElementById("rxUpcomingSection");
+    var upGrid = document.getElementById("rxUpcomingGrid");
+    if(SITE.groupUpcoming && upcoming.length && upSection && upGrid){
+      upGrid.innerHTML = upcoming.map(function(r){ return cardMarkup(r, false); }).join("");
+      upSection.hidden = false;
+    }
+
     /* Small mono count beside the All Research heading, derived from
        the config so it can never go stale. */
     var count = document.getElementById("rxCount");
     if(count){
-      count.textContent = all.length + (all.length === 1 ? " report" : " reports");
+      var label = published.length + (published.length === 1 ? " report" : " reports");
+      if(upcomingInGrid){
+        label = published.length + " published, " + upcoming.length + " coming";
+      }
+      count.textContent = label;
     }
 
     renderPressCta();
-    renderSchema(all);
+
+    /* Structured data lists published research only. An upcoming
+       report has no URL and nothing to cite yet. */
+    renderSchema(published);
   }
 
   if(document.readyState === "loading"){
