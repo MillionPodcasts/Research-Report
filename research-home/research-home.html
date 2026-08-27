@@ -1,0 +1,1438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- ============================================================
+     HOW TO MAINTAIN THIS PAGE
+     ------------------------------------------------------------
+     Everything you normally need to change lives in the CONFIG
+     block below (search for "CONFIG STARTS HERE"). You should not
+     need to touch the HTML markup or the CSS to publish a report.
+
+     ADD A REPORT
+       Copy any object inside the REPORTS array, paste it as a new
+       entry, and change the values. Nothing else to do. The card,
+       the sort order, the date label and the structured data all
+       update on their own.
+
+     EDIT A TITLE / DESCRIPTION / THUMBNAIL / DATE / TAG
+       Change that one field on that one object.
+
+     REMOVE A REPORT
+       Delete its object from the REPORTS array.
+
+     REORDER
+       Default order is newest first, by lastUpdated.
+       To pin an arrangement, add "order": 1, "order": 2 and so on.
+       Any report with an order number is placed first, in that
+       order; everything without one follows in date order.
+
+     MARK A REPORT AS FEATURED
+       Set "featured": true. It renders as the large card in the
+       Featured Research band above the grid. If no report is
+       featured, that whole band is not rendered at all.
+       Featured reports are hidden from the All Research grid so
+       they do not appear twice. To show them in both places, set
+       SITE.showFeaturedInGrid to true.
+
+     WHERE THUMBNAILS GO
+       Path pattern:  /images/research/<id>.jpg
+       Dimensions:    1200 x 675 px  (16:9)
+       If a thumbnail is missing, empty, or fails to load, the page
+       draws a branded fallback tile from the theme colour and the
+       report title. A missing image can never break the layout,
+       so it is safe to ship a report before its artwork is ready.
+
+     STATS STRIP
+       SITE.stats, three entries. Use the token {{count}} as a
+       value to print the live number of published reports.
+
+     JOURNALIST CTA
+       SITE.pressContactUrl. It currently holds the literal
+       placeholder PRESS_CONTACT_URL. Replace it with the real
+       press or media-contact URL before this page goes live.
+
+     THEME
+       All colours are CSS variables in the DESIGN TOKENS block at
+       the top of the stylesheet. Change them there, once.
+     ============================================================ -->
+
+<title>MillionPodcasts Research: Podcast Industry Data and Reports</title>
+<meta name="description" content="Original data and analysis on the global podcast industry from MillionPodcasts, powered by a database of 2.7M shows. Browse every published research report.">
+<link rel="canonical" href="https://www.millionpodcasts.com/research">
+
+<!-- NOTE: the meta/og/twitter descriptions below repeat the database
+     figure as literal text (meta tags cannot read the JS config). If you
+     change SITE.databaseSize, change it here too, in all three places. -->
+
+<!-- Open Graph / Twitter. NOTE: og:image is a PLACEHOLDER, supply a
+     1200x630 share image before launch. If the CMS already emits its
+     own og/twitter tags for this route, delete this block rather than
+     shipping two sets. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MillionPodcasts">
+<meta property="og:title" content="MillionPodcasts Research: Podcast Industry Data and Reports">
+<meta property="og:description" content="Original data and analysis on the global podcast industry from MillionPodcasts, powered by a database of 2.7M shows.">
+<meta property="og:url" content="https://www.millionpodcasts.com/research">
+<meta property="og:image" content="https://www.millionpodcasts.com/images/research/og-research-index.jpg">
+<meta property="og:image:alt" content="MillionPodcasts">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MillionPodcasts Research: Podcast Industry Data and Reports">
+<meta name="twitter:description" content="Original data and analysis on the global podcast industry from MillionPodcasts, powered by a database of 2.7M shows.">
+<meta name="twitter:image" content="https://www.millionpodcasts.com/images/research/og-research-index.jpg">
+
+<!-- Self-hosted fonts + base styles (Inter, Fraunces, JetBrains Mono) from millionpodcasts.com.
+     Do NOT swap this for a Google Fonts / CDN link, the fonts ship from here. -->
+<link href="https://www.millionpodcasts.com/research/assets/inter.css" rel="stylesheet">
+
+<script>
+/* ============================================================
+   CONFIG STARTS HERE
+   This is the single source of truth for the whole page.
+   A non-expert can publish a report by copying one object.
+   ============================================================ */
+
+/* Alt text for every logo and image on the page. House rule:
+   always the one word "MillionPodcasts", never "Million Podcasts". */
+var IMAGE_ALT = "MillionPodcasts";
+
+var SITE = {
+
+  /* ---- Journalist CTA destination ----------------------------
+     PLACEHOLDER. Replace with the real press / media contact URL
+     (a press page, or a mailto: for the media inbox).
+     Left deliberately as the literal string so it is obvious it
+     has not been set. ------------------------------------------ */
+  pressContactUrl: "PRESS_CONTACT_URL",
+
+  /* ---- Database size ------------------------------------------
+     Printed in the hero subtitle AND in the first stat, from this
+     one value, so the two can never disagree on the page.
+     Set to 2.7M to match the live homepage, which says 2.7M in its
+     hero, its stats row and its meta description. The original
+     brief said 2.8M+. Change it here once and both update. ------- */
+  databaseSize: "2.7M",
+
+  /* ---- Stats strip under the hero ----------------------------
+     Value above, small label under. The strip sizes itself to
+     however many entries are here, so add or remove freely.
+
+     These are the five real counts from the millionpodcasts.com
+     homepage, so /research reads as a continuation of it rather
+     than a separate site with different numbers.
+
+     Two tokens are available as values:
+       "{{database}}"  prints SITE.databaseSize (see above)
+       "{{count}}"     prints the live number of published reports
+     -------------------------------------------------------------- */
+  stats: [
+    { value: "{{database}}", label: "Total podcasts"     },
+    { value: "1.2M",         label: "Verified contacts"  },
+    { value: "62.1M",        label: "Episodes indexed"   },
+    { value: "180",          label: "Languages"          },
+    { value: "11.4K",        label: "Beats & categories" }
+  ],
+
+  /* Show featured reports in the All Research grid as well as in
+     the Featured band? Default false, so nothing appears twice. */
+  showFeaturedInGrid: false
+};
+
+/* ---- Standard tag vocabulary ---------------------------------
+   Use these values only, spelled exactly like this. Filtering UI
+   is not built yet, but standardising now means it can be added
+   later without restructuring anything.
+   Each tag is bound to one accent hue from the report palette so
+   a given tag always looks the same wherever it appears.
+   -------------------------------------------------------------- */
+var TAGS = {
+  Industry:    { ink: "#3A4BA0", tint: "#EFF1FF" },
+  Video:       { ink: "#4A3CA6", tint: "#F0EDFE" },
+  Regional:    { ink: "#12707D", tint: "#E6F7FA" },
+  Sponsorship: { ink: "#4536A8", tint: "#EDEBFB" },
+  Audience:    { ink: "#3A4BA0", tint: "#EFF1FF" },
+  Platform:    { ink: "#4A3CA6", tint: "#F0EDFE" },
+  Creator:     { ink: "#12707D", tint: "#E6F7FA" },
+  Advertising: { ink: "#4536A8", tint: "#EDEBFB" }
+};
+
+/* ==============================================================
+   REPORTS
+   One object per published report. Copy an entry to add one.
+
+   id           stable slug. NEVER change it once set, the
+                thumbnail path and the fallback tile key off it.
+   title        the report title as it should read on the card.
+   description  one or two sentences.
+   url          the report's own page on this site.
+   thumbnail    /images/research/<id>.jpg  at 1200x675 (16:9).
+                Leave "" to draw the branded fallback tile.
+   lastUpdated  ISO date "YYYY-MM-DD". The page formats it for
+                display, so never type a display date here.
+   tag          optional. One value from TAGS above.
+   featured     optional. true renders the large featured card.
+   order        optional. A number pins the arrangement and
+                overrides the newest-first date sort.
+   ============================================================== */
+var REPORTS = [
+
+  {
+    id: "the-uk-podcast-landscape-2026",
+    title: "The UK Podcast Landscape 2026",
+    description: "An analysis of 6,693 active UK podcasts covering market concentration, publishers, monetisation, and the video shift.",
+    url: "https://www.millionpodcasts.com/research/the-uk-podcast-landscape-2026",
+    thumbnail: "",                 // PLACEHOLDER -> /images/research/the-uk-podcast-landscape-2026.jpg
+    lastUpdated: "2026-08-01",     // CONFIRM. First covered by the trade press in June 2026 at the
+                                   // old 5,400 base; the page was revised in August to the 6,693
+                                   // base. August is right for "last updated", June for "published".
+    tag: "Regional"
+  },
+
+  {
+    id: "the-nba-podcast-ecosystem-2026",
+    title: "The NBA Podcast Ecosystem 2026",
+    description: "An analysis of 2,215 active NBA podcasts covering sponsorship, network effects, and team-level audiences.",
+    url: "https://www.millionpodcasts.com/research/the-nba-podcast-ecosystem-2026",
+    thumbnail: "",                 // PLACEHOLDER -> /images/research/the-nba-podcast-ecosystem-2026.jpg
+    lastUpdated: "2026-06-11",     // Matches the published date printed on the report page itself.
+    tag: "Sponsorship"
+  },
+
+  {
+    id: "the-state-of-video-podcasting-2026",
+    title: "The State of Video Podcasting 2026",
+    description: "An analysis of 34,208 active video podcasts covering platform distribution, monetisation, and audience concentration.",
+    url: "https://www.millionpodcasts.com/research/the-state-of-video-podcasting-2026",
+    thumbnail: "",                 // PLACEHOLDER -> /images/research/the-state-of-video-podcasting-2026.jpg
+    lastUpdated: "2026-05-12",     // CONFIRM. Trade coverage dates first pickup to May 2026, not
+                                   // July as previously guessed here.
+    tag: "Video",
+    featured: true                 // DEMONSTRATION ONLY, choose the real featured report
+  }
+
+];
+/* ============================================================
+   CONFIG ENDS HERE. Nothing below needs editing to publish.
+   ============================================================ */
+</script>
+
+<style>
+  /* ============ DESIGN TOKENS (MillionPodcasts blue theme) ============
+     Every colour on this page comes from here. Change the palette in
+     this one block and it applies throughout. */
+  :root{
+  /* ============================================================
+     MILLIONPODCASTS, DESIGN SYSTEM TOKENS
+     ============================================================ */
+  --mp-primary:         #5E77FB;   /* Primary (blue) */
+  --mp-primary-hover:   #4B5FC9;   /* Primary / Hover */
+  --mp-primary-disable: #DFE4FE;   /* Primary / Disable */
+  --mp-upgrade-bg:      #FFF8DE;   /* Upgrade Button BG */
+  --mp-error:           #F8285A;   /* Error */
+  --mp-success:         #17C653;   /* Success */
+  --mp-icons:           #B1B3B9;   /* Icons */
+  --mp-border:          #DFE4FE;   /* Border */
+  --mp-page-bg:         #FAFBFF;   /* Page Background */
+  --mp-section-sel:     #EFF1FF;   /* Section Selected */
+  --mp-heading:         #000000;   /* Headings */
+  --mp-subheading:      #333333;   /* Sub Headings */
+  --mp-paragraph:       #72727D;   /* Paragraph Text */
+  --mp-secondary:       #95959D;   /* Secondary Text */
+  --mp-white:           #FFFFFF;   /* Universal White */
+
+  /* Extended cool-tone accents (same blue-led theme) */
+  --mp-indigo:          #3A4BA0;   /* deep primary */
+  --mp-periwinkle:      #7C6CF0;   /* secondary accent */
+  --mp-violet:          #5B4BD1;   /* tertiary accent */
+  --mp-teal:            #2DB6C9;   /* quaternary accent */
+
+  /* Signature treatment from the report palette */
+  --mp-grad: linear-gradient(90deg,#5E77FB 0%,#7C6CF0 50%,#22B8CF 100%);
+  --mp-shadow-soft: 0 1px 2px rgba(40,46,82,.05), 0 12px 28px -16px rgba(40,46,82,.14);
+  --mp-shadow-lift: 0 3px 10px rgba(40,46,82,.08), 0 28px 56px -22px rgba(94,119,251,.30);
+
+  /* ---- Legacy variable names remapped onto the theme ---- */
+  --ink:        var(--mp-page-bg);     /* page background */
+  --ink-2:      var(--mp-white);       /* card surface */
+  --ink-3:      var(--mp-section-sel); /* card hover / selected */
+  --paper:      var(--mp-heading);     /* primary / heading ink */
+  --paper-2:    var(--mp-subheading);  /* sub-headings */
+  --rule:       var(--mp-border);      /* dividers */
+  --muted:      var(--mp-paragraph);   /* paragraph / muted */
+  --muted-2:    var(--mp-secondary);   /* faint labels */
+  --amber:      var(--mp-primary);     /* accent -> primary blue */
+  --amber-2:    var(--mp-primary-hover);
+  --amber-deep: var(--mp-indigo);
+  --rust:       var(--mp-periwinkle);
+  --moss:       var(--mp-success);
+  --plum:       var(--mp-violet);
+  --teal:       var(--mp-teal);
+  --line:        rgba(13,17,38,.08);
+  --line-strong: rgba(13,17,38,.14);
+  --shadow: 0 24px 60px -24px rgba(94,119,251,.22);
+}
+
+  /* ============ BASE / RESET / TYPOGRAPHY ============ */
+  *{box-sizing:border-box;margin:0;padding:0}
+  *{ -webkit-tap-highlight-color: rgba(94,119,251,.15) }
+  html{scroll-behavior:smooth}
+  body{
+    background: var(--mp-page-bg);
+    color: var(--paper);
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .serif{font-family:'Fraunces', Georgia, serif}
+  .mono{font-family:'JetBrains Mono', monospace}
+  h1,h2,h3,h4{font-family:'Fraunces', Georgia, serif;font-weight:500;letter-spacing:-.01em}
+  h1{font-size: clamp(54px, 8vw, 128px); line-height:.92; letter-spacing:-.04em; font-weight:400}
+  h2{font-size: clamp(34px, 4.2vw, 60px); line-height:1.02; letter-spacing:-.025em; font-weight:500}
+  h3{font-size: clamp(22px, 2.4vw, 30px); line-height:1.15; letter-spacing:-.015em}
+  h4{font-size: 20px; line-height:1.25}
+  h1,h2{ color: var(--mp-heading); }
+  h3,h4{ color: var(--mp-subheading); }
+  p{ color: var(--mp-paragraph); }
+  a{ color: var(--mp-primary); }
+  a:hover{ color: var(--mp-primary-hover); }
+  ::selection{ background: var(--mp-section-sel); color: var(--mp-heading); }
+
+  /* Skip link, keyboard users land on the report library directly */
+  .rx-skip{
+    position:absolute; left:-9999px; top:0; z-index:200;
+    background:var(--mp-primary); color:#fff;
+    padding:10px 16px; border-radius:0 0 8px 0;
+    font-size:14px; font-weight:600; text-decoration:none;
+  }
+  .rx-skip:focus{ left:0; color:#fff; }
+
+  /* ============ MILLIONPODCASTS HEADER ============ */
+.mp-header{
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(250,251,255,.88);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--mp-border);
+  box-shadow: 0 1px 3px rgba(40,46,82,.04);
+  /* Smooth grow/collapse for mobile menu open/close */
+  transition: height .32s cubic-bezier(.22,.61,.36,1), background .32s ease;
+}
+.mp-header-inner{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.mp-logo{ display: flex; align-items: center; flex-shrink: 0; }
+.mp-logo img{ height: 32px; width: auto; display: block; }
+.mp-nav-left{
+  display: flex; align-items: center; gap: 28px;
+  flex: 1; margin-left: 32px;
+}
+.mp-nav-left > a,
+.mp-nav-left .mp-dropdown-trigger{
+  color: var(--paper);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  text-decoration: none; letter-spacing: 0;
+  text-transform: none; cursor: pointer;
+  background: none; border: none; padding: 0;
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: color .15s ease;
+}
+.mp-nav-left > a:hover,
+.mp-nav-left .mp-dropdown-trigger:hover{ color: var(--mp-primary); }
+.mp-nav-left .mp-dropdown-trigger::after{
+  content: ''; display: inline-block;
+  width: 7px; height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  margin-left: 4px; transition: transform .2s ease;
+}
+.mp-dropdown{ position: relative; }
+.mp-dropdown-panel{
+  position: absolute; top: calc(100% + 14px); left: -20px;
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid var(--mp-border);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px -12px rgba(40,46,82,.20), 0 4px 12px rgba(40,46,82,.06);
+  padding: 18px 20px; min-width: 240px;
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s;
+  z-index: 110;
+}
+.mp-dropdown:hover .mp-dropdown-panel,
+.mp-dropdown:focus-within .mp-dropdown-panel,
+.mp-dropdown.is-open .mp-dropdown-panel{
+  opacity: 1; visibility: visible; transform: translateY(0);
+}
+.mp-dropdown:hover .mp-dropdown-trigger::after,
+.mp-dropdown.is-open .mp-dropdown-trigger::after{
+  transform: rotate(225deg) translate(2px, 2px);
+}
+.mp-dropdown-section{ padding: 6px 0; }
+.mp-dropdown-section + .mp-dropdown-section{
+  border-top: 1px solid var(--mp-border); margin-top: 6px; padding-top: 12px;
+}
+.mp-dropdown-label{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px; display: block;
+}
+.mp-dropdown-panel a{
+  display: block; padding: 7px 10px; margin: 0 -10px;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--paper); text-decoration: none;
+  transition: background .12s ease, color .12s ease;
+}
+.mp-dropdown-panel a:hover{
+  background: var(--ink-3); color: var(--mp-primary);
+}
+/* Hide link icons on desktop, they appear only inside the open mobile menu */
+.mp-dropdown-panel a .mp-link-icon{ display: none; }
+.mp-nav-right{
+  display: flex; align-items: center; gap: 18px; flex-shrink: 0;
+}
+.mp-nav-right a{
+  color: var(--paper);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  text-decoration: none; text-transform: none; letter-spacing: 0;
+  transition: color .15s ease;
+}
+.mp-nav-right a:hover{ color: var(--mp-primary); }
+.mp-cta-btn{
+  background: var(--mp-primary) !important;
+  color: #fff !important;
+  padding: 9px 18px; border-radius: 8px;
+  font-weight: 600 !important; font-size: 14px;
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 2px rgba(58,75,160,.18);
+}
+.mp-cta-btn:hover{
+  background: var(--mp-primary-hover) !important; color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(58,75,160,.32);
+}
+
+/* Mobile-only Pricing pill (sits in header row beside the toggle), hidden on desktop */
+.mp-mobile-pricing-pill{ display: none; }
+
+.mp-mobile-toggle{
+  display: none;
+  background: none; border: none; cursor: pointer;
+  padding: 8px;
+  width: 40px; height: 40px;
+  align-items: center; justify-content: center;
+}
+.mp-mobile-toggle .mp-icon-hamburger,
+.mp-mobile-toggle .mp-icon-close{
+  display: none;
+  width: 22px; height: 22px;
+  color: var(--mp-primary);
+}
+.mp-mobile-toggle .mp-icon-hamburger{ display: block; }
+
+@media (max-width: 980px){
+  /* Explicit closed-state height so the height transition to 100vh animates smoothly */
+  .mp-header{ height: 64px; }
+  /* Header row: logo | Pricing pill | hamburger/X */
+  .mp-header-inner{
+    padding: 12px 18px;
+    gap: 12px;
+  }
+  /* When menu opens, header expands to fill the viewport with a solid bg. */
+  .mp-header.is-open{
+    height: 100vh;
+    height: 100dvh;
+    background: var(--mp-page-bg);
+    overflow: hidden;
+  }
+  .mp-header.is-open .mp-header-inner{
+    height: 100%;
+    align-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mp-nav-left, .mp-nav-right{ display: none; }
+  .mp-mobile-toggle{ display: inline-flex; margin-left: 0; }
+  .mp-mobile-pricing-pill{
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: auto;
+    background: var(--mp-primary);
+    color: #fff !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    letter-spacing: 0;
+    transition: background .15s ease;
+    box-shadow: 0 1px 2px rgba(58,75,160,.18);
+  }
+  .mp-mobile-pricing-pill:hover{ background: var(--mp-primary-hover); }
+
+  /* Swap hamburger -> X when menu is open */
+  .mp-header-inner.is-open .mp-mobile-toggle .mp-icon-hamburger{ display: none; }
+  .mp-header-inner.is-open .mp-mobile-toggle .mp-icon-close{ display: block; }
+
+  /* Open menu: header row pinned at top; nav lists wrap below as full-width blocks. */
+  .mp-header-inner.is-open{
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .mp-header-inner.is-open .mp-logo            { order: 0; }
+  .mp-header-inner.is-open .mp-mobile-pricing-pill { order: 1; }
+  .mp-header-inner.is-open .mp-mobile-toggle   { order: 2; }
+  .mp-header-inner.is-open .mp-nav-left        { order: 3; flex-basis: 100%; }
+  .mp-header-inner.is-open .mp-nav-right       { order: 4; flex-basis: 100%; }
+
+  .mp-header-inner.is-open .mp-nav-left{
+    display: flex; flex-direction: column;
+    align-items: stretch; gap: 0;
+    width: calc(100% + 36px);
+    max-width: calc(100% + 36px);
+    margin: 14px -18px 0;
+    padding: 0;
+    border-top: 1px solid var(--mp-border);
+  }
+  .mp-header-inner.is-open .mp-nav-left > a,
+  .mp-header-inner.is-open .mp-nav-left .mp-dropdown-trigger{
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%;
+    padding: 16px 18px;
+    margin: 0;
+    font-size: 15px; font-weight: 500;
+    color: var(--paper);
+    border-bottom: 1px solid var(--mp-border);
+    border-radius: 0;
+    text-align: left;
+  }
+  /* Dropdown trigger chevron, clean chevron via SVG bg (recolored to primary blue) */
+  .mp-header-inner.is-open .mp-nav-left .mp-dropdown-trigger::after{
+    content: ''; width: 18px; height: 18px;
+    border: none; transform: none; margin: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235E77FB' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center;
+    background-size: 18px 18px;
+    transition: transform .2s ease;
+  }
+  .mp-header-inner.is-open .mp-dropdown.is-open .mp-dropdown-trigger::after{
+    transform: rotate(180deg);
+  }
+
+  /* Resources accordion panel, collapsed by default, opens on click */
+  .mp-header-inner.is-open .mp-dropdown-panel{
+    position: static;
+    opacity: 1; visibility: visible; transform: none;
+    box-shadow: none; border: none; border-radius: 0;
+    padding: 0; min-width: 0;
+    background: transparent;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    display: none;
+    width: 100%;
+  }
+  .mp-header-inner.is-open .mp-dropdown.is-open .mp-dropdown-panel{
+    display: block;
+    padding: 4px 18px 12px 18px;
+    border-bottom: 1px solid var(--mp-border);
+  }
+  .mp-header-inner.is-open .mp-dropdown-section{
+    padding: 8px 0;
+  }
+  .mp-header-inner.is-open .mp-dropdown-section + .mp-dropdown-section{
+    border-top: none; margin-top: 0; padding-top: 8px;
+  }
+  .mp-header-inner.is-open .mp-dropdown-label{
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: .04em; text-transform: capitalize;
+    color: var(--muted); margin: 4px 0 6px 0;
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a{
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 4px; margin: 0;
+    font-size: 14px; font-weight: 500;
+    color: var(--paper);
+    border-radius: 0;
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a:hover{
+    background: transparent; color: var(--mp-primary);
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a .mp-link-icon{
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; flex-shrink: 0;
+    color: var(--mp-primary);
+  }
+  .mp-header-inner.is-open .mp-dropdown-panel a .mp-link-icon svg{
+    width: 100%; height: 100%; display: block;
+  }
+
+  /* In-menu Pricing row (matches the bare link rows above it) */
+  .mp-header-inner.is-open .mp-nav-right{
+    display: flex; flex-direction: column;
+    align-items: stretch; gap: 0;
+    width: calc(100% + 36px);
+    max-width: calc(100% + 36px);
+    margin: 0 -18px;
+    padding: 0;
+  }
+  .mp-header-inner.is-open .mp-nav-right > a:not(.mp-cta-btn){
+    display: flex; align-items: center;
+    width: 100%;
+    padding: 16px 18px;
+    font-size: 15px; font-weight: 500;
+    color: var(--paper);
+    border-bottom: 1px solid var(--mp-border);
+  }
+  /* The Start Free Trial primary button, full-width at the bottom (36px inset) */
+  .mp-header-inner.is-open .mp-nav-right .mp-cta-btn{
+    align-self: stretch;
+    margin: 20px 36px 16px;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 15px;
+    border-radius: 8px;
+    border-bottom: none;
+  }
+}
+@media (max-width: 560px){
+  .mp-header-inner{ padding: 12px 18px; }
+  .mp-logo img{ height: 28px; }
+}
+
+  /* ============ MILLIONPODCASTS FOOTER ============ */
+.mp-footer{
+  background: var(--mp-section-sel);
+  color: var(--paper-2);
+  padding: 28px 0 22px;
+  font-family: 'Inter', sans-serif;
+  border-top: 1px solid var(--mp-border);
+}
+.mp-footer-inner{
+  max-width: 1400px; margin: 0 auto;
+  padding: 0 40px;
+  display: flex; flex-direction: column;
+  gap: 18px;
+}
+.mp-footer-row{
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 18px 32px;
+}
+.mp-footer-copyright{
+  font-size: 14px; color: var(--muted);
+  letter-spacing: 0; text-transform: none;
+  font-weight: 400; flex-shrink: 0;
+}
+.mp-footer-links{
+  display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center;
+  gap: 8px 36px; font-size: 14px; margin-left: auto;
+}
+.mp-footer-links a{
+  color: var(--paper-2); text-decoration: none;
+  transition: color .15s ease; font-weight: 400;
+}
+.mp-footer-links a:hover{ color: var(--mp-primary); }
+.mp-footer-social{
+  display: flex; align-items: center; justify-content: center;
+  gap: 22px; width: 100%;
+  padding-top: 14px;
+  border-top: 1px solid var(--mp-border);
+}
+.mp-footer-social a{
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  transition: color .15s ease, transform .15s ease;
+}
+.mp-footer-social a:hover{
+  color: var(--mp-primary); transform: translateY(-1px);
+}
+.mp-footer-social svg{
+  width: 18px; height: 18px; fill: currentColor; display: block;
+}
+@media (max-width: 980px){
+  .mp-footer-inner{ padding: 0 24px; }
+  .mp-footer-row{ flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+  .mp-footer-links{ justify-content: center; margin-left: 0; }
+}
+@media (max-width: 720px){
+  .mp-footer-inner{ padding: 0 18px; gap: 14px; }
+  .mp-footer-row{ gap: 12px 20px; }
+  .mp-footer-links{ gap: 6px 18px; font-size: 13px; }
+  .mp-footer-copyright{ font-size: 13px; }
+  .mp-footer-social{ gap: 18px; padding-top: 12px; }
+  .mp-footer-social svg{ width: 16px; height: 16px; }
+}
+@media (max-width: 480px){
+  .mp-footer{ padding: 24px 0 18px; }
+}
+
+/* ============================================================
+   RESEARCH INDEX PAGE
+   ============================================================ */
+.rx-wrap{ max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+@media (max-width: 768px){ .rx-wrap{ padding: 0 20px; } }
+
+/* ---- Hero + stats: one centred white band, capped by the
+       signature gradient hairline. Mirrors the homepage, where the
+       headline and the counts read as a single block. ---- */
+.rx-band{
+  background: var(--mp-white);
+  border-bottom: 1px solid var(--mp-border);
+  position: relative;
+}
+.rx-band::after{
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 3px; background: var(--mp-grad);
+}
+
+.rx-hero{
+  text-align: center;
+  padding: 126px 0 6px;       /* top pad clears the fixed header */
+}
+.rx-hero-eyebrow{
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--mp-primary);
+  margin-bottom: 20px;
+}
+.rx-hero-eyebrow::before{
+  content: ""; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--mp-primary); opacity: .7; flex: 0 0 auto;
+}
+.rx-hero h1{
+  font-size: clamp(38px, 5.6vw, 66px);
+  line-height: 1.02;
+  letter-spacing: -.032em;
+  font-weight: 500;
+  color: var(--mp-heading);
+  max-width: 15ch;
+  margin: 0 auto;
+}
+.rx-hero p{
+  margin: 20px auto 0;
+  max-width: 600px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--mp-paragraph);
+}
+/* Homepage pattern: key figures bolded inside body copy */
+.rx-hero p strong{ color: var(--mp-heading); font-weight: 600; }
+@media (max-width: 768px){ .rx-hero{ padding: 104px 0 4px; } }
+
+/* ---- Stats strip ----
+   Column count is set from the config at render time, so the strip
+   sizes itself to however many stats are listed. ---- */
+.rx-stats{ padding: 34px 0 38px; }
+.rx-stats-inner{
+  display: grid;
+  grid-template-columns: repeat(var(--stat-cols, 3), minmax(0, 1fr));
+  gap: 26px 16px;
+  text-align: center;
+}
+.rx-stat-value{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(24px, 2.7vw, 33px); font-weight: 500;
+  letter-spacing: -.025em; line-height: 1.05;
+  color: var(--mp-heading);
+}
+.rx-stat-label{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mp-secondary); margin-top: 9px;
+}
+@media (max-width: 860px){
+  .rx-stats{ padding: 28px 0 32px; }
+  .rx-stats-inner{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 14px; }
+}
+@media (max-width: 520px){
+  .rx-stats-inner{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---- Section heads ---- */
+/* Section heads follow the homepage rhythm: a real Fraunces heading,
+   a hairline rule, and a small mono count on the right. */
+.rx-sec{ padding-top: 54px; }
+.rx-sec-head{ display: flex; align-items: baseline; gap: 18px; margin-bottom: 24px; }
+.rx-sec-head h2{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -.02em;
+  text-transform: none;
+  color: var(--mp-heading);
+  flex-shrink: 0;
+}
+.rx-sec-rule{ flex: 1; height: 1px; background: var(--mp-border); align-self: center; }
+.rx-sec-count{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mp-secondary); flex-shrink: 0;
+}
+@media (max-width: 480px){
+  .rx-sec-head{ gap: 12px; }
+  .rx-sec-count{ display: none; }
+}
+/* Skip-link target: focusable for keyboard users, but no stray outline */
+.rx-sec[tabindex="-1"]:focus{ outline: none; }
+
+/* ---- Grid ---- */
+.r-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 1024px){ .r-grid{ grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+@media (max-width: 680px){ .r-grid{ grid-template-columns: 1fr; } }
+
+/* ---- Report card ----
+   The whole card is one <a>, so the entire surface is clickable and
+   it is reachable in one tab stop with a visible focus ring. */
+.r-card{
+  position: relative;
+  display: flex; flex-direction: column;
+  height: 100%;                      /* equal heights across the row */
+  background: var(--mp-white);
+  border: 1px solid var(--mp-border);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: var(--mp-shadow-soft);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.r-card::before{
+  content: ""; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--mp-grad); z-index: 3;
+}
+.r-card:hover{
+  transform: translateY(-3px);
+  box-shadow: var(--mp-shadow-lift);
+  border-color: var(--mp-primary-disable);
+}
+.r-card:focus-visible{ outline: 3px solid var(--mp-primary); outline-offset: 3px; }
+
+/* Thumbnail, always 16:9. The branded fallback tile sits underneath
+   the <img>, so a missing or broken image can never break layout. */
+.r-thumb{
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; background: var(--mp-section-sel);
+  border-bottom: 1px solid var(--mp-border);
+}
+.r-thumb img{
+  position: absolute; inset: 0; z-index: 2;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.r-tile{
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 18px 20px;
+  background-color: var(--tile);
+  background-image: radial-gradient(120% 100% at 100% 0%, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 60%);
+}
+.r-tile-motif{ display: flex; align-items: flex-end; gap: 5px; height: 34px; }
+.r-tile-motif i{ display: block; width: 7px; border-radius: 2px; background: rgba(255,255,255,.42); }
+.r-tile-title{
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 500; color: #FFFFFF;
+  font-size: clamp(19px, 2vw, 24px); line-height: 1.14; letter-spacing: -.015em;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.r-tile-mark{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(255,255,255,.82); margin-top: 10px;
+}
+
+/* Card body */
+.r-body{ display: flex; flex-direction: column; flex: 1; padding: 18px 20px 18px; }
+.r-tag{
+  align-self: flex-start;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px;
+  background: var(--tag-tint); color: var(--tag-ink);
+  margin-bottom: 12px;
+}
+.r-card .r-title{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 20px; font-weight: 500; line-height: 1.2; letter-spacing: -.015em;
+  color: var(--mp-heading);
+}
+.r-desc{
+  margin-top: 9px;
+  font-size: 14.5px; line-height: 1.55; color: var(--mp-paragraph);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.r-foot{ margin-top: auto; padding-top: 16px; }
+.r-meta{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--mp-secondary);
+  padding-top: 14px; border-top: 1px solid var(--mp-border);
+}
+.r-cue{
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px;
+  font-size: 13.5px; font-weight: 600; color: var(--mp-primary);
+}
+.r-cue i{ font-style: normal; transition: transform .18s ease; }
+.r-card:hover .r-cue i{ transform: translateX(4px); }
+
+/* ---- Featured card ----
+   On desktop this runs the full width of the grid, with the image
+   column at roughly two card-widths and the copy at one. Under
+   860px it reverts to an ordinary stacked single-column card. */
+.r-card--featured{ flex-direction: row; align-items: stretch; }
+.r-card--featured .r-thumb{
+  flex: 0 0 56%; border-bottom: none; border-right: 1px solid var(--mp-border);
+}
+.r-card--featured .r-body{ padding: 34px 36px; justify-content: center; }
+.r-card--featured .r-title{ font-size: clamp(25px, 2.6vw, 34px); line-height: 1.12; }
+.r-card--featured .r-desc{ font-size: 15.5px; margin-top: 12px; -webkit-line-clamp: 4; }
+.r-card--featured .r-tile-title{ font-size: clamp(24px, 2.8vw, 36px); }
+.r-card--featured .r-tile{ padding: 26px 30px; }
+.r-card--featured .r-tile-motif{ height: 48px; }
+.r-card--featured .r-tile-motif i{ width: 9px; }
+@media (max-width: 860px){
+  .r-card--featured{ flex-direction: column; }
+  .r-card--featured .r-thumb{
+    flex: none; width: 100%;
+    border-right: none; border-bottom: 1px solid var(--mp-border);
+  }
+  .r-card--featured .r-body{ padding: 18px 20px; }
+  .r-card--featured .r-title{ font-size: 22px; }
+  .r-card--featured .r-desc{ font-size: 14.5px; -webkit-line-clamp: 3; }
+}
+
+/* ---- For journalists ---- */
+.rx-press{
+  margin-top: 62px;
+  background: var(--mp-section-sel);
+  border: 1px solid var(--mp-border);
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px 28px; flex-wrap: wrap;
+}
+.rx-press-eyebrow{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 500; line-height: 1.3;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mp-indigo); margin-bottom: 7px;
+}
+.rx-press p{ font-size: 14.5px; color: var(--mp-subheading); max-width: 620px; }
+.rx-press-cta{
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--mp-primary); color: #FFFFFF !important;
+  font-size: 14px; font-weight: 600; line-height: 1;
+  padding: 12px 20px; border-radius: 10px;
+  text-decoration: none; white-space: nowrap; flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(94,119,251,.28);
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.rx-press-cta:hover{
+  background: var(--mp-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(94,119,251,.36);
+}
+.rx-press-cta:focus-visible{ outline: 3px solid var(--mp-indigo); outline-offset: 3px; }
+.rx-press-cta i{ font-style: normal; transition: transform .18s ease; }
+.rx-press-cta:hover i{ transform: translateX(3px); }
+
+/* ---- Page tail ---- */
+.rx-main{ padding-bottom: 84px; }
+
+/* Empty state, only ever seen if REPORTS is emptied */
+.rx-empty{
+  border: 1px dashed var(--mp-border); border-radius: 14px;
+  padding: 40px 24px; text-align: center;
+  font-size: 15px; color: var(--mp-paragraph);
+  background: var(--mp-white);
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *, *::before, *::after{
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<a class="rx-skip" href="#research-library">Skip to research</a>
+
+<!-- ========================= HEADER =========================
+     Shared MillionPodcasts header. Kept identical to the
+     HeaderFooter template so it stays in sync sitewide. -->
+<header class="mp-header">
+  <div class="mp-header-inner" id="mpHeaderInner">
+    <a href="https://www.millionpodcasts.com/" class="mp-logo" aria-label="MillionPodcasts Home">
+      <img src="https://cdn.millionpodcasts.com/assets/product-logo/millionpodcasts-full.svg" alt="MillionPodcasts">
+    </a>
+    <nav class="mp-nav-left" aria-label="Primary">
+      <a href="https://www.millionpodcasts.com/">Home</a>
+      <a href="https://www.millionpodcasts.com/charts">Podcast Charts</a>
+      <a href="https://www.millionpodcasts.com/about">About</a>
+      <div class="mp-dropdown" id="mpResourcesDropdown">
+        <button type="button" class="mp-dropdown-trigger" id="mpResourcesTrigger" aria-haspopup="true" aria-expanded="false" aria-controls="mpResourcesPanel">Resources</button>
+        <div class="mp-dropdown-panel" id="mpResourcesPanel" role="menu">
+          <div class="mp-dropdown-section">
+            <span class="mp-dropdown-label">Content</span>
+            <a href="https://www.millionpodcasts.com/blog/" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg></span>Blog</a>
+            <a href="https://www.millionpodcasts.com/blog/category/platform-guide" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4.5A2.5 2.5 0 0 1 4.5 2H11v18H4.5A2.5 2.5 0 0 1 2 17.5z"/><path d="M22 4.5A2.5 2.5 0 0 0 19.5 2H13v18h6.5a2.5 2.5 0 0 0 2.5-2.5z"/></svg></span>Platform Guide</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-podcasters" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="2.2"/><path d="M7.5 15.5a6 6 0 1 1 9 0"/><path d="M5 18a9 9 0 1 1 14 0"/><line x1="12" y1="20" x2="12" y2="22"/></svg></span>For Podcasters</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-advertisers/" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 15V9l2.5 4L13 9v6"/><line x1="16" y1="13" x2="18.5" y2="13"/><path d="M17 9v6"/></svg></span>For Advertisers</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-businesses" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="3" y1="12" x2="21" y2="12"/></svg></span>For Businesses</a>
+            <a href="https://www.millionpodcasts.com/blog/category/for-pr-pros" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M14 8a4 4 0 0 1 0 8"/><path d="M17 5a7 7 0 0 1 0 14"/></svg></span>For PR Pros</a>
+            <a href="https://www.millionpodcasts.com/blog/category/industry-data" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></span>Industry Data</a>
+            <!-- PARKED: drop-in Research entry for the Resources dropdown.
+                 Uncomment when you decide where /research goes in the nav,
+                 and mirror the same line into the shared site header so the
+                 two stay in sync.
+            <a href="https://www.millionpodcasts.com/research" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><line x1="8" y1="7" x2="15" y2="7"/><line x1="8" y1="11" x2="13" y2="11"/></svg></span>Research</a>
+            -->
+          </div>
+          <div class="mp-dropdown-section">
+            <span class="mp-dropdown-label">Customers</span>
+            <a href="https://www.millionpodcasts.com/customers" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 14.5 9 21 9.5 16 13.8 17.6 20 12 16.8 6.4 20 8 13.8 3 9.5 9.5 9"/></svg></span>Customer Reviews</a>
+            <a href="https://help.millionpodcasts.com" role="menuitem"><span class="mp-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.6 2.2c-.7.4-1.1 1-1.1 1.8v.5"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></span>Help Center</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="mp-nav-right">
+      <a href="https://www.millionpodcasts.com/login">Login</a>
+      <a href="https://www.millionpodcasts.com/pricing">Pricing</a>
+      <a href="https://www.millionpodcasts.com/register" class="mp-cta-btn">Start Free Trial</a>
+    </div>
+    <a href="https://www.millionpodcasts.com/pricing" class="mp-mobile-pricing-pill" aria-label="Pricing">Pricing</a>
+    <button class="mp-mobile-toggle" id="mpMobileToggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg class="mp-icon-hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      <svg class="mp-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+<script>
+(function(){
+  var dropdown   = document.getElementById('mpResourcesDropdown');
+  var trigger    = document.getElementById('mpResourcesTrigger');
+  var panel      = document.getElementById('mpResourcesPanel');
+  var headerNav  = document.getElementById('mpHeaderInner');
+  var mobileBtn  = document.getElementById('mpMobileToggle');
+
+  function closeDropdown(){
+    if(!dropdown) return;
+    dropdown.classList.remove('is-open');
+    if(trigger) trigger.setAttribute('aria-expanded', 'false');
+  }
+  function openDropdown(){
+    if(!dropdown) return;
+    dropdown.classList.add('is-open');
+    if(trigger) trigger.setAttribute('aria-expanded', 'true');
+  }
+  if(trigger){
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(dropdown.classList.contains('is-open')){ closeDropdown(); } else { openDropdown(); }
+    });
+  }
+  if(panel){ panel.addEventListener('click', function(e){ e.stopPropagation(); }); }
+  document.addEventListener('click', function(e){
+    if(dropdown && !dropdown.contains(e.target)){ closeDropdown(); }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' || e.keyCode === 27){ closeDropdown(); }
+  });
+  if(mobileBtn && headerNav){
+    var headerEl = document.querySelector('.mp-header');
+    function setOpen(open){
+      if(open){
+        headerNav.classList.add('is-open');
+        if(headerEl) headerEl.classList.add('is-open');
+      } else {
+        headerNav.classList.remove('is-open');
+        if(headerEl) headerEl.classList.remove('is-open');
+      }
+      mobileBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if(!open) closeDropdown();
+    }
+    mobileBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      setOpen(!headerNav.classList.contains('is-open'));
+    });
+    // Close mobile menu when a link inside it is tapped
+    headerNav.addEventListener('click', function(e){
+      var link = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (link && headerNav.contains(link) && headerNav.classList.contains('is-open')) {
+        setOpen(false);
+      }
+    });
+    // Close on outside tap (mobile)
+    document.addEventListener('click', function(e){
+      if (headerNav.classList.contains('is-open') &&
+          !headerNav.contains(e.target) &&
+          !mobileBtn.contains(e.target)) {
+        setOpen(false);
+      }
+    });
+    // Reset on resize back to desktop
+    window.addEventListener('resize', function(){
+      if (window.innerWidth > 980 && headerNav.classList.contains('is-open')) {
+        setOpen(false);
+      }
+    });
+  }
+})();
+</script>
+
+<!-- ========================= PAGE ========================= -->
+<main class="rx-main">
+
+  <!-- Hero + stats: one band. No logo here on purpose, the fixed
+       header already carries it. -->
+  <section class="rx-band">
+    <div class="rx-hero">
+      <div class="rx-wrap">
+        <div class="rx-hero-eyebrow">For journalists &middot; Marketers &middot; Industry professionals</div>
+        <h1>MillionPodcasts Research</h1>
+        <p>Original data and analysis on the global podcast industry, powered by a database of <strong id="rxDbSize">2.7M</strong> shows.</p>
+      </div>
+    </div>
+
+    <!-- Stats strip. Values come from SITE.stats in the config block. -->
+    <div class="rx-stats" aria-label="MillionPodcasts at a glance">
+      <div class="rx-wrap">
+        <div class="rx-stats-inner" id="rxStats"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rx-wrap">
+
+    <!-- Featured Research. Rendered only when at least one report
+         has featured: true. -->
+    <section class="rx-sec" id="rxFeaturedSection" hidden>
+      <div class="rx-sec-head">
+        <h2>Featured Research</h2>
+        <span class="rx-sec-rule" aria-hidden="true"></span>
+      </div>
+      <div id="rxFeatured"></div>
+    </section>
+
+    <!-- All Research -->
+    <section class="rx-sec" id="research-library" tabindex="-1">
+      <div class="rx-sec-head">
+        <h2>All Research</h2>
+        <span class="rx-sec-rule" aria-hidden="true"></span>
+        <span class="rx-sec-count" id="rxCount"></span>
+      </div>
+      <div class="r-grid" id="rxGrid"></div>
+    </section>
+
+    <!-- For journalists -->
+    <section class="rx-press" aria-labelledby="rxPressHeading">
+      <div>
+        <h2 class="rx-press-eyebrow" id="rxPressHeading">For journalists</h2>
+        <p>Research and data from MillionPodcasts for journalists, marketers and industry professionals.</p>
+      </div>
+      <a class="rx-press-cta" id="rxPressCta" href="PRESS_CONTACT_URL">
+        Contact the research team <i aria-hidden="true">&rarr;</i>
+      </a>
+    </section>
+
+  </div>
+</main>
+
+<!-- ========================= FOOTER =========================
+     Shared MillionPodcasts footer, plus the logo the research
+     index spec calls for. -->
+<footer class="mp-footer">
+  <div class="mp-footer-inner">
+    <div class="mp-footer-row">
+      <div class="mp-footer-copyright">&copy; 2026 MillionPodcasts. All Rights Reserved.</div>
+      <nav class="mp-footer-links" aria-label="Footer">
+        <a href="https://www.millionpodcasts.com">millionpodcasts.com</a>
+        <a href="https://www.millionpodcasts.com/podcasts-directory">Podcast Directory</a>
+        <a href="https://www.millionpodcasts.com/shows-directory">Shows Directory</a>
+        <a href="https://www.millionpodcasts.com/charts">Podcast Charts</a>
+        <a href="https://www.millionpodcasts.com/about">About</a>
+        <a href="https://www.millionpodcasts.com/blog/">Blog</a>
+        <a href="https://www.millionpodcasts.com/privacy">Privacy</a>
+        <a href="https://www.millionpodcasts.com/terms">Terms</a>
+        <a href="https://help.millionpodcasts.com">Help Center</a>
+      </nav>
+    </div>
+    <div class="mp-footer-social" aria-label="Social media">
+      <a href="https://x.com/millionpodcasts" aria-label="X (Twitter)" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/company/millionpodcasts/" aria-label="LinkedIn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/millionpodcasts/" aria-label="Instagram" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/@million-podcasts" aria-label="YouTube" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </a>
+      <a href="https://open.spotify.com/show/033vlO5t8s3AsMb0ITwREc" aria-label="Spotify" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.66.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.601-1.559.301z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   RENDERER
+   Reads SITE / TAGS / REPORTS from the config block in <head>
+   and builds the page. You should not need to edit anything
+   below to publish, edit, reorder or remove a report.
+   ============================================================ */
+(function(){
+  "use strict";
+
+  var MONTHS = ["January","February","March","April","May","June",
+                "July","August","September","October","November","December"];
+
+  var DEFAULT_TAG_THEME = { ink: "#3A4BA0", tint: "#EFF1FF" };
+
+  /* Escape anything that comes from the config before it reaches the DOM. */
+  function esc(value){
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  /* Single place that turns an ISO date into its display form.
+     Change the return line here to change every date on the page. */
+  function formatDate(iso){
+    if(!iso){ return ""; }
+    var parts = String(iso).split("-");
+    var year  = parseInt(parts[0], 10);
+    var month = parseInt(parts[1], 10);
+    if(!year || !month || month < 1 || month > 12){ return String(iso); }
+    return MONTHS[month - 1] + " " + year;   /* e.g. "August 2026" */
+  }
+
+  function tagTheme(tag){
+    return (tag && TAGS[tag]) ? TAGS[tag] : DEFAULT_TAG_THEME;
+  }
+
+  /* Sort: pinned "order" values first, then newest lastUpdated first. */
+  function sortReports(list){
+    return list.slice().sort(function(a, b){
+      var aPinned = typeof a.order === "number";
+      var bPinned = typeof b.order === "number";
+      if(aPinned && bPinned){ return a.order - b.order; }
+      if(aPinned){ return -1; }
+      if(bPinned){ return 1; }
+      return String(b.lastUpdated || "").localeCompare(String(a.lastUpdated || ""));
+    });
+  }
+
+  /* Branded fallback tile: theme colour keyed to the report's tag,
+     plus the report title and a small data motif. Always rendered,
+     and sits behind the <img> so a missing or broken image simply
+     reveals it instead of breaking the card. */
+  function tileMarkup(report){
+    var heights = [40, 66, 52, 88, 72];   /* small bar motif */
+    var bars = heights.map(function(h){
+      return '<i style="height:' + h + '%"></i>';
+    }).join("");
+    return '' +
+      '<div class="r-tile" style="--tile:' + esc(tagTheme(report.tag).ink) + '">' +
+        '<div class="r-tile-motif" aria-hidden="true">' + bars + '</div>' +
+        '<div>' +
+          '<div class="r-tile-title">' + esc(report.title) + '</div>' +
+          '<div class="r-tile-mark">MillionPodcasts Research</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function cardMarkup(report, isFeatured){
+    var theme = tagTheme(report.tag);
+    var dateLabel = formatDate(report.lastUpdated);
+    var image = report.thumbnail
+      ? '<img src="' + esc(report.thumbnail) + '" alt="' + esc(IMAGE_ALT) + '"' +
+        ' loading="lazy" decoding="async"' +
+        ' onerror="this.style.display=\'none\'">'
+      : "";
+
+    var tag = report.tag
+      ? '<span class="r-tag" style="--tag-ink:' + esc(theme.ink) +
+        ';--tag-tint:' + esc(theme.tint) + '">' + esc(report.tag) + '</span>'
+      : "";
+
+    var meta = dateLabel
+      ? '<div class="r-meta">' + esc(dateLabel) + ' &middot; MillionPodcasts Research</div>'
+      : '<div class="r-meta">MillionPodcasts Research</div>';
+
+    return '' +
+      '<a class="r-card' + (isFeatured ? " r-card--featured" : "") + '"' +
+        ' href="' + esc(report.url) + '" data-report-id="' + esc(report.id) + '">' +
+        '<div class="r-thumb">' + tileMarkup(report) + image + '</div>' +
+        '<div class="r-body">' +
+          tag +
+          '<h3 class="r-title">' + esc(report.title) + '</h3>' +
+          '<p class="r-desc">' + esc(report.description) + '</p>' +
+          '<div class="r-foot">' +
+            meta +
+            '<span class="r-cue">Read research <i aria-hidden="true">&rarr;</i></span>' +
+          '</div>' +
+        '</div>' +
+      '</a>';
+  }
+
+  /* ---- Stats strip ----
+     Supports two tokens in a value: {{database}} and {{count}}.
+     The column count is written to CSS so the strip fits whatever
+     number of stats the config lists. */
+  function renderStats(reportCount){
+    var host = document.getElementById("rxStats");
+    if(!host || !SITE.stats){ return; }
+    host.style.setProperty("--stat-cols", String(SITE.stats.length));
+    host.innerHTML = SITE.stats.map(function(stat){
+      var value = String(stat.value)
+        .replace("{{database}}", String(SITE.databaseSize))
+        .replace("{{count}}", String(reportCount));
+      return '' +
+        '<div class="rx-stat">' +
+          '<div class="rx-stat-value">' + esc(value) + '</div>' +
+          '<div class="rx-stat-label">' + esc(stat.label) + '</div>' +
+        '</div>';
+    }).join("");
+  }
+
+  /* Hero subtitle reads its figure from the same SITE.databaseSize,
+     so the sentence and the stat can never disagree. */
+  function renderDbSize(){
+    var node = document.getElementById("rxDbSize");
+    if(node && SITE.databaseSize){ node.textContent = SITE.databaseSize; }
+  }
+
+  /* ---- Structured data ----
+     An ItemList of every published report, generated from the same
+     config array so it can never drift from what is on the page.
+     NOTE: if the CMS already emits its own schema for this route,
+     delete this function call rather than shipping two graphs. */
+  function renderSchema(reports){
+    var origin = "https://www.millionpodcasts.com";
+    function absolute(url){
+      return /^https?:\/\//i.test(url) ? url : origin + url;
+    }
+    var graph = {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "MillionPodcasts Research",
+      "description": "Original data and analysis on the global podcast industry, powered by a database of 2.7M shows.",
+      "url": origin + "/research",
+      "publisher": { "@type": "Organization", "name": "MillionPodcasts", "url": origin },
+      "mainEntity": {
+        "@type": "ItemList",
+        "numberOfItems": reports.length,
+        "itemListElement": reports.map(function(report, index){
+          return {
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+              "@type": "Report",
+              "name": report.title,
+              "description": report.description,
+              "url": absolute(report.url),
+              "datePublished": report.lastUpdated,
+              "publisher": { "@type": "Organization", "name": "MillionPodcasts" }
+            }
+          };
+        })
+      }
+    };
+    var node = document.createElement("script");
+    node.type = "application/ld+json";
+    node.textContent = JSON.stringify(graph);
+    document.head.appendChild(node);
+  }
+
+  /* ---- Journalist CTA ---- */
+  function renderPressCta(){
+    var cta = document.getElementById("rxPressCta");
+    if(!cta){ return; }
+    cta.setAttribute("href", SITE.pressContactUrl);
+    if(SITE.pressContactUrl === "PRESS_CONTACT_URL"){
+      /* Deliberate: no destination is invented. Set SITE.pressContactUrl. */
+      if(window.console && console.warn){
+        console.warn("MillionPodcasts research index: SITE.pressContactUrl is still the placeholder PRESS_CONTACT_URL.");
+      }
+    }
+  }
+
+  /* ---- Boot ---- */
+  function render(){
+    var all = sortReports(REPORTS || []);
+    var featured = all.filter(function(r){ return r.featured === true; });
+    var gridItems = SITE.showFeaturedInGrid
+      ? all
+      : all.filter(function(r){ return r.featured !== true; });
+
+    renderDbSize();
+    renderStats(all.length);
+
+    var featuredSection = document.getElementById("rxFeaturedSection");
+    var featuredHost = document.getElementById("rxFeatured");
+    if(featured.length && featuredSection && featuredHost){
+      /* Only the first featured report gets the large card. Any others
+         fall back to ordinary cards in the grid below. */
+      featuredHost.innerHTML = cardMarkup(featured[0], true);
+      featuredSection.hidden = false;
+      if(featured.length > 1 && !SITE.showFeaturedInGrid){
+        gridItems = featured.slice(1).concat(gridItems);
+        gridItems = sortReports(gridItems);
+      }
+    }
+
+    var grid = document.getElementById("rxGrid");
+    if(grid){
+      grid.innerHTML = gridItems.length
+        ? gridItems.map(function(r){ return cardMarkup(r, false); }).join("")
+        : '<div class="rx-empty">No research reports are published yet.</div>';
+    }
+
+    /* Small mono count beside the All Research heading, derived from
+       the config so it can never go stale. */
+    var count = document.getElementById("rxCount");
+    if(count){
+      count.textContent = all.length + (all.length === 1 ? " report" : " reports");
+    }
+
+    renderPressCta();
+    renderSchema(all);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", render);
+  } else {
+    render();
+  }
+})();
+</script>
+
+</body>
+</html>
