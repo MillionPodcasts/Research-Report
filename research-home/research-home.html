@@ -1125,10 +1125,17 @@ var REPORTS = [
   font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: "lnum" 1, "tnum" 1;
 }
-/* Unit suffix (M, K, +) picks up the brand blue, as on the homepage */
-.rx-stat-value .u{ color: var(--mp-primary); }
-/* The database size leads, the rest support it */
-.rx-stat:first-child .rx-stat-value{ font-size: clamp(31px, 3.3vw, 42px); }
+/* Unit suffix (M, K, +) picks up the brand blue, as on the homepage.
+   It needs its own breathing room: the negative letter-spacing on the
+   number pulls the M hard against the last digit. The gap is in em so
+   it tracks the font size across breakpoints. */
+.rx-stat-value .u{
+  color: var(--mp-primary);
+  margin-left: .07em;
+  letter-spacing: 0;
+}
+/* Every stat is the same size. An earlier version enlarged the first
+   one, which just read as an inconsistency next to the other four. */
 .rx-stat-label{
   font-family: 'Inter', sans-serif;
   font-size: 13.5px; font-weight: 400;
