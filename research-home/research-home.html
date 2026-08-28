@@ -119,15 +119,97 @@
        SITE.showFeaturedInGrid to true.
 
      ------------------------------------------------------------
+     COVERAGE (the strip under the hero AND the card "Cited by" line)
+       Both come from the single COVERAGE array. One line per outlet
+       PER REPORT:
+         { name: "Podnews", report: "<report id>", url: "..." }
+       "report" must match a report id in REPORTS, that is how a card
+       finds its own coverage.
+
+       The strip shows the first SITE.coverageStripLimit names with
+       duplicates removed, so keep the strongest outlets at the top.
+       Each card shows the first two entries matching its own id.
+       Empty the array and both disappear.
+
+       List independent outlets only. Podcast players and aggregators
+       republishing someone else's newsletter item are not separate
+       coverage, and social posts do not belong here.
+
+     ------------------------------------------------------------
+       Each card names SITE.citedByNamesPerCard outlets (2 by
+       default) and then says "and N more", where N is the real
+       remaining count. Raise the number to name more of them.
+
+     ------------------------------------------------------------
+     "GET NOTIFIED" LINK ON UPCOMING CARDS
+       SITE.upcomingNotifyUrl. While it holds the placeholder, the
+       link is not rendered at all, so it can never ship as a dead
+       link. Set a mailto or a signup URL and it appears on every
+       upcoming card.
+
+     ------------------------------------------------------------
+     CITE THIS RESEARCH
+       Nothing to maintain. One row is generated per PUBLISHED
+       report from its fullTitle, published year and url, so it
+       updates itself whenever you edit a report. Upcoming reports
+       get no row.
+
+     ------------------------------------------------------------
+     KEY FINDING ON A CARD
+       Optional keyStat field on any report, e.g.
+         keyStat: "1% of shows capture 42% of listening"
+       Shown under the description with a blue rule. Left empty
+       everywhere for now on purpose. Check the number against the
+       report before adding it, this page is a citation asset.
+
+     ------------------------------------------------------------
+     KEY FINDING ON A CARD (the biggest lever on this page)
+       Optional keyStat field on any report, e.g.
+         keyStat: "1% of shows capture 42% of all listening"
+       It renders under the description with its own KEY FINDING
+       label, and it is the reason a visitor clicks. Give every
+       report one. Check the figure against the report first.
+
+     ------------------------------------------------------------
+     LIBRARY TOOLBAR (search, tag filters, sort)
+       Built and working, but hidden until the library has
+       SITE.toolbarMinReports published reports (6 by default).
+       Set it to 0 to turn it on now.
+       Filter chips are generated from the tags actually in use, so
+       a chip never returns an empty result. While a search or
+       filter is active the featured card folds back into the grid,
+       otherwise filtering could hide the report being searched for.
+
+     ------------------------------------------------------------
      STATS STRIP
        SITE.stats. Add or remove entries freely, the strip resizes
        itself. "{{database}}" prints SITE.databaseSize, "{{count}}"
        prints the live number of reports.
 
      ------------------------------------------------------------
-     JOURNALIST CTA
-       SITE.pressContactUrl. Currently the literal placeholder
-       PRESS_CONTACT_URL. Replace it before this page goes live.
+     PDFs
+       Path convention: /research/pdfs/<file>.pdf
+       To add one: upload the file, then set the pdf field on that
+       report, e.g. pdf: "/research/pdfs/uk.pdf".
+       To remove it: delete the field. No button, no broken link.
+       PDF buttons only ever appear on published reports.
+
+     ------------------------------------------------------------
+     EDITABLE PROSE BLOCKS (not in the config)
+       Three blocks are plain text in the markup, edit them in place:
+         "How we work"        the methodology section
+         "Cite this research" the lead line above the citation rows
+         "Press and research questions"  the contact panel
+       The database figure is the one exception: any element with a
+       data-db-prose attribute is filled from SITE.databaseSize, so
+       no prose block can contradict the stats strip. Add that
+       attribute to a new span and it stays in sync too.
+
+     ------------------------------------------------------------
+     PRESS CONTACT
+       SITE.pressContactUrl is set to the research team mailto, the
+       same address printed in the contact panel, so the button and
+       the visible address cannot drift apart.
 
      ------------------------------------------------------------
      THEME
@@ -176,12 +258,42 @@ var IMAGE_ALT = "MillionPodcasts";
 
 var SITE = {
 
-  /* ---- Journalist CTA destination ----------------------------
-     PLACEHOLDER. Replace with the real press / media contact URL
-     (a press page, or a mailto: for the media inbox).
-     Left deliberately as the literal string so it is obvious it
-     has not been set. ------------------------------------------ */
-  pressContactUrl: "PRESS_CONTACT_URL",
+  /* ---- Press contact -----------------------------------------
+     RESOLVED. The old PRESS_CONTACT_URL placeholder now points at
+     the research team's mailto, the same address printed in the
+     "Press and research questions" panel at the foot of the page,
+     so the button and the visible address can never disagree. --- */
+  pressContactUrl: "mailto:anuj@millionpodcasts.com?subject=Press%20enquiry%3A%20MillionPodcasts%20research",
+
+  /* ---- Notify destination for upcoming reports ---------------
+     While this is the placeholder, the "Get notified" link is NOT
+     rendered at all. An upcoming card just shows its Coming soon
+     pill. Nothing on the page ever links to nowhere.
+
+     Currently pointed at the same research inbox as the press
+     contact. Swap it for a signup form URL once there is a research
+     mailing list, so notifications scale past one inbox.
+     ------------------------------------------------------------- */
+  upcomingNotifyUrl: "mailto:anuj@millionpodcasts.com?subject=Notify%20me%20about%20upcoming%20MillionPodcasts%20research",
+
+  /* How many outlets each card names before it switches to
+     "and N more". The count is always the true total. */
+  citedByNamesPerCard: 2,
+
+  /* ---- Research library toolbar (search, tag filters, sort) ----
+     The toolbar only renders once the library has at least this many
+     PUBLISHED reports. A search box and a row of filter chips over
+     three reports is UI with nothing to do, and it makes a young
+     library look emptier than it is.
+
+     Set to 0 to force it on now and see how it behaves.
+     Everything is built and tested, it is only waiting on volume. */
+  toolbarMinReports: 6,
+
+  /* How many outlets the "Research cited by" strip shows. The
+     COVERAGE array below holds every outlet, the strip shows the
+     first N of them, so keep the strongest names at the top. */
+  coverageStripLimit: 12,
 
   /* ---- Database size ------------------------------------------
      Printed in the hero subtitle AND in the first stat, from this
@@ -251,6 +363,48 @@ var TAGS = {
 };
 
 /* ==============================================================
+   COVERAGE
+   Outlets that have cited MillionPodcasts research. Drives BOTH the
+   "Research cited by" strip under the hero AND the small "Cited by"
+   line on each report card, from this one array.
+
+   One line per outlet PER REPORT. "report" must match a report id
+   in REPORTS below, that is how a card knows which coverage is its
+   own. Add a line to add an outlet, delete a line to remove one.
+   Empty the array and the strip and every card line disappear.
+
+   Only list independent outlets that actually covered the research.
+   Podcast players and aggregators republishing someone else's
+   newsletter item are not separate coverage, and social posts
+   (Reddit, LinkedIn, Mastodon) do not belong in a credibility strip.
+   ============================================================== */
+var COVERAGE = [
+  /* Ordered strongest first. The strip shows the first
+     SITE.coverageStripLimit names (deduplicated); each card shows the
+     first two that match its own id. */
+  { name: "Podnews",                  report: "the-nba-podcast-ecosystem-2026",   url: "https://podnews.net/update/total-hours-podcasts-26" },
+  { name: "Podnews",                  report: "the-state-of-video-podcasting-2026", url: "https://podnews.net/update/podcast-review-daylight-acquisition" },
+  { name: "MediaPost",                report: "the-state-of-video-podcasting-2026", url: "https://www.mediapost.com/publications/article/416882/video-podcast-us-ad-market-estimated-at-3b.html" },
+  { name: "Podcast News Daily",       report: "the-state-of-video-podcasting-2026", url: "https://www.podcastnewsdaily.com/news/just-1-of-video-podcasts-capture-42-of-all-listening-study-finds/article_ba8bd504-b8d2-46d5-96e3-6a3094214e57.html" },
+  { name: "What's New in Publishing", report: "the-state-of-video-podcasting-2026", url: "https://whatsnewinpublishing.substack.com/p/video-podcasting-has-become-a-serious" },
+  { name: "Barrett Media",            report: "the-nba-podcast-ecosystem-2026",   url: "https://barrettmedia.com/2026/06/16/nba-podcasts-hosted-men-ten-shows/" },
+  { name: "PodcastingToday",          report: "the-uk-podcast-landscape-2026",    url: "https://podcastingtoday.co.uk/uk-podcast-market-dominated-by-a-small-number-of-shows-says-new-research/" },
+  { name: "PPC Land",                 report: "the-state-of-video-podcasting-2026", url: "https://ppc.land/77-of-34-208-video-podcasts-carry-no-advertising-millionpodcasts-finds/" },
+  { name: "Net Influencer",           report: "the-state-of-video-podcasting-2026", url: "https://www.netinfluencer.com/77-percent-of-video-podcasts-show-no-brand-sponsorship-activity-report-finds/" },
+  { name: "PR News",                  report: "the-state-of-video-podcasting-2026", url: "https://www.prnewsonline.com/podcast-guesting-is-a-core-pr-strategy-heres-how-to-get-your-client-booked/" },
+  { name: "Sports Geek",              report: "the-nba-podcast-ecosystem-2026",   url: "https://sportsgeekhq.com/wall-streets-130b-sports-tech-quarter-fifa-2026s-broadcast-complexity-fox-rokus-streaming-play/" },
+  { name: "Castnews",                 report: "the-state-of-video-podcasting-2026", url: "https://www.castnews.com.br/the-state-of-video-podcasting-2026/" },
+  { name: "Via Podcast",              report: "the-state-of-video-podcasting-2026", url: "https://viapodcast.fm/estudio-el-10-de-los-video-podcast-concentra-el-85-de-la-audiencia/" },
+  { name: "Podcast Videos",           report: "the-nba-podcast-ecosystem-2026",   url: "https://www.podcastvideos.com/articles/the-power-of-video-sports-podcasting/" },
+  { name: "Podcast Videos",           report: "the-state-of-video-podcasting-2026", url: "https://www.podcastvideos.com/articles/video-podcasting-trends-in-2026-empowering-creators-with-insights-and-essential-tools/" },
+  { name: "Operation Podcast",        report: "the-state-of-video-podcasting-2026", url: "https://www.operationpodcast.com/blog/why-podcast-consistency-beats-virality-2026-data" },
+  { name: "The Daily Scout",          report: "the-state-of-video-podcasting-2026", url: "https://thedailyscout.com/s/DGXwNRB49BQ" },
+  { name: "Tropical Podcasting",      report: "the-state-of-video-podcasting-2026", url: "https://www.tropicalpodcasting.com/p/el-1-de-videopodcasts-se-queda-con-casi-todo" },
+  { name: "Audiogen",                 report: "the-state-of-video-podcasting-2026", url: "https://audiogen.substack.com/p/3x3-139-escuchar-la-industria-entender" },
+  { name: "BEIFAHRERSITZ",            report: "the-state-of-video-podcasting-2026", url: "https://beifahrersitz.substack.com/p/so-war-der-deutsche-podcast-award" }
+];
+
+/* ==============================================================
    REPORTS
    One object per published report. To add one, copy an entry,
    paste it, change the values. Nothing else needs touching.
@@ -267,11 +421,23 @@ var TAGS = {
    url         Full link to the report's own page.
    thumbnail   "/images/research/<id>.jpg" at 1200x675 (16:9).
                Leave "" to draw the branded fallback tile instead.
+   pdf         Optional. Path to the report's PDF. Renders a
+               "PDF" download button on the card. Omit it and no
+               button appears, so a report with no PDF yet simply
+               has none. Never renders on an upcoming report.
    published   ISO date "YYYY-MM-DD". Shows as "Published June 2026".
    updated     Optional ISO date. When set and different from
                published, the card shows "Updated August 2026"
                instead, and the report sorts by this date.
+   keyStat     Optional. One short, quotable finding shown on the
+               card, e.g. "1% of shows capture 42% of listening".
+               Left empty on every report for now ON PURPOSE: put
+               nothing here until the number has been checked against
+               the report itself. This page is a citation asset, a
+               wrong figure here is worse than no figure.
    tag         Optional. One value from TAGS above.
+   expected    Optional, upcoming entries only. A year or quarter
+               shown on the Coming soon pill, e.g. "2026" or "Q4 2026".
    status      Optional. "published" (the default when absent) or
                "upcoming" for research not released yet. An upcoming
                entry needs no url, published date or thumbnail.
@@ -289,8 +455,11 @@ var REPORTS = [
     description: "An analysis of 6,693 active UK podcasts covering market concentration, publishers, monetisation, and the video shift.",
     url: "https://www.millionpodcasts.com/research/the-uk-podcast-landscape-2026",
     thumbnail: "",                 // PLACEHOLDER -> /images/research/the-uk-podcast-landscape-2026.jpg
+    pdf: "/research/pdfs/uk.pdf",  // PLACEHOLDER path, confirm where the file is served from
     published: "2026-06-01",       // CONFIRM. Trade coverage dates first pickup to June 2026.
     updated: "2026-08-01",         // Page revised in August to the 6,693 base. Card reads "Updated".
+    // keyStat: "",                // ADD ONE. A single quotable finding, checked
+                                   // against the report. See the Video entry.
     tag: "Regional"
   },
 
@@ -300,8 +469,13 @@ var REPORTS = [
     fullTitle: "The NBA Podcast Ecosystem 2026",
     description: "An analysis of 2,215 active NBA podcasts covering sponsorship, network effects, and team-level audiences.",
     url: "https://www.millionpodcasts.com/research/the-nba-podcast-ecosystem-2026",
-    thumbnail: "",                 // PLACEHOLDER -> /images/research/the-nba-podcast-ecosystem-2026.jpg
+    // TEMPORARY, hotlinked from sportico.com. Not ours to use and not
+    // on our servers. Replace with /images/research/<id>.jpg before launch.
+    thumbnail: "https://www.sportico.com/wp-content/uploads/2025/10/Steph_Curry_NBA_Revenue.png?w=1280&h=720&crop=1",
+    pdf: "/research/pdfs/nba.pdf", // PLACEHOLDER path, confirm where the file is served from
     published: "2026-06-11",       // Matches the published date printed on the report page itself.
+    // keyStat: "",                // ADD ONE. A single quotable finding, checked
+                                   // against the report. See the Video entry.
     tag: "Sports"
   },
 
@@ -311,8 +485,15 @@ var REPORTS = [
     fullTitle: "The State of Video Podcasting 2026",
     description: "An analysis of 34,208 active video podcasts covering platform distribution, monetisation, and audience concentration.",
     url: "https://www.millionpodcasts.com/research/the-state-of-video-podcasting-2026",
-    thumbnail: "",                 // PLACEHOLDER -> /images/research/the-state-of-video-podcasting-2026.jpg
+    // TEMPORARY, a Google Images cache URL. These expire without notice.
+    // Replace with /images/research/<id>.jpg before launch.
+    thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjrcUDaHQn-fsp58tioh976jKNs__Pb9QwdjrCtBETSY0ZAyVFeymCgi5U&s=10",
+    pdf: "/research/pdfs/video.pdf", // PLACEHOLDER path, confirm where the file is served from
     published: "2026-05-12",       // CONFIRM. Trade coverage dates first pickup to May 2026.
+    // *** CONFIRM AGAINST THE REPORT BEFORE LAUNCH ***
+    // Taken from Podcast News Daily's headline on this research, which
+    // is a third party's paraphrase, not the report itself.
+    keyStat: "1% of shows capture 42% of all listening",
     tag: "Video",
     featured: true                 // DEMONSTRATION ONLY, choose the real featured report
   },
@@ -327,6 +508,8 @@ var REPORTS = [
     description: "An analysis of the Australian podcast market: concentration, publishers, monetisation, and the video shift.",  // PLACEHOLDER copy
     tag: "Regional",
     status: "upcoming"
+    // expected: "2026"            // Optional. Adds a year to the pill:
+                                   // "Coming soon / 2026". Left off for now.
     // no url, no published date, no thumbnail yet
   }
 
@@ -832,7 +1015,7 @@ var REPORTS = [
 
 .rx-hero{
   text-align: center;
-  padding: 126px 0 6px;       /* top pad clears the fixed header */
+  padding: 126px 0 22px;      /* top pad clears the fixed header */
 }
 .rx-hero-eyebrow{
   display: inline-flex; align-items: center; gap: 8px;
@@ -869,7 +1052,24 @@ var REPORTS = [
   color: var(--mp-heading); font-weight: 600;
   font-variant-numeric: lining-nums;
 }
-@media (max-width: 768px){ .rx-hero{ padding: 104px 0 4px; } }
+.rx-hero-cta{
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 24px;
+  font-size: 14px; font-weight: 600;
+  color: var(--mp-primary); text-decoration: none;
+  padding: 11px 20px;
+  border: 1px solid var(--mp-primary-disable);
+  border-radius: 8px;
+  background: var(--mp-white);
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.rx-hero-cta:hover{
+  background: var(--mp-primary); color: #FFFFFF; border-color: var(--mp-primary);
+}
+.rx-hero-cta:focus-visible{ outline: 3px solid var(--mp-primary); outline-offset: 3px; }
+.rx-hero-cta i{ font-style: normal; transition: transform .18s ease; }
+.rx-hero-cta:hover i{ transform: translateY(2px); }
+@media (max-width: 768px){ .rx-hero{ padding: 104px 0 16px; } }
 
 /* ---- Stats strip ----
    Matches the homepage counts row: bold Inter numerals with the
@@ -900,6 +1100,8 @@ var REPORTS = [
 }
 /* Unit suffix (M, K, +) picks up the brand blue, as on the homepage */
 .rx-stat-value .u{ color: var(--mp-primary); }
+/* The database size leads, the rest support it */
+.rx-stat:first-child .rx-stat-value{ font-size: clamp(31px, 3.3vw, 42px); }
 .rx-stat-label{
   font-family: 'Inter', sans-serif;
   font-size: 13.5px; font-weight: 400;
@@ -907,7 +1109,7 @@ var REPORTS = [
   color: var(--mp-paragraph); margin-top: 5px;
 }
 @media (max-width: 860px){
-  .rx-stats{ padding: 26px 0 28px; }
+  .rx-stats{ padding: 34px 0 28px; }
   .rx-stats-inner{ grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 14px; }
 }
 @media (max-width: 520px){
@@ -918,7 +1120,7 @@ var REPORTS = [
 /* ---- Section heads ---- */
 /* Section heads follow the homepage rhythm: a real Fraunces heading,
    a hairline rule, and a small mono count on the right. */
-.rx-sec{ padding-top: 54px; }
+.rx-sec{ padding-top: 66px; }
 .rx-sec-head{ display: flex; align-items: baseline; gap: 18px; margin-bottom: 24px; }
 .rx-sec-head h2{
   font-family: 'Fraunces', Georgia, serif;
@@ -941,6 +1143,80 @@ var REPORTS = [
 /* Skip-link target: focusable for keyboard users, but no stray outline */
 .rx-sec[tabindex="-1"]:focus{ outline: none; }
 
+/* ---- Library toolbar ----
+   Hidden until the library is big enough to need it, see
+   SITE.toolbarMinReports. */
+.rx-toolbar{ margin-bottom: 26px; }
+.rx-search{
+  position: relative;
+  display: flex; align-items: center;
+  border: 1px solid var(--mp-border);
+  border-radius: 8px;
+  background: var(--mp-white);
+  padding: 0 14px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.rx-search:focus-within{
+  border-color: var(--mp-primary);
+  box-shadow: 0 0 0 3px rgba(94,119,251,.14);
+}
+.rx-search svg{ width: 16px; height: 16px; color: var(--mp-paragraph); flex: 0 0 auto; }
+.rx-search input{
+  flex: 1; border: 0; outline: none; background: transparent;
+  font-family: 'Inter', sans-serif; font-size: 14.5px;
+  color: var(--mp-heading);
+  padding: 13px 10px;
+}
+.rx-search input::placeholder{ color: var(--mp-paragraph); }
+.rx-toolbar-row{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-top: 14px;
+}
+.rx-chips{ display: flex; flex-wrap: wrap; gap: 8px; }
+.rx-chip{
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: var(--mp-subheading);
+  background: transparent;
+  border: 1px solid var(--mp-border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: color .14s ease, border-color .14s ease, background .14s ease;
+}
+.rx-chip:hover{ border-color: var(--mp-primary-disable); color: var(--mp-primary); }
+.rx-chip:focus-visible{ outline: 2px solid var(--mp-primary); outline-offset: 2px; }
+.rx-chip.is-on{
+  background: var(--mp-indigo); border-color: var(--mp-indigo); color: #FFFFFF;
+}
+.rx-sort{
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mp-paragraph);
+  flex-shrink: 0;
+}
+.rx-sort select{
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px; font-weight: 500;
+  letter-spacing: 0; text-transform: none;
+  color: var(--mp-heading);
+  background: var(--mp-white);
+  border: 1px solid var(--mp-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.rx-sort select:focus-visible{ outline: 2px solid var(--mp-primary); outline-offset: 2px; }
+.rx-noresults{
+  margin-top: 22px; font-size: 14.5px; color: var(--mp-paragraph);
+}
+.rx-noresults button{
+  font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 600;
+  color: var(--mp-primary); background: none; border: 0;
+  padding: 0; cursor: pointer; text-decoration: underline;
+}
+
 /* ---- Grid ---- */
 .r-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 @media (max-width: 1024px){ .r-grid{ grid-template-columns: repeat(2, 1fr); gap: 20px; } }
@@ -955,22 +1231,54 @@ var REPORTS = [
   height: 100%;                      /* equal heights across the row */
   background: var(--mp-white);
   border: 1px solid var(--mp-border);
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
   text-decoration: none;
-  box-shadow: var(--mp-shadow-soft);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  box-shadow: 0 1px 2px rgba(40,46,82,.04);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
 }
-.r-card::before{
-  content: ""; position: absolute; top: 0; left: 0; right: 0;
-  height: 3px; background: var(--mp-grad); z-index: 3;
-}
+/* The gradient cap is reserved for the featured card. Repeating it on
+   every card in the grid turned a signature into wallpaper. */
 .r-card:hover{
-  transform: translateY(-3px);
-  box-shadow: var(--mp-shadow-lift);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(40,46,82,.05), 0 14px 30px -20px rgba(40,46,82,.24);
   border-color: var(--mp-primary-disable);
 }
-.r-card:focus-visible{ outline: 3px solid var(--mp-primary); outline-offset: 3px; }
+.r-card:focus-within{ outline: 3px solid var(--mp-primary); outline-offset: 3px; }
+
+/* The title's link stretches over the whole card, so the card stays
+   fully clickable while remaining valid HTML with a PDF link inside.
+   Anything that must stay clickable sits above it on z-index. */
+.r-link{ color: inherit; text-decoration: none; }
+.r-link::after{
+  content: ""; position: absolute; inset: 0; z-index: 3;
+}
+.r-actions{
+  position: relative; z-index: 4;
+  display: inline-flex; align-items: center; gap: 14px;
+  flex-wrap: wrap;
+}
+/* PDF is the secondary action: the full interactive report leads. */
+.r-pdf{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px; font-weight: 600;
+  color: var(--mp-paragraph);
+  text-decoration: none;
+  padding: 6px 11px;
+  border: 1px solid var(--mp-border);
+  border-radius: 7px;
+  white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.r-pdf svg{ width: 13px; height: 13px; }
+.r-pdf:hover{
+  color: var(--mp-primary);
+  border-color: var(--mp-primary-disable);
+  background: var(--mp-section-sel);
+}
+.r-pdf:focus-visible{ outline: 2px solid var(--mp-primary); outline-offset: 2px; }
+.r-notify{ position: relative; z-index: 4; }
 
 /* Thumbnail, always 16:9. The branded fallback tile sits underneath
    the <img>, so a missing or broken image can never break layout. */
@@ -1001,15 +1309,18 @@ var REPORTS = [
 
 /* Card body */
 .r-body{ display: flex; flex-direction: column; flex: 1; padding: 18px 20px 18px; }
+/* Category label: a small coloured marker and the word. Reads as
+   information architecture rather than decoration. */
 .r-tag{
+  display: inline-flex; align-items: center; gap: 7px;
   align-self: flex-start;
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; font-weight: 500;
-  letter-spacing: .12em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 999px;
-  background: var(--tag-tint); color: var(--tag-ink);
-  margin-bottom: 12px;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--tag-ink);
+  margin-bottom: 11px;
 }
+.r-tag i{ width: 6px; height: 6px; background: var(--tag-ink); flex: 0 0 auto; }
 .r-card .r-title{
   font-family: 'Fraunces', Georgia, serif;
   font-size: 20px; font-weight: 500; line-height: 1.2; letter-spacing: -.015em;
@@ -1020,20 +1331,65 @@ var REPORTS = [
   font-size: 14.5px; line-height: 1.55; color: var(--mp-paragraph);
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
-.r-foot{ margin-top: auto; padding-top: 16px; }
+/* Foot: optional "cited by" line, then date and read cue on one row.
+   The rule sits on the foot itself so both lines share it. */
+.r-foot{
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--mp-border);
+}
+.r-cited{
+  font-size: 11.5px; line-height: 1.4;
+  color: var(--mp-paragraph);
+  margin-bottom: 9px;
+}
+.r-cited-more{ color: var(--mp-paragraph); }
+.r-cited b{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--mp-paragraph);
+  margin-right: 5px;
+}
+.r-footrow{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px 16px; flex-wrap: wrap;
+}
 .r-meta{
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--mp-secondary);
-  padding-top: 14px; border-top: 1px solid var(--mp-border);
+  color: var(--mp-paragraph);
 }
 .r-cue{
   display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 10px;
   font-size: 13.5px; font-weight: 600; color: var(--mp-primary);
+  white-space: nowrap;
 }
 .r-cue i{ font-style: normal; transition: transform .18s ease; }
 .r-card:hover .r-cue i{ transform: translateX(4px); }
+
+/* Upcoming foot: pill on the left, notify link on the right */
+.r-foot--soon{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+/* With no notify link set, the pill sits alone on the left */
+.r-foot--soon:not(:has(.r-notify)){ justify-content: flex-start; }
+.r-notify{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600;
+  color: var(--mp-primary); text-decoration: none;
+  white-space: nowrap;
+}
+.r-notify:hover{ color: var(--mp-primary-hover); }
+.r-notify:focus-visible{ outline: 2px solid var(--mp-primary); outline-offset: 3px; border-radius: 4px; }
+.r-notify i{ font-style: normal; transition: transform .18s ease; }
+.r-notify:hover i{ transform: translateX(3px); }
+
+/* Narrow cards: stack the date and actions rather than squeezing them */
+@media (max-width: 460px){
+  .r-footrow{ flex-direction: column; align-items: flex-start; gap: 10px; }
+}
 
 /* ---- Upcoming (not yet published) card ----
    Rendered as a <div>, not an <a>, so there is nothing to click and
@@ -1050,7 +1406,6 @@ var REPORTS = [
   box-shadow: none;
   cursor: default;
 }
-.r-card--upcoming::before{ display: none; }        /* no gradient cap */
 .r-card--upcoming:hover{
   transform: none; box-shadow: none;
   border-color: rgba(94,119,251,.55);
@@ -1093,6 +1448,10 @@ var REPORTS = [
    column at roughly two card-widths and the copy at one. Under
    860px it reverts to an ordinary stacked single-column card. */
 .r-card--featured{ flex-direction: row; align-items: stretch; }
+.r-card--featured::before{
+  content: ""; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--mp-grad); z-index: 5;
+}
 .r-card--featured .r-thumb{
   flex: 0 0 56%; border-bottom: none; border-right: 1px solid var(--mp-border);
 }
@@ -1114,40 +1473,226 @@ var REPORTS = [
   .r-card--featured .r-desc{ font-size: 14.5px; -webkit-line-clamp: 3; }
 }
 
-/* ---- For journalists ---- */
-.rx-press{
-  margin-top: 62px;
-  background: var(--mp-section-sel);
-  border: 1px solid var(--mp-border);
-  border-radius: 14px;
-  padding: 24px 28px;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px 28px; flex-wrap: wrap;
+/* ---- Research cited by ---- */
+.rx-coverage{
+  padding: 66px 0 4px;
+  text-align: center;
 }
-.rx-press-eyebrow{
+.rx-coverage-label{
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10.5px; font-weight: 500; line-height: 1.3;
+  font-size: 10.5px; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--mp-secondary);
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+.rx-coverage-list{
+  display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: center;
+  gap: 10px 26px;
+  max-width: 1000px; margin: 0 auto;
+}
+.rx-coverage-list a{
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px; font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--mp-subheading);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+.rx-coverage-list a:hover{
+  color: var(--mp-primary);
+  border-bottom-color: var(--mp-primary-disable);
+}
+.rx-coverage-list a:focus-visible{
+  outline: 2px solid var(--mp-primary); outline-offset: 3px; border-radius: 3px;
+}
+@media (max-width: 640px){
+  .rx-coverage-list{ gap: 8px 18px; }
+  .rx-coverage-list a{ font-size: 13px; }
+}
+
+/* ---- Key finding: the reason to click ---- */
+.r-key{
+  margin-top: 14px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--mp-border);
+}
+.r-key-label{
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: var(--mp-paragraph);
+  margin-bottom: 6px;
+}
+.r-key-text{
+  display: block;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 18px; font-weight: 500; line-height: 1.25;
+  letter-spacing: -.015em;
+  color: var(--mp-heading);
+}
+.r-card--featured .r-key-text{ font-size: 24px; }
+.r-card--featured .r-key{ margin-top: 18px; padding-top: 16px; }
+
+/* ---- How we work ----
+   Centred on the page background, no panel fill. Tune the reading
+   measure with --method-measure: much past 80 characters a centred
+   paragraph gets hard to track. */
+.rx-method{
+  --method-measure: 780px;
+  padding: 8px 0 6px;
+  text-align: center;
+}
+.rx-method h2{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(25px, 2.7vw, 34px);
+  font-weight: 500; line-height: 1.1; letter-spacing: -.02em;
+  text-transform: none;
+  color: var(--mp-heading);
+}
+.rx-method h2::after{
+  content: ""; display: block;
+  width: 44px; height: 2px; margin: 18px auto 0;
+  background: var(--mp-grad);
+}
+.rx-method p{
+  max-width: var(--method-measure);
+  margin: 24px auto 0;
+  font-size: 16.5px; line-height: 1.72;
+  color: var(--mp-subheading);
+}
+.rx-method p span{ font-variant-numeric: lining-nums; }
+@media (max-width: 700px){
+  .rx-method p{ font-size: 15.5px; }
+}
+
+/* ---- Cite this research ----
+   A plain thin-ruled list. Useful to journalists, but it should not
+   carry the same visual weight as the research itself. */
+.rx-cite-intro{
+  font-size: 14.5px; color: var(--mp-paragraph);
+  margin: -6px 0 18px;
+}
+.rx-cite-list{
+  display: flex; flex-direction: column;
+  border-top: 1px solid var(--mp-border);
+}
+.rx-cite-row{
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--mp-border);
+}
+.rx-cite-text{
+  flex: 1; min-width: 0;
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.rx-cite-text b{
+  font-size: 14.5px; font-weight: 600; color: var(--mp-heading);
+}
+.rx-cite-text span{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--mp-paragraph);
+}
+.rx-cite-copy{
+  flex: 0 0 auto;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px; font-weight: 600;
+  color: var(--mp-primary);
+  background: transparent;
+  border: 1px solid var(--mp-border);
+  border-radius: 7px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.rx-cite-copy:hover{ background: var(--mp-primary); color: #FFFFFF; border-color: var(--mp-primary); }
+.rx-cite-copy:focus-visible{ outline: 3px solid var(--mp-primary); outline-offset: 2px; }
+.rx-cite-copy.is-done{ background: var(--mp-success); border-color: var(--mp-success); color: #FFFFFF; }
+@media (max-width: 560px){
+  .rx-cite-row{ flex-direction: column; align-items: flex-start; gap: 10px; }
+  .rx-cite-copy{ width: 100%; }
+}
+
+/* ---- Press and research questions ----
+   The one dark panel on the page, so the closing ask carries.
+   Two columns: the ask on the left, who to reach on the right,
+   split by a hairline. Stacks below 760px. */
+.rx-press{
+  margin-top: 66px;
+  background: var(--mp-indigo);
+  border-radius: 12px;
+  padding: 44px 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
+  align-items: center;
+  gap: 44px;
+}
+.rx-press h2{
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 500; line-height: 1.12; letter-spacing: -.02em;
+  color: #FFFFFF;
+  margin-bottom: 12px;
+  max-width: 15ch;
+}
+.rx-press p{
+  font-size: 15.5px; line-height: 1.6;
+  color: #D8DEFF;
+  max-width: 46ch;
+}
+.rx-press-card{
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding-left: 44px;
+  border-left: 1px solid rgba(255,255,255,.22);
+}
+.rx-press-name{
+  font-size: 17px; font-weight: 600; color: #FFFFFF;
+  letter-spacing: -.01em;
+}
+.rx-press-role{
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 500;
   letter-spacing: .14em; text-transform: uppercase;
-  color: var(--mp-indigo); margin-bottom: 7px;
+  color: #C6CFFF;
+  margin-top: 6px;
 }
-.rx-press p{ font-size: 14.5px; color: var(--mp-subheading); max-width: 620px; }
 .rx-press-cta{
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--mp-primary); color: #FFFFFF !important;
+  display: inline-flex; align-items: center; gap: 9px;
+  margin-top: 22px;
+  background: #FFFFFF; color: var(--mp-indigo) !important;
   font-size: 14px; font-weight: 600; line-height: 1;
-  padding: 12px 20px; border-radius: 10px;
-  text-decoration: none; white-space: nowrap; flex-shrink: 0;
-  box-shadow: 0 4px 14px rgba(94,119,251,.28);
-  transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+  padding: 13px 20px; border-radius: 9px;
+  text-decoration: none;
+  transition: background .15s ease, transform .15s ease;
 }
-.rx-press-cta:hover{
-  background: var(--mp-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(94,119,251,.36);
-}
-.rx-press-cta:focus-visible{ outline: 3px solid var(--mp-indigo); outline-offset: 3px; }
+.rx-press-cta:hover{ background: #EFF1FF; transform: translateY(-1px); }
+.rx-press-cta:focus-visible{ outline: 3px solid #FFFFFF; outline-offset: 3px; }
 .rx-press-cta i{ font-style: normal; transition: transform .18s ease; }
 .rx-press-cta:hover i{ transform: translateX(3px); }
+@media (max-width: 900px){
+  .rx-press{ gap: 32px; padding: 40px 36px; }
+  .rx-press-card{ padding-left: 32px; }
+}
+@media (max-width: 760px){
+  .rx-press{
+    grid-template-columns: 1fr;
+    gap: 28px; padding: 34px 26px;
+  }
+  .rx-press h2{ max-width: none; }
+  .rx-press-card{
+    padding-left: 0; padding-top: 28px;
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,.22);
+    align-items: center; text-align: center;
+  }
+  .rx-press-cta{ width: 100%; justify-content: center; font-size: 13.5px; padding: 14px 16px; }
+}
 
 /* ---- Page tail ---- */
 .rx-main{ padding-bottom: 84px; }
@@ -1308,8 +1853,9 @@ var REPORTS = [
     <div class="rx-hero">
       <div class="rx-wrap">
         <div class="rx-hero-eyebrow">For journalists &middot; Marketers &middot; Industry professionals</div>
-        <h1>MillionPodcasts Research</h1>
-        <p>Original data and analysis on the global podcast industry, powered by a database of <strong id="rxDbSize">2.7M</strong> shows.</p>
+        <h1>Podcast Industry Research</h1>
+        <p>Original research and data on the podcast industry, built from the MillionPodcasts database of <strong id="rxDbSize">2.7M</strong> podcasts.</p>
+        <a class="rx-hero-cta" href="#research-library">Explore research <i aria-hidden="true">&darr;</i></a>
       </div>
     </div>
 
@@ -1333,14 +1879,35 @@ var REPORTS = [
       <div id="rxFeatured"></div>
     </section>
 
-    <!-- All Research -->
+    <!-- Research library. The toolbar below only appears once there
+         are SITE.toolbarMinReports published reports. -->
     <section class="rx-sec" id="research-library" tabindex="-1">
       <div class="rx-sec-head">
-        <h2>All Research</h2>
+        <h2>Research Library</h2>
         <span class="rx-sec-rule" aria-hidden="true"></span>
         <span class="rx-sec-count" id="rxCount"></span>
       </div>
+
+      <div class="rx-toolbar" id="rxToolbar" hidden>
+        <div class="rx-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+          <input type="search" id="rxSearch" placeholder="Search research" aria-label="Search research">
+        </div>
+        <div class="rx-toolbar-row">
+          <div class="rx-chips" id="rxChips" role="group" aria-label="Filter by topic"></div>
+          <label class="rx-sort">
+            <span>Sort</span>
+            <select id="rxSort" aria-label="Sort research">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="az">A to Z</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
       <div class="r-grid" id="rxGrid"></div>
+      <p class="rx-noresults" id="rxNoResults" hidden>No research matches that. <button type="button" id="rxClear">Clear filters</button></p>
     </section>
 
     <!-- Coming soon. Only rendered when SITE.groupUpcoming is true
@@ -1354,15 +1921,65 @@ var REPORTS = [
       <div class="r-grid" id="rxUpcomingGrid"></div>
     </section>
 
-    <!-- For journalists -->
-    <section class="rx-press" aria-labelledby="rxPressHeading">
-      <div>
-        <h2 class="rx-press-eyebrow" id="rxPressHeading">For journalists</h2>
-        <p>Research and data from MillionPodcasts for journalists, marketers and industry professionals.</p>
+  <!-- Research cited by. Built from the COVERAGE array in the config.
+       Not rendered at all when that array is empty. -->
+    <section class="rx-coverage" id="rxCoverageSection" aria-labelledby="rxCoverageHeading" hidden>
+    <div class="rx-wrap">
+      <h2 class="rx-coverage-label" id="rxCoverageHeading">Research cited by</h2>
+      <div class="rx-coverage-list" id="rxCoverage"></div>
+    </div>
+    </section>
+
+    <!-- ===================================================
+         CITE THIS RESEARCH
+         One ready-to-paste citation per PUBLISHED report, generated
+         from the REPORTS config, so it can never drift from the
+         titles and URLs on the cards above. Upcoming reports get no
+         row. The lead line below is editable prose.
+         =================================================== -->
+    <section class="rx-sec" id="rxCite">
+      <div class="rx-sec-head">
+        <h2>Cite this research</h2>
+        <span class="rx-sec-rule" aria-hidden="true"></span>
       </div>
-      <a class="rx-press-cta" id="rxPressCta" href="PRESS_CONTACT_URL">
-        Contact the research team <i aria-hidden="true">&rarr;</i>
-      </a>
+      <p class="rx-cite-intro">Free to quote and cite. Please credit MillionPodcasts and link to the report on first mention.</p>
+      <div class="rx-cite-list" id="rxCiteList"></div>
+    </section>
+
+    <!-- ===================================================
+         HOW WE WORK (methodology)
+         EDITABLE PROSE, edit the paragraphs right here. The only
+         dynamic bit is the database figure: any element carrying
+         data-db-prose is filled from SITE.databaseSize, so it can
+         never contradict the stats strip at the top of the page.
+         =================================================== -->
+    <section class="rx-sec" id="rxMethod">
+      <div class="rx-method">
+        <h2>How we work</h2>
+        <p>MillionPodcasts maintains a continuously updated database of <span data-db-prose>2.7 million</span> podcasts, spanning show metadata, episode catalogues, host and contributor records, distribution platforms, sponsor activity, audience signals and engagement metrics. Our research team draws on this catalogue to produce reports on the questions shaping the podcast industry, each built on a defined sample, a documented methodology and a clearly stated snapshot date. Where figures are modelled rather than directly observed, such as listener estimates and audience demographics, we say so and explain how the model works; where the data has limits, we name them.</p>
+      </div>
+    </section>
+
+    <!-- ===================================================
+         PRESS AND RESEARCH QUESTIONS
+         Editable prose + contact block. The button uses
+         SITE.pressContactUrl, which is set to the same mailto as
+         the address printed here, so the two cannot drift apart.
+         =================================================== -->
+    <section class="rx-press" aria-labelledby="rxPressHeading">
+      <div class="rx-press-copy">
+        <h2 id="rxPressHeading">Press and research questions</h2>
+        <p>For press enquiries, methodology questions, custom data requests or interviews, contact the research team.</p>
+      </div>
+      <div class="rx-press-card">
+        <span class="rx-press-name">Anuj Agarwal</span>
+        <span class="rx-press-role">Founder, MillionPodcasts</span>
+        <!-- The address IS the button, so it appears once and the
+             visible text and the link target cannot disagree. -->
+        <a class="rx-press-cta" id="rxPressCta" href="mailto:anuj@millionpodcasts.com">
+          anuj@millionpodcasts.com <i aria-hidden="true">&rarr;</i>
+        </a>
+      </div>
     </section>
 
   </div>
@@ -1440,6 +2057,11 @@ var REPORTS = [
     return MONTHS[month - 1] + " " + year;   /* e.g. "August 2026" */
   }
 
+  var ORIGIN = "https://www.millionpodcasts.com";
+  function absoluteUrl(url){
+    return /^https?:\/\//i.test(url) ? url : ORIGIN + url;
+  }
+
   function tagTheme(tag){
     return (tag && TAGS[tag]) ? TAGS[tag] : DEFAULT_TAG_THEME;
   }
@@ -1506,6 +2128,35 @@ var REPORTS = [
     return report.status === "upcoming";
   }
 
+  /* Every distinct outlet that covered THIS report, strongest first
+     (COVERAGE is ordered that way). */
+  function coverageFor(reportId){
+    var list = (typeof COVERAGE !== "undefined" && COVERAGE) ? COVERAGE : [];
+    var seen = {}, out = [];
+    for(var i = 0; i < list.length; i++){
+      if(list[i].report === reportId && !seen[list[i].name]){
+        seen[list[i].name] = true;
+        out.push(list[i]);
+      }
+    }
+    return out;
+  }
+
+  /* Names the strongest few outlets, then states how many more there
+     are, so a well-covered report shows its real scale without the
+     line wrapping the card out of shape. Note these are plain text,
+     not links: the whole card is already an <a>, and a link inside a
+     link is invalid HTML. */
+  function citedByMarkup(report){
+    var hits = coverageFor(report.id);
+    if(!hits.length){ return ""; }
+    var shown = Math.max(1, SITE.citedByNamesPerCard || 2);
+    var names = hits.slice(0, shown).map(function(o){ return esc(o.name); }).join(", ");
+    var rest = hits.length - Math.min(shown, hits.length);
+    var more = rest > 0 ? ' <span class="r-cited-more">and ' + rest + ' more</span>' : "";
+    return '<div class="r-cited"><b>Cited by</b> ' + names + more + '</div>';
+  }
+
   function cardMarkup(report, isFeatured){
     var theme = tagTheme(report.tag);
     var upcoming = isUpcoming(report);
@@ -1515,44 +2166,87 @@ var REPORTS = [
         ' onerror="this.style.display=\'none\'">'
       : "";
 
+    /* Tag reads as an editorial category label, not a filled pill:
+       a small coloured marker plus the word. Less SaaS, and it keeps
+       the tag legible against any card. */
     var tag = report.tag
-      ? '<span class="r-tag" style="--tag-ink:' + esc(theme.ink) +
-        ';--tag-tint:' + esc(theme.tint) + '">' + esc(report.tag) + '</span>'
+      ? '<span class="r-tag" style="--tag-ink:' + esc(theme.ink) + '">' +
+          '<i aria-hidden="true"></i>' + esc(report.tag) + '</span>'
       : "";
 
-    /* Published cards get a date line and a read cue. Upcoming cards
-       get a "Coming soon" label in place of both. */
+    /* The single quotable finding. This is the reason to click, so it
+       sits directly above the rule with its own label. */
+    var key = report.keyStat
+      ? '<div class="r-key">' +
+          '<span class="r-key-label">Key finding</span>' +
+          '<span class="r-key-text">' + esc(report.keyStat) + '</span>' +
+        '</div>'
+      : "";
+
+    /* Only the title carries the link. Its ::after covers the card. */
+    var title = upcoming
+      ? '<h3 class="r-title">' + esc(report.title) + '</h3>'
+      : '<h3 class="r-title"><a class="r-link" href="' + esc(report.url) + '">' +
+          esc(report.title) + '</a></h3>';
+
+    /* PDF button, only when that report has a pdf path set, and never
+       on an upcoming report. Sits above the card overlay. */
+    var pdf = (!upcoming && report.pdf)
+      ? '<a class="r-pdf" href="' + esc(report.pdf) + '" download>' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+          'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/>' +
+          '<path d="M4 19h16"/></svg>PDF</a>'
+      : "";
+
+    /* Published cards get a "cited by" line, a date, an optional PDF
+       and a read cue. Upcoming cards get a pill and a notify link. */
     var foot;
     if(upcoming){
-      foot = '<div class="r-foot"><span class="r-soon">Coming soon</span></div>';
+      /* The link only appears once a real destination is set. While
+         SITE.upcomingNotifyUrl is still the placeholder, the card
+         shows the pill alone rather than a link that goes nowhere. */
+      var notifyUrl = SITE.upcomingNotifyUrl;
+      var hasNotify = notifyUrl && notifyUrl !== "UPCOMING_NOTIFY_URL";
+      foot = '<div class="r-foot r-foot--soon">' +
+        '<span class="r-soon"><span>Coming soon' +
+          (report.expected ? " / " + esc(report.expected) : "") +
+        '</span></span>' +
+        (hasNotify
+          ? '<a class="r-notify" href="' + esc(notifyUrl) + '">' +
+              'Get notified <i aria-hidden="true">&rarr;</i></a>'
+          : "") +
+      '</div>';
     } else {
       var dateLine = dateLabel(report);
       foot = '<div class="r-foot">' +
-        (dateLine ? '<div class="r-meta">' + esc(dateLine) + '</div>' : "") +
-        '<span class="r-cue">Read research <i aria-hidden="true">&rarr;</i></span>' +
+        citedByMarkup(report) +
+        '<div class="r-footrow">' +
+          (dateLine ? '<div class="r-meta">' + esc(dateLine) + '</div>' : '<span></span>') +
+          '<div class="r-actions">' +
+            pdf +
+            '<span class="r-cue">Read research <i aria-hidden="true">&rarr;</i></span>' +
+          '</div>' +
+        '</div>' +
       '</div>';
     }
-
-    var inner = '' +
-      '<div class="r-thumb">' + tileMarkup(report) + image + '</div>' +
-      '<div class="r-body">' +
-        tag +
-        '<h3 class="r-title">' + esc(report.title) + '</h3>' +
-        '<p class="r-desc">' + esc(report.description) + '</p>' +
-        foot +
-      '</div>';
 
     var classes = "r-card" +
       (isFeatured ? " r-card--featured" : "") +
       (upcoming ? " r-card--upcoming" : "");
 
-    /* A div, not a link. Inert to clicks and to the keyboard. */
-    if(upcoming){
-      return '<div class="' + classes + '" aria-disabled="true"' +
-        ' data-report-id="' + esc(report.id) + '">' + inner + '</div>';
-    }
-    return '<a class="' + classes + '" href="' + esc(report.url) + '"' +
-      ' data-report-id="' + esc(report.id) + '">' + inner + '</a>';
+    return '<div class="' + classes + '"' +
+      (upcoming ? ' aria-disabled="true"' : "") +
+      ' data-report-id="' + esc(report.id) + '">' +
+        '<div class="r-thumb">' + tileMarkup(report) + image + '</div>' +
+        '<div class="r-body">' +
+          tag +
+          title +
+          '<p class="r-desc">' + esc(report.description) + '</p>' +
+          key +
+          foot +
+        '</div>' +
+      '</div>';
   }
 
   /* ---- Stats strip ----
@@ -1583,11 +2277,26 @@ var REPORTS = [
     }).join("");
   }
 
-  /* Hero subtitle reads its figure from the same SITE.databaseSize,
-     so the sentence and the stat can never disagree. */
+  /* The hero subtitle and the methodology paragraph both read their
+     figure from SITE.databaseSize, so neither can contradict the
+     stats strip. */
   function renderDbSize(){
     var node = document.getElementById("rxDbSize");
     if(node && SITE.databaseSize){ node.textContent = SITE.databaseSize; }
+
+    /* Any element with data-db-prose gets the same figure spelled
+       out, so a new prose block only needs that attribute. */
+    if(SITE.databaseSize && document.querySelectorAll){
+      var spelled = String(SITE.databaseSize)
+        .replace(/\+$/, "")
+        .replace(/M$/, " million")
+        .replace(/K$/, " thousand")
+        .replace(/B$/, " billion");
+      Array.prototype.forEach.call(
+        document.querySelectorAll("[data-db-prose]"),
+        function(el){ el.textContent = spelled; }
+      );
+    }
   }
 
   /* ---- Structured data ----
@@ -1596,15 +2305,13 @@ var REPORTS = [
      NOTE: if the CMS already emits its own schema for this route,
      delete this function call rather than shipping two graphs. */
   function renderSchema(reports){
-    var origin = "https://www.millionpodcasts.com";
-    function absolute(url){
-      return /^https?:\/\//i.test(url) ? url : origin + url;
-    }
+    var origin = ORIGIN;
+    var absolute = absoluteUrl;
     var graph = {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "name": "MillionPodcasts Research",
-      "description": "Original data and analysis on the global podcast industry, powered by a database of 2.7M shows.",
+      "description": "Original research and data on the podcast industry from MillionPodcasts.",
       "url": origin + "/research",
       "publisher": { "@type": "Organization", "name": "MillionPodcasts", "url": origin },
       "mainEntity": {
@@ -1629,10 +2336,118 @@ var REPORTS = [
         })
       }
     };
-    var node = document.createElement("script");
-    node.type = "application/ld+json";
-    node.textContent = JSON.stringify(graph);
-    document.head.appendChild(node);
+
+    /* Hierarchy for search engines. No visual breadcrumb, the centred
+       hero reads better without one. */
+    var crumbs = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",     "item": origin },
+        { "@type": "ListItem", "position": 2, "name": "Research", "item": origin + "/research" }
+      ]
+    };
+    [graph, crumbs].forEach(function(payload){
+      var node = document.createElement("script");
+      node.type = "application/ld+json";
+      node.textContent = JSON.stringify(payload);
+      document.head.appendChild(node);
+    });
+  }
+
+  /* ---- Research cited by ---- */
+  function renderCoverage(){
+    var section = document.getElementById("rxCoverageSection");
+    var host = document.getElementById("rxCoverage");
+    if(!section || !host){ return; }
+    var all = (typeof COVERAGE !== "undefined" && COVERAGE) ? COVERAGE : [];
+    var seen = {}, list = [];
+    for(var i = 0; i < all.length; i++){
+      if(!seen[all[i].name]){ seen[all[i].name] = true; list.push(all[i]); }
+    }
+    list = list.slice(0, SITE.coverageStripLimit || list.length);
+    if(!list.length){ return; }        /* strip stays hidden when empty */
+    host.innerHTML = list.map(function(outlet){
+      return '<a href="' + esc(outlet.url) + '" target="_blank" rel="noopener">' +
+        esc(outlet.name) + '</a>';
+    }).join("");
+    section.hidden = false;
+  }
+
+  /* ---- Cite this research ----
+     One ready-to-paste line per published report, built from the same
+     titles and URLs the cards use, so it can never fall out of step. */
+  /* Year comes from the report's own publication date, so a 2027
+     report cites as 2027 without anyone editing anything. */
+  function reportYear(report){
+    var iso = String(report.published || report.updated || "");
+    var year = parseInt(iso.split("-")[0], 10);
+    return year || new Date().getFullYear();
+  }
+
+  /* Format: <full title>. MillionPodcasts, <year>. <url> */
+  function citationText(report){
+    return (report.fullTitle || report.title) + ". MillionPodcasts, " +
+      reportYear(report) + ". " + absoluteUrl(report.url);
+  }
+
+  function renderCitations(published){
+    var host = document.getElementById("rxCiteList");
+    var section = document.getElementById("rxCite");
+    if(!host){ return; }
+    if(!published.length){
+      if(section){ section.hidden = true; }
+      return;
+    }
+    host.innerHTML = published.map(function(report){
+      var text = citationText(report);
+      return '' +
+        '<div class="rx-cite-row">' +
+          '<span class="rx-cite-text">' +
+            '<b>' + esc(report.fullTitle || report.title) + '</b>' +
+            '<span>MillionPodcasts, ' + reportYear(report) + '</span>' +
+          '</span>' +
+          '<button type="button" class="rx-cite-copy" data-cite="' + esc(text) + '">Copy</button>' +
+        '</div>';
+    }).join("");
+
+    host.addEventListener("click", function(event){
+      var btn = event.target && event.target.closest
+        ? event.target.closest(".rx-cite-copy") : null;
+      if(!btn){ return; }
+      copyText(btn.getAttribute("data-cite"), btn);
+    });
+  }
+
+  /* Clipboard API needs a secure context, so fall back to a hidden
+     textarea when it is unavailable. */
+  function copyText(text, btn){
+    function done(){
+      var original = btn.textContent;
+      btn.textContent = "Copied";
+      btn.classList.add("is-done");
+      window.setTimeout(function(){
+        btn.textContent = original;
+        btn.classList.remove("is-done");
+      }, 1800);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ legacyCopy(text, done); });
+    } else {
+      legacyCopy(text, done);
+    }
+  }
+
+  function legacyCopy(text, done){
+    var field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+    try { document.execCommand("copy"); done(); } catch(err){ /* nothing to do */ }
+    document.body.removeChild(field);
   }
 
   /* ---- Journalist CTA ---- */
@@ -1640,6 +2455,9 @@ var REPORTS = [
     var cta = document.getElementById("rxPressCta");
     if(!cta){ return; }
     cta.setAttribute("href", SITE.pressContactUrl);
+    if(SITE.upcomingNotifyUrl === "UPCOMING_NOTIFY_URL" && window.console && console.warn){
+      console.warn("MillionPodcasts research index: SITE.upcomingNotifyUrl is still the placeholder UPCOMING_NOTIFY_URL.");
+    }
     if(SITE.pressContactUrl === "PRESS_CONTACT_URL"){
       /* Deliberate: no destination is invented. Set SITE.pressContactUrl. */
       if(window.console && console.warn){
@@ -1648,73 +2466,197 @@ var REPORTS = [
     }
   }
 
+  /* ============================================================
+     LIBRARY TOOLBAR
+     Search, tag filter and sort over the published reports. The
+     whole toolbar stays hidden until the library has at least
+     SITE.toolbarMinReports reports, see the config note.
+     ============================================================ */
+  var LIB = { all: [], published: [], upcoming: [], featuredId: null,
+              query: "", tag: "All", sort: "newest" };
+
+  function matches(report){
+    if(LIB.tag !== "All" && report.tag !== LIB.tag){ return false; }
+    if(!LIB.query){ return true; }
+    var haystack = [report.title, report.fullTitle, report.description,
+                    report.keyStat, report.tag].join(" ").toLowerCase();
+    return haystack.indexOf(LIB.query) !== -1;
+  }
+
+  function applySort(list){
+    var out = list.slice();
+    if(LIB.sort === "az"){
+      out.sort(function(a, b){ return String(a.title).localeCompare(String(b.title)); });
+    } else if(LIB.sort === "oldest"){
+      out.sort(function(a, b){
+        return String(effectiveDate(a)).localeCompare(String(effectiveDate(b)));
+      });
+    } else {
+      out = sortReports(out);
+    }
+    return out;
+  }
+
+  function isFiltering(){
+    return LIB.query !== "" || LIB.tag !== "All" || LIB.sort !== "newest";
+  }
+
+  /* Redraws the grid. While a filter or search is active the featured
+     card is folded back into the grid, otherwise a filtered result
+     could hide the one report the visitor was looking for. */
+  function paintGrid(){
+    var grid = document.getElementById("rxGrid");
+    var none = document.getElementById("rxNoResults");
+    var featuredSection = document.getElementById("rxFeaturedSection");
+    if(!grid){ return; }
+
+    var filtering = isFiltering();
+    var pool = (filtering || SITE.showFeaturedInGrid)
+      ? LIB.published.slice()
+      : LIB.published.filter(function(r){ return r.id !== LIB.featuredId; });
+
+    var results = applySort(pool.filter(matches));
+
+    /* Upcoming reports trail the published ones, and only when the
+       library is not being filtered down. */
+    var upcomingHere = (!SITE.groupUpcoming && !filtering) ? LIB.upcoming : [];
+
+    if(featuredSection && LIB.featuredId){
+      featuredSection.hidden = filtering;
+    }
+
+    var cards = results.concat(upcomingHere);
+    grid.innerHTML = cards.map(function(r){ return cardMarkup(r, false); }).join("");
+    if(none){ none.hidden = cards.length > 0; }
+
+    var count = document.getElementById("rxCount");
+    if(count){
+      if(filtering){
+        count.textContent = results.length +
+          (results.length === 1 ? " report" : " reports");
+      } else {
+        var label = LIB.published.length +
+          (LIB.published.length === 1 ? " report" : " reports");
+        if(upcomingHere.length){
+          label = LIB.published.length + " published, " + upcomingHere.length + " coming";
+        }
+        count.textContent = label;
+      }
+    }
+  }
+
+  function buildToolbar(){
+    var toolbar = document.getElementById("rxToolbar");
+    if(!toolbar){ return; }
+    if(LIB.published.length < (SITE.toolbarMinReports || 0)){ return; }
+
+    /* Chips come from the tags actually in use, never the full
+       vocabulary. Offering a filter that returns nothing is worse
+       than not offering it. */
+    var used = [], seen = {};
+    LIB.published.concat(LIB.upcoming).forEach(function(r){
+      if(r.tag && !seen[r.tag]){ seen[r.tag] = true; used.push(r.tag); }
+    });
+
+    var chips = document.getElementById("rxChips");
+    if(chips){
+      chips.innerHTML = ["All"].concat(used).map(function(tag){
+        return '<button type="button" class="rx-chip' + (tag === "All" ? " is-on" : "") +
+          '" data-tag="' + esc(tag) + '" aria-pressed="' + (tag === "All") + '">' +
+          esc(tag) + '</button>';
+      }).join("");
+      chips.addEventListener("click", function(event){
+        var btn = event.target && event.target.closest ? event.target.closest(".rx-chip") : null;
+        if(!btn){ return; }
+        LIB.tag = btn.getAttribute("data-tag");
+        Array.prototype.forEach.call(chips.querySelectorAll(".rx-chip"), function(c){
+          var on = c === btn;
+          c.classList.toggle("is-on", on);
+          c.setAttribute("aria-pressed", String(on));
+        });
+        paintGrid();
+      });
+    }
+
+    var search = document.getElementById("rxSearch");
+    if(search){
+      search.addEventListener("input", function(){
+        LIB.query = String(search.value || "").trim().toLowerCase();
+        paintGrid();
+      });
+    }
+
+    var sort = document.getElementById("rxSort");
+    if(sort){
+      sort.addEventListener("change", function(){
+        LIB.sort = sort.value;
+        paintGrid();
+      });
+    }
+
+    var clear = document.getElementById("rxClear");
+    if(clear){
+      clear.addEventListener("click", function(){
+        LIB.query = ""; LIB.tag = "All"; LIB.sort = "newest";
+        if(search){ search.value = ""; }
+        if(sort){ sort.value = "newest"; }
+        if(chips){
+          Array.prototype.forEach.call(chips.querySelectorAll(".rx-chip"), function(c){
+            var on = c.getAttribute("data-tag") === "All";
+            c.classList.toggle("is-on", on);
+            c.setAttribute("aria-pressed", String(on));
+          });
+        }
+        paintGrid();
+      });
+    }
+
+    toolbar.hidden = false;
+  }
+
   /* ---- Boot ----
      Published and upcoming are split here. Published research always
      leads; upcoming trails, either at the end of the grid or in its
      own section, per SITE.groupUpcoming. */
   function render(){
     var all = sortReports(REPORTS || []);
-    var published = all.filter(function(r){ return !isUpcoming(r); });
-    var upcoming  = all.filter(isUpcoming);
+    LIB.all = all;
+    LIB.published = all.filter(function(r){ return !isUpcoming(r); });
+    LIB.upcoming  = all.filter(isUpcoming);
 
     /* {{count}} and the section count reflect PUBLISHED research
        only. Unreleased work never inflates that number. */
     renderDbSize();
-    renderStats(published.length);
+    renderStats(LIB.published.length);
 
     /* Featured is drawn from published only, so an upcoming report
        can never take the featured slot. */
-    var featured = published.filter(function(r){ return r.featured === true; });
-    var gridItems = SITE.showFeaturedInGrid
-      ? published.slice()
-      : published.filter(function(r){ return r.featured !== true; });
-
+    var featured = LIB.published.filter(function(r){ return r.featured === true; });
     var featuredSection = document.getElementById("rxFeaturedSection");
     var featuredHost = document.getElementById("rxFeatured");
     if(featured.length && featuredSection && featuredHost){
-      /* Only the first featured report gets the large card. Any others
-         fall back to ordinary cards in the grid below. */
+      LIB.featuredId = featured[0].id;
       featuredHost.innerHTML = cardMarkup(featured[0], true);
       featuredSection.hidden = false;
-      if(featured.length > 1 && !SITE.showFeaturedInGrid){
-        gridItems = sortReports(featured.slice(1).concat(gridItems));
-      }
     }
 
-    /* Upcoming cards either trail the grid or move to their own band. */
-    var upcomingInGrid = !SITE.groupUpcoming && upcoming.length > 0;
-    if(upcomingInGrid){ gridItems = gridItems.concat(upcoming); }
-
-    var grid = document.getElementById("rxGrid");
-    if(grid){
-      grid.innerHTML = gridItems.length
-        ? gridItems.map(function(r){ return cardMarkup(r, false); }).join("")
-        : '<div class="rx-empty">No research reports are published yet.</div>';
-    }
+    buildToolbar();
+    paintGrid();
 
     var upSection = document.getElementById("rxUpcomingSection");
     var upGrid = document.getElementById("rxUpcomingGrid");
-    if(SITE.groupUpcoming && upcoming.length && upSection && upGrid){
-      upGrid.innerHTML = upcoming.map(function(r){ return cardMarkup(r, false); }).join("");
+    if(SITE.groupUpcoming && LIB.upcoming.length && upSection && upGrid){
+      upGrid.innerHTML = LIB.upcoming.map(function(r){ return cardMarkup(r, false); }).join("");
       upSection.hidden = false;
     }
 
-    /* Small mono count beside the All Research heading, derived from
-       the config so it can never go stale. */
-    var count = document.getElementById("rxCount");
-    if(count){
-      var label = published.length + (published.length === 1 ? " report" : " reports");
-      if(upcomingInGrid){
-        label = published.length + " published, " + upcoming.length + " coming";
-      }
-      count.textContent = label;
-    }
-
+    renderCoverage();
+    renderCitations(LIB.published);
     renderPressCta();
 
     /* Structured data lists published research only. An upcoming
        report has no URL and nothing to cite yet. */
-    renderSchema(published);
+    renderSchema(LIB.published);
   }
 
   if(document.readyState === "loading"){
