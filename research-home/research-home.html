@@ -189,7 +189,8 @@
      ------------------------------------------------------------
      PDFs
        The folder is SITE.pdfBasePath, set once for the whole page.
-       Each report carries only its filename:
+       It is "" by default, meaning the PDFs sit in the same folder
+       as this HTML file. Each report carries only its filename:
          pdf: "uk.pdf"
        To add one: upload the file to that folder, then set the pdf
        field on that report. To remove it: delete the field. No
@@ -295,10 +296,25 @@ var SITE = {
 
   /* ---- Where the PDFs live -----------------------------------
      Reports below carry just the FILENAME. This is the folder they
-     are served from, set it once. CONFIRM this path is right.
-     A report may still override it completely by giving a pdf value
+     are served from, set once for the whole page.
+
+     "" means "the same folder as this page", which is the setup on
+     GitHub Pages where the PDFs sit beside the HTML file.
+
+     WATCH OUT when this moves to millionpodcasts.com:
+       - A path starting with "/" is relative to the DOMAIN root. On a
+         GitHub Pages project site the page lives under
+         /<repo>/, so "/research/pdfs/x.pdf" resolves to
+         millionpodcasts.github.io/research/pdfs/x.pdf and 404s.
+       - A relative path like "" or "pdfs/" depends on the trailing
+         slash of the page URL. At /research/ it resolves inside
+         /research/; at /research (no slash) it resolves at the root.
+       Once the real serving path is known, set it explicitly here,
+       e.g. "/research/pdfs/", and it applies to every report.
+
+     A report may still override this completely by giving a pdf value
      that starts with "/" or "http". ------------------------------ */
-  pdfBasePath: "/research/pdfs/",
+  pdfBasePath: "",
 
   /* How many outlets the "Research cited by" strip shows. The
      COVERAGE array below holds every outlet, the strip shows the
@@ -433,9 +449,9 @@ var COVERAGE = [
                Leave "" to draw the branded fallback tile instead.
    pdf         Optional. Just the FILENAME, e.g. "uk.pdf". It is
                resolved against SITE.pdfBasePath. Renders a "PDF"
-               download button on the card. Omit it and no button
-               appears, so a report with no PDF yet simply has none.
-               Never renders on an upcoming report.
+               button on the card that opens the file in a new tab.
+               Omit it and no button appears, so a report with no PDF
+               yet simply has none. Never on an upcoming report.
    published   ISO date "YYYY-MM-DD". Shows as "Published June 2026".
    updated     Optional ISO date. When set and different from
                published, the card shows "Updated August 2026"
@@ -1264,13 +1280,16 @@ var REPORTS = [
 .r-link::after{
   content: ""; position: absolute; inset: 0; z-index: 3;
 }
+/* NOT raised above the card overlay. Only the PDF link inside it is.
+   If this wrapper is given a z-index, the "Read research" cue lands on
+   top of the overlay and that corner of the card stops being clickable. */
 .r-actions{
-  position: relative; z-index: 4;
   display: inline-flex; align-items: center; gap: 14px;
   flex-wrap: wrap;
 }
 /* PDF is the secondary action: the full interactive report leads. */
 .r-pdf{
+  position: relative; z-index: 4;
   display: inline-flex; align-items: center; gap: 6px;
   font-family: 'Inter', sans-serif;
   font-size: 12.5px; font-weight: 600;
@@ -2211,13 +2230,22 @@ var REPORTS = [
           esc(report.title) + '</a></h3>';
 
     /* PDF button, only when that report has a pdf path set, and never
-       on an upcoming report. Sits above the card overlay. */
+       on an upcoming report. Sits above the card overlay.
+       Opens in a new tab rather than downloading: no "download"
+       attribute (it would override target and force a save), an
+       external-link icon so the button looks like what it does, and
+       an aria-label naming the report, since a screen reader running
+       through the page would otherwise hear "PDF" three times with
+       nothing to tell them apart. */
     var pdf = (!upcoming && report.pdf)
-      ? '<a class="r-pdf" href="' + esc(pdfUrl(report.pdf)) + '" download>' +
+      ? '<a class="r-pdf" href="' + esc(pdfUrl(report.pdf)) + '"' +
+          ' target="_blank" rel="noopener"' +
+          ' aria-label="' + esc(report.title) + ' PDF, opens in a new tab">' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-          '<path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/>' +
-          '<path d="M4 19h16"/></svg>PDF</a>'
+          '<path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/>' +
+          '<path d="M18 13.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5.5"/>' +
+          '</svg>PDF</a>'
       : "";
 
     /* Published cards get a "cited by" line, a date, an optional PDF
