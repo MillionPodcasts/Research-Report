@@ -188,10 +188,13 @@
 
      ------------------------------------------------------------
      PDFs
-       Path convention: /research/pdfs/<file>.pdf
-       To add one: upload the file, then set the pdf field on that
-       report, e.g. pdf: "/research/pdfs/uk.pdf".
-       To remove it: delete the field. No button, no broken link.
+       The folder is SITE.pdfBasePath, set once for the whole page.
+       Each report carries only its filename:
+         pdf: "uk.pdf"
+       To add one: upload the file to that folder, then set the pdf
+       field on that report. To remove it: delete the field. No
+       button, no broken link.
+       If the files move, change SITE.pdfBasePath, not every report.
        PDF buttons only ever appear on published reports.
 
      ------------------------------------------------------------
@@ -289,6 +292,13 @@ var SITE = {
      Set to 0 to force it on now and see how it behaves.
      Everything is built and tested, it is only waiting on volume. */
   toolbarMinReports: 6,
+
+  /* ---- Where the PDFs live -----------------------------------
+     Reports below carry just the FILENAME. This is the folder they
+     are served from, set it once. CONFIRM this path is right.
+     A report may still override it completely by giving a pdf value
+     that starts with "/" or "http". ------------------------------ */
+  pdfBasePath: "/research/pdfs/",
 
   /* How many outlets the "Research cited by" strip shows. The
      COVERAGE array below holds every outlet, the strip shows the
@@ -421,10 +431,11 @@ var COVERAGE = [
    url         Full link to the report's own page.
    thumbnail   "/images/research/<id>.jpg" at 1200x675 (16:9).
                Leave "" to draw the branded fallback tile instead.
-   pdf         Optional. Path to the report's PDF. Renders a
-               "PDF" download button on the card. Omit it and no
-               button appears, so a report with no PDF yet simply
-               has none. Never renders on an upcoming report.
+   pdf         Optional. Just the FILENAME, e.g. "uk.pdf". It is
+               resolved against SITE.pdfBasePath. Renders a "PDF"
+               download button on the card. Omit it and no button
+               appears, so a report with no PDF yet simply has none.
+               Never renders on an upcoming report.
    published   ISO date "YYYY-MM-DD". Shows as "Published June 2026".
    updated     Optional ISO date. When set and different from
                published, the card shows "Updated August 2026"
@@ -455,7 +466,7 @@ var REPORTS = [
     description: "An analysis of 6,693 active UK podcasts covering market concentration, publishers, monetisation, and the video shift.",
     url: "https://www.millionpodcasts.com/research/the-uk-podcast-landscape-2026",
     thumbnail: "",                 // PLACEHOLDER -> /images/research/the-uk-podcast-landscape-2026.jpg
-    pdf: "/research/pdfs/uk.pdf",  // PLACEHOLDER path, confirm where the file is served from
+    pdf: "uk.pdf",
     published: "2026-06-01",       // CONFIRM. Trade coverage dates first pickup to June 2026.
     updated: "2026-08-01",         // Page revised in August to the 6,693 base. Card reads "Updated".
     // keyStat: "",                // ADD ONE. A single quotable finding, checked
@@ -472,7 +483,7 @@ var REPORTS = [
     // TEMPORARY, hotlinked from sportico.com. Not ours to use and not
     // on our servers. Replace with /images/research/<id>.jpg before launch.
     thumbnail: "https://www.sportico.com/wp-content/uploads/2025/10/Steph_Curry_NBA_Revenue.png?w=1280&h=720&crop=1",
-    pdf: "/research/pdfs/nba.pdf", // PLACEHOLDER path, confirm where the file is served from
+    pdf: "nba.pdf",
     published: "2026-06-11",       // Matches the published date printed on the report page itself.
     // keyStat: "",                // ADD ONE. A single quotable finding, checked
                                    // against the report. See the Video entry.
@@ -488,7 +499,7 @@ var REPORTS = [
     // TEMPORARY, a Google Images cache URL. These expire without notice.
     // Replace with /images/research/<id>.jpg before launch.
     thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjrcUDaHQn-fsp58tioh976jKNs__Pb9QwdjrCtBETSY0ZAyVFeymCgi5U&s=10",
-    pdf: "/research/pdfs/video.pdf", // PLACEHOLDER path, confirm where the file is served from
+    pdf: "video.pdf",
     published: "2026-05-12",       // CONFIRM. Trade coverage dates first pickup to May 2026.
     // *** CONFIRM AGAINST THE REPORT BEFORE LAUNCH ***
     // Taken from Podcast News Daily's headline on this research, which
@@ -2062,6 +2073,16 @@ var REPORTS = [
     return /^https?:\/\//i.test(url) ? url : ORIGIN + url;
   }
 
+  /* A pdf value is just a filename, resolved against SITE.pdfBasePath.
+     A value that already starts with "/" or "http" is left alone, so a
+     single report can point somewhere else entirely. */
+  function pdfUrl(value){
+    if(!value){ return ""; }
+    var v = String(value);
+    if(/^https?:\/\//i.test(v) || v.charAt(0) === "/"){ return v; }
+    return (SITE.pdfBasePath || "") + v;
+  }
+
   function tagTheme(tag){
     return (tag && TAGS[tag]) ? TAGS[tag] : DEFAULT_TAG_THEME;
   }
@@ -2192,7 +2213,7 @@ var REPORTS = [
     /* PDF button, only when that report has a pdf path set, and never
        on an upcoming report. Sits above the card overlay. */
     var pdf = (!upcoming && report.pdf)
-      ? '<a class="r-pdf" href="' + esc(report.pdf) + '" download>' +
+      ? '<a class="r-pdf" href="' + esc(pdfUrl(report.pdf)) + '" download>' +
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
           'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
           '<path d="M12 3v12"/><polyline points="7 11 12 16 17 11"/>' +
